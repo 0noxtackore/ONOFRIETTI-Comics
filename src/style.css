@@ -1,0 +1,182 @@
+/* ============================================================
+   ONOFRIETTI COMICS — Estilos globales
+   Dirección de arte: monocromático estricto (negro / blanco),
+   tipografía industrial "Archivo" (expandida para títulos).
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    @apply bg-black font-sans text-white antialiased;
+  }
+
+  /* Las imágenes no se pueden arrastrar ni seleccionar */
+  img {
+    -webkit-user-drag: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  ::selection {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  /* Barra de desplazamiento monocromática */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #050505;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border: 2px solid #050505;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a;
+  }
+}
+
+@layer components {
+  /* Tipografía display: Archivo expandida (eje de ancho) */
+  .font-display {
+    font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    font-stretch: 125%;
+  }
+
+  /* Texto solo contorneado (estilo cartel de cómic) */
+  .text-outline {
+    -webkit-text-stroke: 1.5px #ffffff;
+    color: transparent;
+  }
+
+  /* Entrada animada de los bloques del hero */
+  .rise-in {
+    opacity: 0;
+    animation: rise-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Zoom lento del fondo del hero */
+  .animate-slow-zoom {
+    animation: slow-zoom 22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Grano sutil de película sobre toda la página */
+  .noise-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Cinta en movimiento (marquee) */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee var(--marquee-duration, 40s) linear infinite;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  /* Revelado por scroll — activado por la directiva v-reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Subrayado animado para enlaces */
+  .link-line {
+    position: relative;
+  }
+  .link-line::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-line:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(36px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slow-zoom {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1.18);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Accesibilidad: respeta la preferencia de reducir animaciones */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .rise-in,
+  .animate-slow-zoom,
+  .marquee-track {
+    animation: none;
+  }
+  .rise-in {
+    opacity: 1;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
