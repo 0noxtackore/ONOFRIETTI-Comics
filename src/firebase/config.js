@@ -7,20 +7,19 @@
 //   4. En la consola crea la colección "comics"
 //   5. Activa Authentication (Email/Contraseña) y crea tu usuario admin.
 //      Reglas: Firestore/Storage -> read público, write solo con sesión.
-//   6. Gestiona el catálogo desde el panel oculto: https://sitio/#/admin
+//   6. Gestiona el catálogo desde el panel oculto: https://sitio/admin
 //
 // Esquema recomendado para cada documento de la colección "comics":
 //   {
 //     title: "Reyes de la Noche",
 //     subtitle: "Turno de noche",
-//     issue: "Nº 05",
-//     index: "05",
-//     year: "2026",
-//     pages: "40",
-//     status: "Próximamente",        // Disponible | Edición limitada | Agotado | Próximamente
-//     poster: "",                     // URL directa de portada (opcional)
+//     issue: 5,                   // Número del cómic (número; se muestra "#5")
+//     year: 2026,                 // Año (número)
+//     pages: 40,                  // Páginas (número)
+//     status: "Próximamente",     // Disponible | Edición limitada | Agotado | Próximamente
+//     poster: "",                 // URL directa de portada (opcional)
 //     storagePath: "covers/xxx.webp", // Portada subida a Storage (opcional)
-//     featured: false                 // Cómic destacado del hero
+//     featured: false             // Cómic destacado del hero
 //   }
 
 const firebaseConfig = {

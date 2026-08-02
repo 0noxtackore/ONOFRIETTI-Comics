@@ -1,0 +1,6 @@
+# Netlify config: SPA fallback para que las rutas limpias funcionen
+# al recargar /comic/... y /admin
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

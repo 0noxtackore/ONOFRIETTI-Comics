@@ -1,8 +1,7 @@
 <script setup>
-// Rutas por hash:
-//   #/admin       → panel de administración oculto
-//   #/comic/<id>  → ficha de detalle del cómic (código de producto + enlace)
-// El resto de la URL muestra el sitio normal.
+// Rutas en modo history (URLs limpias):
+//   /admin           → panel de administración oculto
+//   /comics/<slug>   → ficha de detalle del cómic (slug del título)
 import { ref, onMounted, onUnmounted } from 'vue'
 import SiteHeader from './components/layout/SiteHeader.vue'
 import SiteMenu from './components/layout/SiteMenu.vue'
@@ -11,19 +10,34 @@ import HeroSection from './components/sections/HeroSection.vue'
 import LatestComicsSection from './components/sections/LatestComicsSection.vue'
 import AdminPanel from './components/admin/AdminPanel.vue'
 import ComicDetail from './components/comic/ComicDetail.vue'
+import { navigate } from './utils/router'
 
 const isAdmin = ref(false)
-const comicId = ref(null)
+const comicSlug = ref(null)
 
-function parseHash() {
-  const hash = window.location.hash
-  isAdmin.value = hash.startsWith('#/admin')
-  const m = hash.match(/^#\/comic\/(.+)$/)
-  comicId.value = m ? decodeURIComponent(m[1]) : null
+function parseRoute() {
+  const path = window.location.pathname
+  isAdmin.value = path.startsWith('/admin')
+  const m = path.match(/^\/comics\/(.+)$/)
+  comicSlug.value = m ? decodeURIComponent(m[1]) : null
 }
 
 function closeDetail() {
-  window.location.hash = ''
+  navigate('/')
+}
+
+// Intercepta los enlaces internos (empezando por "/") para navegar sin
+// recargar la página. Los anclas de sección ("#comics", etc.) siguen
+// funcionando como scroll normal.
+function onDocumentClick(e) {
+  const anchor = e.target.closest('a')
+  if (!anchor) return
+  const href = anchor.getAttribute('href')
+  if (!href || !href.startsWith('/')) return
+  const url = new URL(href, window.location.origin)
+  if (url.origin !== window.location.origin) return
+  e.preventDefault()
+  navigate(url.pathname + url.search)
 }
 
 // Protege las imágenes: evita que se puedan arrastrar (se aplica a las que
@@ -36,21 +50,23 @@ function protectImages() {
 
 let imageObserver = null
 onMounted(() => {
-  parseHash()
-  window.addEventListener('hashchange', parseHash)
+  parseRoute()
+  window.addEventListener('popstate', parseRoute)
+  document.addEventListener('click', onDocumentClick)
 
   protectImages()
   imageObserver = new MutationObserver(protectImages)
   imageObserver.observe(document.body, { childList: true, subtree: true })
 })
 onUnmounted(() => {
-  window.removeEventListener('hashchange', parseHash)
+  window.removeEventListener('popstate', parseRoute)
+  document.removeEventListener('click', onDocumentClick)
   if (imageObserver) imageObserver.disconnect()
 })
 </script>
 
 <template>
-  <!-- Panel de administración (solo en #/admin) -->
+  <!-- Panel de administración (solo en /admin) -->
   <AdminPanel v-if="isAdmin" />
 
   <div v-else class="min-h-screen overflow-x-clip bg-black text-white antialiased selection:bg-white selection:text-black">
@@ -70,6 +86,6 @@ onUnmounted(() => {
     <SiteFooter />
   </div>
 
-  <!-- Ficha de detalle del cómic (solo en #/comic/<id>) -->
-  <ComicDetail v-if="!isAdmin && comicId" :comic-id="comicId" @close="closeDetail" />
+  <!-- Ficha de detalle del cómic (solo en /comics/<slug>) -->
+  <ComicDetail v-if="!isAdmin && comicSlug" :slug="comicSlug" @close="closeDetail" />
 </template>

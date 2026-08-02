@@ -17,11 +17,11 @@ const navLinks = [
     class="fixed inset-x-0 top-0 z-50 transition-all duration-500"
     :class="isScrolled ? 'border-b border-white/10 bg-ink-950/90 backdrop-blur-md' : 'bg-transparent'"
   >
-    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:h-20 md:px-8">
+    <div class="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:h-20 md:px-8">
       <AppLogo size="sm" class="mx-auto md:mx-0" />
 
-      <!-- Navegación de escritorio -->
-      <nav class="hidden items-center gap-10 md:flex" aria-label="Principal">
+      <!-- Navegación de escritorio, centrada -->
+      <nav class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 md:flex" aria-label="Principal">
         <a
           v-for="link in navLinks"
           :key="link.href"

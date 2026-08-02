@@ -1,4 +1,4 @@
-// Servicios de escritura para el panel de administración (#/admin).
+// Servicios de escritura para el panel de administración (/admin).
 // Crear, actualizar, eliminar cómics. Las portadas se convierten a un
 // enlace de imagen (data URL) y se guardan en el propio documento de
 // Firestore, así no hace falta Firebase Storage ni plan de pago.
@@ -12,7 +12,7 @@ export async function listComics() {
   const fb = await getFirebase()
   if (!fb) return []
   const { collection, getDocs, query, orderBy } = await import('firebase/firestore')
-  const snap = await getDocs(query(collection(fb.db, 'comics'), orderBy('index')))
+  const snap = await getDocs(query(collection(fb.db, 'comics'), orderBy('issue')))
   return snap.docs.map(mapDoc)
 }
 

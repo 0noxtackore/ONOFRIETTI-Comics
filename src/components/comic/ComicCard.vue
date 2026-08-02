@@ -3,6 +3,7 @@
 // El botón cambia según el estado: los disponibles llevan texto de venta.
 import { computed } from 'vue'
 import ComicCover from './ComicCover.vue'
+import { formatIssue } from '../../utils/format'
 
 const props = defineProps({
   comic: { type: Object, required: true },
@@ -28,11 +29,11 @@ const buyLabel = computed(() => {
 
 <template>
   <article v-reveal="{ delay: (index % 3) * 90 }" class="group flex flex-col">
-    <a
-      :href="`#/comic/${comic.id}`"
-      :aria-label="`Ver ficha de ${comic.title}`"
-      class="relative block overflow-hidden border border-white/10 transition-colors duration-500 group-hover:border-white"
-    >
+<a
+        :href="`/comics/${comic.slug}`"
+        :aria-label="`Ver ficha de ${comic.title}`"
+        class="relative block overflow-hidden border border-white/10 transition-colors duration-500 group-hover:border-white"
+      >
       <div class="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
         <ComicCover :comic="comic" :poster="comic.poster" />
       </div>
@@ -40,7 +41,7 @@ const buyLabel = computed(() => {
 
     <div class="pt-5 text-center">
       <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/50">
-        {{ comic.issue }} — {{ comic.year }}
+        {{ formatIssue(comic.issue) }} — {{ comic.year }}
       </p>
       <h3 class="font-display mt-1 text-lg font-black uppercase leading-tight tracking-tight text-white sm:text-xl">
         {{ comic.title }}

@@ -3,9 +3,12 @@
 import MonoPoster from '../ui/MonoPoster.vue'
 import Marquee from '../ui/Marquee.vue'
 import { comics } from '../../data/comics'
+import { formatIssue } from '../../utils/format'
 
 const featured = comics.find((c) => c.featured)
-const meta = ['Nº ' + featured.issue.slice(-2), featured.year, `${featured.pages} páginas`, 'Tinta y café']
+const meta = featured
+  ? [formatIssue(featured.issue), featured.year, `${featured.pages} páginas`, 'Tinta y café']
+  : []
 
 const tickerItems = [
   'Nuevos números cada mes',

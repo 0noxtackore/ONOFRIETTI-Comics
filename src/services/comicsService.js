@@ -6,20 +6,22 @@
 // campo "poster" de cada documento; no se usa Firebase Storage.
 import { getFirebase } from '../firebase/init'
 import { comics as seedComics } from '../data/comics'
+import { slugify } from '../utils/format'
 
 let cached = null
 
 // Normaliza un documento de Firestore a un cómic.
 export function mapDoc(doc) {
   const d = doc.data()
+  const num = (v) => (v === '' || v == null ? '' : Number(v))
   return {
     id: doc.id,
+    slug: d.slug || slugify(d.title),
     title: d.title || '',
     subtitle: d.subtitle || '',
-    issue: d.issue || '',
-    index: d.index || '',
-    year: d.year || '',
-    pages: d.pages || '',
+    issue: num(d.issue),
+    year: num(d.year),
+    pages: num(d.pages),
     status: d.status || 'Disponible',
     author: d.author || 'Angello Aponte',
     description: d.description || '',
@@ -38,7 +40,7 @@ export async function fetchComics() {
 
   try {
     const { collection, getDocs, query, orderBy } = await import('firebase/firestore')
-    const q = query(collection(fb.db, 'comics'), orderBy('index'))
+    const q = query(collection(fb.db, 'comics'), orderBy('issue'))
     const snap = await getDocs(q)
     const list = snap.docs.map(mapDoc)
 
@@ -53,7 +55,23 @@ export async function fetchComics() {
   }
 }
 
-// Devuelve un cómic concreto por su ID (desde Firestore o el catálogo local).
+// Devuelve un cómic por su slug (URL limpia /comics/<slug>).
+export async function fetchComicBySlug(slug) {
+  const fb = await getFirebase()
+  if (fb) {
+    try {
+      const { collection, getDocs, query, where, limit } = await import('firebase/firestore')
+      const q = query(collection(fb.db, 'comics'), where('slug', '==', slug), limit(1))
+      const snap = await getDocs(q)
+      if (!snap.empty) return mapDoc(snap.docs[0])
+    } catch (err) {
+      console.error('No se pudo leer el cómic por slug', slug, err)
+    }
+  }
+  return seedComics.find((c) => c.slug === slug) || null
+}
+
+// Devuelve un cómic concreto por su ID (para compatibilidad / admin).
 export async function fetchComicById(id) {
   const fb = await getFirebase()
   if (fb) {

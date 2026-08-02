@@ -1,9 +1,10 @@
 <script setup>
-// Ficha de detalle del cómic (se abre en #/comic/<id>).
+// Ficha de detalle del cómic (se abre en /comic/<id>).
 // Muestra la portada grande, descripción, metadatos, el código de producto
 // y un botón para copiar el enlace directo de la ficha.
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { fetchComicById, fetchComics } from '../../services/comicsService'
+import { formatIssue } from '../../utils/format'
 
 const props = defineProps({
   comicId: { type: String, required: true },
@@ -33,12 +34,18 @@ async function load() {
   loading.value = false
 }
 
+function buy() {
+  if (!isAvailable.value) return
+  added.value = true
+  emit('close')
+}
+
 function onKey(e) {
   if (e.key === 'Escape') emit('close')
 }
 
 function productUrl() {
-  return window.location.origin + window.location.pathname + '#/comic/' + props.comicId
+  return window.location.origin + window.location.pathname.replace(/\/comic\/.*$/, '') + '/comic/' + props.comicId
 }
 
 function shareText() {
@@ -128,7 +135,7 @@ watch(() => props.comicId, load)
           <!-- Información -->
           <div class="flex flex-col p-6 md:p-10">
             <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">
-              {{ comic.issue }} — {{ comic.year }}
+              {{ formatIssue(comic.issue) }} — {{ comic.year }}
             </p>
             <h2 class="font-display mt-2 text-3xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-4xl">
               {{ comic.title }}
@@ -139,11 +146,11 @@ watch(() => props.comicId, load)
             <dl class="mt-8 grid grid-cols-3 gap-px border border-white/15 bg-white/15">
               <div class="bg-black p-3 md:p-4">
                 <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Páginas</dt>
-                <dd class="font-display mt-1 text-lg font-black text-white">{{ comic.pages }}</dd>
+                <dd class="font-display mt-1 text-lg font-black text-white">{{ comic.pages || '—' }}</dd>
               </div>
               <div class="bg-black p-3 md:p-4">
                 <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Año</dt>
-                <dd class="font-display mt-1 text-lg font-black text-white">{{ comic.year }}</dd>
+                <dd class="font-display mt-1 text-lg font-black text-white">{{ comic.year || '—' }}</dd>
               </div>
               <div class="bg-black p-3 md:p-4">
                 <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Autor</dt>
@@ -221,7 +228,7 @@ watch(() => props.comicId, load)
             <a
               :href="isAvailable ? '#comics' : undefined"
               :aria-disabled="!isAvailable"
-              @click="isAvailable && (added = true)"
+              @click="buy"
               class="mt-8 flex w-full items-center justify-center gap-3 px-6 py-4 text-xs font-bold uppercase tracking-[0.25em] transition-colors duration-300 sm:inline-flex sm:w-auto"
               :class="
                 isAvailable
@@ -245,7 +252,7 @@ watch(() => props.comicId, load)
           <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">Más de la categoría</p>
           <h3 class="font-display mt-1 text-2xl font-black uppercase tracking-tight text-white">{{ comic.title }}</h3>
           <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
-            <a v-for="r in related" :key="r.id" :href="`#/comic/${r.id}`" class="group block">
+            <a v-for="r in related" :key="r.id" :href="`/comic/${r.id}`" class="group block">
               <div class="overflow-hidden border border-white/10 transition-colors duration-300 group-hover:border-white">
                 <img
                   :src="r.poster || '/images/no-image.webp'"
@@ -253,7 +260,7 @@ watch(() => props.comicId, load)
                   class="aspect-[1920/2951] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
               </div>
-              <p class="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">{{ r.issue }} — {{ r.year }}</p>
+              <p class="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">{{ formatIssue(r.issue) }} — {{ r.year }}</p>
               <h4 class="font-display mt-1 text-sm font-black uppercase tracking-tight text-white">{{ r.title }}</h4>
             </a>
           </div>
