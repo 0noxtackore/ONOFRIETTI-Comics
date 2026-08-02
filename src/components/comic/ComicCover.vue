@@ -13,7 +13,7 @@ defineProps({
   <div class="relative aspect-[1920/2951] overflow-hidden bg-ink-900">
     <img
       :src="poster || '/images/no-image.webp'"
-      :alt="`Portada de ${comic.title}`"
+      :alt="`Cover of ${comic.title}`"
       class="absolute inset-0 h-full w-full object-cover"
     />
   </div>

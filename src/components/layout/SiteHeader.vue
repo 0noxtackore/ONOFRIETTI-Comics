@@ -8,7 +8,7 @@ const { isScrolled } = useScrollState(32)
 const { isOpen, toggle } = useMenu()
 
 const navLinks = [
-  { label: 'Cómics', href: '#comics' },
+  { label: 'Comics', href: '#comics' },
 ]
 </script>
 
@@ -21,7 +21,7 @@ const navLinks = [
       <AppLogo size="sm" class="mx-auto md:mx-0" />
 
       <!-- Navegación de escritorio, centrada -->
-      <nav class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 md:flex" aria-label="Principal">
+      <nav class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 md:flex" aria-label="Main">
         <a
           v-for="link in navLinks"
           :key="link.href"
@@ -37,7 +37,7 @@ const navLinks = [
         :aria-expanded="isOpen ? 'true' : 'false'"
         :aria-controls="isOpen ? 'site-menu' : undefined"
         aria-haspopup="dialog"
-        :aria-label="isOpen ? 'Cerrar menú' : 'Abrir menú'"
+        :aria-label="isOpen ? 'Close menu' : 'Open menu'"
         @click="toggle"
         class="absolute right-5 inline-flex h-11 w-11 flex-col items-center justify-center gap-1.5 border border-white/20 transition-colors hover:border-white md:hidden"
       >

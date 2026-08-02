@@ -5,8 +5,8 @@ import { useMenu } from '../../composables/useMenu'
 const { isOpen, close } = useMenu()
 
 const links = [
-  { label: 'Inicio', href: '#inicio', index: '01' },
-  { label: 'Cómics', href: '#comics', index: '02' },
+  { label: 'Home', href: '#inicio', index: '01' },
+  { label: 'Comics', href: '#comics', index: '02' },
 ]
 
 const socials = ['Instagram', 'X', 'YouTube', 'TikTok']
@@ -20,10 +20,10 @@ const socials = ['Instagram', 'X', 'YouTube', 'TikTok']
       class="fixed inset-0 z-40 flex flex-col bg-ink-950"
       role="dialog"
       aria-modal="true"
-      aria-label="Menú de navegación"
+      aria-label="Navigation menu"
     >
       <div class="flex flex-1 flex-col justify-between px-5 pb-8 pt-28 md:px-8 md:pt-36">
-        <nav aria-label="Menú">
+        <nav aria-label="Menu">
           <ul class="flex flex-col">
             <li v-for="(link, i) in links" :key="link.href">
               <a
@@ -52,7 +52,7 @@ const socials = ['Instagram', 'X', 'YouTube', 'TikTok']
         </nav>
 
         <div class="flex flex-col gap-4 border-t border-white/10 pt-6 md:flex-row md:items-center md:justify-between">
-          <p class="text-xs uppercase tracking-[0.25em] text-white/50">Fundado en 1998 · A tinta y café</p>
+          <p class="text-xs uppercase tracking-[0.25em] text-white/50">Founded in 1998 · Ink and coffee</p>
           <div class="flex gap-6">
             <a
               v-for="s in socials"

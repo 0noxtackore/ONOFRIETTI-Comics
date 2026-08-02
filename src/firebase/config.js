@@ -12,11 +12,10 @@
 // Esquema recomendado para cada documento de la colección "comics":
 //   {
 //     title: "Reyes de la Noche",
-//     subtitle: "Turno de noche",
-//     issue: 5,                   // Número del cómic (número; se muestra "#5")
+//     issue: 5,                   // Número del cómic (número; se muestra "Issue #5")
 //     year: 2026,                 // Año (número)
 //     pages: 40,                  // Páginas (número)
-//     status: "Próximamente",     // Disponible | Edición limitada | Agotado | Próximamente
+//     status: "Coming Soon",        // Available | Limited Edition | Sold Out | Coming Soon
 //     poster: "",                 // URL directa de portada (opcional)
 //     storagePath: "covers/xxx.webp", // Portada subida a Storage (opcional)
 //     featured: false             // Cómic destacado del hero

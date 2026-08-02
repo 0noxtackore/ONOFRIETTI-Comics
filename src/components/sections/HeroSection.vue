@@ -7,16 +7,16 @@ import { formatIssue } from '../../utils/format'
 
 const featured = comics.find((c) => c.featured)
 const meta = featured
-  ? [formatIssue(featured.issue), featured.year, `${featured.pages} páginas`, 'Tinta y café']
+  ? [formatIssue(featured.issue), featured.year, `${featured.pages} pages`, 'Ink and coffee']
   : []
 
 const tickerItems = [
-  'Nuevos números cada mes',
-  '100% dibujado a mano',
-  'El Origen ya disponible',
-  'Sin superhéroes. Solo historias',
-  'Fundado en 1998',
-  'Hecho a tinta',
+  'New issues every month',
+  '100% hand-drawn',
+  'The Origin available now',
+  'No superheroes. Just stories',
+  'Founded in 1998',
+  'Made in ink',
 ]
 </script>
 
@@ -39,7 +39,7 @@ const tickerItems = [
       <div class="max-w-3xl">
         <p class="rise-in mb-6 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.4em] text-white/70" style="animation-delay: 100ms">
           <span class="inline-block h-px w-12 bg-white"></span>
-          Onofrietti Comics presenta
+          Onofrietti Comics presents
         </p>
 
         <h1 class="font-display text-[15vw] font-black uppercase leading-[0.85] tracking-tight text-white sm:text-8xl lg:text-[7rem]">
@@ -48,8 +48,8 @@ const tickerItems = [
         </h1>
 
         <p class="rise-in mt-8 max-w-xl text-base leading-relaxed text-white/70 md:text-lg" style="animation-delay: 420ms">
-          Donde todo empezó. Una historia de tinta, garabatos y el fondo de un cuaderno
-          de tercer grado.
+          Where it all began. A story of ink, doodles, and the bottom of a
+          third-grade notebook.
         </p>
 
         <ul class="rise-in mt-8 flex flex-wrap gap-x-2 gap-y-3 text-xs font-semibold uppercase tracking-[0.25em] text-white/60" style="animation-delay: 520ms">
@@ -64,14 +64,14 @@ const tickerItems = [
             href="#comics"
             class="group inline-flex items-center gap-3 bg-white px-8 py-4 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors hover:bg-white/80"
           >
-            Ver cómics
+            See comics
             <span class="transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden="true">→</span>
           </a>
           <a
             href="#comics"
             class="inline-flex items-center gap-3 border border-white/30 px-8 py-4 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors hover:border-white hover:bg-white hover:text-black"
           >
-            El catálogo
+            The catalog
           </a>
         </div>
       </div>

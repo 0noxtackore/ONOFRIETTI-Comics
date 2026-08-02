@@ -3,11 +3,10 @@
 // Muestra la portada grande, descripción, metadatos, el código de producto
 // y un botón para copiar el enlace directo de la ficha.
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { fetchComicById, fetchComics } from '../../services/comicsService'
-import { formatIssue } from '../../utils/format'
+import { fetchComicBySlug, fetchComics } from '../../services/comicsService'
 
 const props = defineProps({
-  comicId: { type: String, required: true },
+  slug: { type: String, required: true },
 })
 const emit = defineEmits(['close'])
 
@@ -17,19 +16,21 @@ const copied = ref(false)
 const added = ref(false)
 const related = ref([])
 
-const isAvailable = computed(() => ['Disponible', 'Edición limitada'].includes(comic.value?.status))
+const isAvailable = computed(() => ['Available', 'Limited Edition'].includes(comic.value?.status))
 
 async function load() {
   loading.value = true
   added.value = false
-  comic.value = await fetchComicById(props.comicId)
+  comic.value = await fetchComicBySlug(props.slug)
   related.value = []
   if (comic.value) {
-    // Cómics de la misma categoría (la categoría = título del cómic).
+    // Cómics de la misma serie (mismo protagonista): siguientes 4 capítulos.
     const list = await fetchComics()
-    related.value = list.filter(
-      (c) => c.title === comic.value.title && c.id !== comic.value.id
-    )
+    related.value = list
+      .filter((c) => c.protagonist === comic.value.protagonist && c.id !== comic.value.id)
+      .sort((a, b) => a.issue - b.issue)
+      .filter((c) => c.issue > comic.value.issue)
+      .slice(0, 4)
   }
   loading.value = false
 }
@@ -45,7 +46,7 @@ function onKey(e) {
 }
 
 function productUrl() {
-  return window.location.origin + window.location.pathname.replace(/\/comic\/.*$/, '') + '/comic/' + props.comicId
+  return window.location.origin + window.location.pathname.replace(/\/comics\/.*$/, '') + '/comics/' + props.slug
 }
 
 function shareText() {
@@ -82,7 +83,7 @@ onUnmounted(() => {
   document.body.style.overflow = ''
 })
 
-watch(() => props.comicId, load)
+watch(() => props.slug, load)
 </script>
 
 <template>
@@ -103,20 +104,20 @@ watch(() => props.comicId, load)
 
       <!-- No encontrado -->
       <div v-else-if="!comic" class="w-full max-w-md border border-white/15 p-10 text-center">
-        <p class="text-sm uppercase tracking-[0.25em] text-white/50">Cómic no encontrado</p>
+        <p class="text-sm uppercase tracking-[0.25em] text-white/50">Comic not found</p>
         <button
           @click="emit('close')"
           class="mt-6 bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-white/80"
         >
-          Volver
+          Back
         </button>
       </div>
 
-      <!-- Ficha del cómic -->
+      <!-- Comic sheet -->
       <div v-else class="relative w-full border border-white/15 bg-black">
         <button
           @click="emit('close')"
-          aria-label="Cerrar ficha"
+          aria-label="Close sheet"
           class="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center border border-white/20 text-white transition-colors duration-300 hover:border-white"
         >
           ×
@@ -127,40 +128,40 @@ watch(() => props.comicId, load)
           <div class="relative overflow-hidden border-b border-white/15 md:border-b-0 md:border-r">
             <img
               :src="comic.poster || '/images/no-image.webp'"
-              :alt="`Portada de ${comic.title}`"
+              :alt="`Cover of ${comic.title}`"
               class="aspect-[1920/2951] w-full object-cover"
             />
           </div>
 
           <!-- Información -->
           <div class="flex flex-col p-6 md:p-10">
-            <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">
-              {{ formatIssue(comic.issue) }} — {{ comic.year }}
-            </p>
-            <h2 class="font-display mt-2 text-3xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-4xl">
-              {{ comic.title }}
-            </h2>
-            <p class="mt-2 text-base font-semibold uppercase tracking-[0.2em] text-white/60">{{ comic.subtitle }}</p>
+            <div class="flex flex-col items-center text-center">
+              <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">
+                {{ comic.year }}
+              </p>
+              <h2 class="font-display mt-2 text-3xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-4xl">
+                {{ comic.title }}
+              </h2>
+              <p class="mt-2 text-base font-semibold uppercase tracking-[0.2em] text-white/60">Issue {{ comic.issue }}</p>
+            </div>
 
             <!-- Metadatos -->
-            <dl class="mt-8 grid grid-cols-3 gap-px border border-white/15 bg-white/15">
-              <div class="bg-black p-3 md:p-4">
-                <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Páginas</dt>
-                <dd class="font-display mt-1 text-lg font-black text-white">{{ comic.pages || '—' }}</dd>
-              </div>
-              <div class="bg-black p-3 md:p-4">
-                <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Año</dt>
-                <dd class="font-display mt-1 text-lg font-black text-white">{{ comic.year || '—' }}</dd>
-              </div>
-              <div class="bg-black p-3 md:p-4">
-                <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Autor</dt>
-                <dd class="font-display mt-1 min-w-0 break-words text-lg font-black text-white">{{ comic.author }}</dd>
-              </div>
-            </dl>
+            <div class="mt-8 flex justify-center">
+              <dl class="grid grid-cols-2 gap-px border border-white/15 bg-white/15 text-center">
+                <div class="bg-black p-3 md:p-4">
+                  <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Pages</dt>
+                  <dd class="font-display mt-1 text-lg font-black text-white">{{ comic.pages || '—' }}</dd>
+                </div>
+                <div class="bg-black p-3 md:p-4">
+                  <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Author</dt>
+                  <dd class="font-display mt-1 min-w-0 break-words text-lg font-black text-white">{{ comic.author }}</dd>
+                </div>
+              </dl>
+            </div>
 
             <!-- Compartir -->
             <div class="mt-6 border border-white/15 p-4">
-              <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Compartir</p>
+              <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Share</p>
               <div class="mt-3 flex flex-wrap gap-2">
                 <a
                   :href="shareUrl('whatsapp')"
@@ -219,7 +220,7 @@ watch(() => props.comicId, load)
                     <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
                     <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
                   </svg>
-                  {{ copied ? 'Copiado' : 'Copiar enlace' }}
+                  {{ copied ? 'Copied' : 'Copy link' }}
                 </button>
               </div>
             </div>
@@ -242,26 +243,27 @@ watch(() => props.comicId, load)
               <svg v-else viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">
                 <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
               </svg>
-              {{ isAvailable ? 'Comprar' : comic.status }}
+              {{ isAvailable ? 'Buy' : comic.status }}
             </a>
           </div>
         </div>
 
-        <!-- Cómics de la misma categoría (la categoría es el título) -->
+        <!-- Cómics de la misma serie -->
         <div v-if="related.length" class="border-t border-white/15 px-6 py-8 md:px-10">
-          <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">Más de la categoría</p>
+          <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">More from this series</p>
           <h3 class="font-display mt-1 text-2xl font-black uppercase tracking-tight text-white">{{ comic.title }}</h3>
           <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
-            <a v-for="r in related" :key="r.id" :href="`/comic/${r.id}`" class="group block">
+            <a v-for="r in related" :key="r.id" :href="`/comics/${r.slug}`" class="group block">
               <div class="overflow-hidden border border-white/10 transition-colors duration-300 group-hover:border-white">
                 <img
                   :src="r.poster || '/images/no-image.webp'"
-                  :alt="`Portada de ${r.title}`"
+                  :alt="`Cover of ${r.title}`"
                   class="aspect-[1920/2951] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
               </div>
-              <p class="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">{{ formatIssue(r.issue) }} — {{ r.year }}</p>
+              <p class="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">{{ r.year }}</p>
               <h4 class="font-display mt-1 text-sm font-black uppercase tracking-tight text-white">{{ r.title }}</h4>
+              <p class="mt-0.5 text-xs text-white/50">Issue {{ r.issue }}</p>
             </a>
           </div>
         </div>

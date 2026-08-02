@@ -15,3 +15,11 @@ export function slugify(text) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 }
+
+// Deriva el nombre del protagonista desde el título del cómic.
+// Ej. "THE FORMIDABLE TUTEQUE-MAN" → "TUTEQUE-MAN".
+export function protagonistFromTitle(title) {
+  return String(title || '')
+    .replace(/^THE\s+/i, '')
+    .trim()
+}

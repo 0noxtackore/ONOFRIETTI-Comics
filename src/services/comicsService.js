@@ -6,7 +6,7 @@
 // campo "poster" de cada documento; no se usa Firebase Storage.
 import { getFirebase } from '../firebase/init'
 import { comics as seedComics } from '../data/comics'
-import { slugify } from '../utils/format'
+import { slugify, protagonistFromTitle } from '../utils/format'
 
 let cached = null
 
@@ -18,11 +18,11 @@ export function mapDoc(doc) {
     id: doc.id,
     slug: d.slug || slugify(d.title),
     title: d.title || '',
-    subtitle: d.subtitle || '',
+    protagonist: d.protagonist || protagonistFromTitle(d.title),
     issue: num(d.issue),
     year: num(d.year),
     pages: num(d.pages),
-    status: d.status || 'Disponible',
+    status: d.status || 'Available',
     author: d.author || 'Angello Aponte',
     description: d.description || '',
     poster: d.poster || '',
