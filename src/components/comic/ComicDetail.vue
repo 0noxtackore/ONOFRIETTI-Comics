@@ -4,6 +4,7 @@
 // y un botón para copiar el enlace directo de la ficha.
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { fetchComicBySlug, fetchComics } from '../../services/comicsService'
+import { onAdminAuth } from '../../firebase/auth'
 
 const props = defineProps({
   slug: { type: String, required: true },
@@ -15,6 +16,7 @@ const loading = ref(true)
 const copied = ref(false)
 const added = ref(false)
 const related = ref([])
+const isAdmin = ref(false)
 
 const isAvailable = computed(() => ['Available', 'Limited Edition'].includes(comic.value?.status))
 
@@ -25,8 +27,12 @@ async function load() {
   related.value = []
   if (comic.value) {
     // Cómics de la misma serie (mismo protagonista): siguientes 4 capítulos.
+    // Los visitantes solo ven los disponibles de la serie.
     const list = await fetchComics()
-    related.value = list
+    const base = isAdmin.value
+      ? list
+      : list.filter((c) => ['Available', 'Limited Edition'].includes(c.status))
+    related.value = base
       .filter((c) => c.protagonist === comic.value.protagonist && c.id !== comic.value.id)
       .sort((a, b) => a.issue - b.issue)
       .filter((c) => c.issue > comic.value.issue)
@@ -73,14 +79,20 @@ async function copyLink() {
   }
 }
 
-onMounted(() => {
+let unsubscribeAuth = null
+onMounted(async () => {
   window.addEventListener('keydown', onKey)
   document.body.style.overflow = 'hidden'
+  unsubscribeAuth = await onAdminAuth((u) => {
+    isAdmin.value = Boolean(u)
+    if (comic.value) load()
+  })
   load()
 })
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
   document.body.style.overflow = ''
+  if (unsubscribeAuth) unsubscribeAuth()
 })
 
 watch(() => props.slug, load)

@@ -326,7 +326,7 @@ watch(search, (v) => {
             type="email"
             required
             autocomplete="username"
-            placeholder="admin@onofrietti.com"
+            placeholder="you@example.com"
             class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
           />
         </label>
@@ -338,7 +338,7 @@ watch(search, (v) => {
             type="password"
             required
             autocomplete="current-password"
-            placeholder="••••••••"
+            placeholder="Enter your password"
             class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
           />
         </label>
