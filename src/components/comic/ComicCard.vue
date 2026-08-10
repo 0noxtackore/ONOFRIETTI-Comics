@@ -9,6 +9,14 @@ const props = defineProps({
   index: { type: Number, default: 0 },
 })
 
+// Esquineras de visor de cámara en la portada.
+const corners = [
+  'left-0 top-0 border-l-2 border-t-2',
+  'right-0 top-0 border-r-2 border-t-2',
+  'bottom-0 left-0 border-b-2 border-l-2',
+  'bottom-0 right-0 border-b-2 border-r-2',
+]
+
 // Buyable statuses
 const isAvailable = computed(() => ['Available', 'Limited Edition'].includes(props.comic.status))
 
@@ -40,17 +48,26 @@ const titleFontSize = computed(() => {
     <a
       :href="`/comics/${comic.slug}`"
       :aria-label="`View ${comic.title} details`"
-      class="group/cover relative block overflow-hidden border border-white/10 transition-colors duration-500 group-hover:border-white/60"
+      class="group/cover relative block overflow-hidden border-2 border-white/10 transition-colors duration-500"
     >
       <div class="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
         <ComicCover :comic="comic" :poster="comic.poster" />
       </div>
 
-      <!-- Overlay suave al hover de la imagen -->
+      <!-- Líneas diagonales blancas al hover de la imagen -->
       <span
-        class="pointer-events-none absolute inset-0 bg-white opacity-0 transition-opacity duration-300 group-hover/cover:opacity-[0.08]"
+        class="diagonal-stripes pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/cover:opacity-100"
         aria-hidden="true"
       ></span>
+
+      <!-- Esquineras de visor de cámara (solo al hover) -->
+      <template v-for="corner in corners" :key="corner">
+        <span
+          class="pointer-events-none absolute z-10 h-6 w-6 border-white opacity-0 transition-opacity duration-300 group-hover/cover:opacity-100"
+          :class="corner"
+          aria-hidden="true"
+        ></span>
+      </template>
     </a>
 
     <div class="flex flex-1 flex-col justify-center pt-5 text-center">
@@ -63,7 +80,7 @@ const titleFontSize = computed(() => {
           {{ comic.title }}
         </h3>
       </div>
-      <p class="mt-1 text-sm text-white/50">Issue {{ comic.issue }}</p>
+      <p class="mb-6 mt-1 text-sm text-white/50">Issue {{ comic.issue }}</p>
     </div>
 
     <!-- Botón de compra. TODO: apuntar al futuro checkout / tienda. -->
