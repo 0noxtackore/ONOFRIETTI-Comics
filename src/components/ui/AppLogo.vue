@@ -11,7 +11,7 @@ defineProps({
     <img
       src="/images/logo-menubar.png"
       alt="Onofrietti Comics"
-      class="h-auto w-auto object-contain transition-opacity duration-300 group-hover:opacity-80"
+      class="object-contain transition-opacity duration-300 group-hover:opacity-80"
       :class="size === 'lg' ? 'h-20' : size === 'sm' ? 'h-20' : 'h-14'"
     />
   </a>
