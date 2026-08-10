@@ -28,6 +28,7 @@ export default {
       },
       fontFamily: {
         sans: ['Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        anton: ['Anton', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },

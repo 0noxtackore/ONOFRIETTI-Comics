@@ -40,31 +40,17 @@ const titleFontSize = computed(() => {
     <a
       :href="`/comics/${comic.slug}`"
       :aria-label="`View ${comic.title} details`"
-      class="relative block overflow-hidden border border-white/10 transition-colors duration-500 group-hover:border-da-400"
+      class="group/cover relative block overflow-hidden border border-white/10 transition-colors duration-500 group-hover:border-da-400"
     >
       <div class="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
         <ComicCover :comic="comic" :poster="comic.poster" />
       </div>
 
-      <!-- Overlay estilo DeviantArt: título al hover -->
-      <div class="pointer-events-none absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/90 via-black/20 to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <div class="flex justify-end">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            class="h-5 w-5 text-white transition-all duration-300 group-hover:scale-110 group-hover:text-da-400"
-            aria-hidden="true"
-          >
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </div>
-        <div>
-          <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/60">{{ comic.year }}</p>
-          <h4 class="font-display mt-1 line-clamp-2 text-lg font-black uppercase leading-tight text-white">{{ comic.title }}</h4>
-        </div>
-      </div>
+      <!-- Overlay suave al hover de la imagen -->
+      <span
+        class="pointer-events-none absolute inset-0 bg-white opacity-0 transition-opacity duration-300 group-hover/cover:opacity-[0.08]"
+        aria-hidden="true"
+      ></span>
     </a>
 
     <div class="flex flex-1 flex-col justify-center pt-5 text-center">
@@ -87,7 +73,7 @@ const titleFontSize = computed(() => {
       class="mt-auto inline-flex w-full items-center justify-center gap-2 px-3 py-3 text-[11px] font-bold uppercase tracking-[0.15em] transition-all duration-300 sm:gap-3 sm:px-6 sm:py-3.5 sm:text-xs sm:tracking-[0.25em]"
       :class="
         isAvailable
-          ? 'bg-white text-black hover:bg-da-400'
+          ? 'bg-white text-black hover:bg-da-400 group-hover:bg-da-400'
           : 'pointer-events-none cursor-not-allowed border border-white/15 text-white/40'
       "
     >
