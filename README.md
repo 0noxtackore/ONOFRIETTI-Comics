@@ -1,94 +1,94 @@
 <p align="center">
-  <img src="/images/logo-solid.png" alt="Onofrietti Comics" width="100%" />
+  <img src="public/images/logo-solid.png" alt="Onofrietti Comics" width="100%" />
 </p>
 
 # Onofrietti Comics
 
-Sitio web de Onofrietti Comics — historias dibujadas a tinta desde 1998. Una tienda digital de cómics independientes con catálogo, detalle de cada ejemplar y panel de administración para gestionar el contenido.
+Official website of Onofrietti Comics — a young independent comics studio founded in 2026. A digital comics store with a catalog, a detail page for each issue and an admin panel to manage content.
 
-## Características
+## Features
 
-- **Catálogo de cómics** con búsqueda y filtrado por protagonista.
-- **Ficha de detalle** con portada, año, autor, páginas y enlaces para compartir.
-- **Panel de administración** protegido por autenticación de Firebase para dar de alta y gestionar cómics.
-- **Diseño monocromático** (negro / grises / blanco) con tipografía industrial *Archivo*, grano de película y micro-interacciones en hover.
-- **Imágenes lazy-loaded** para un renderizado más fluido.
+- **Comics catalog** with search and filtering by protagonist.
+- **Detail sheet** with cover, year, author, pages and share links.
+- **Admin panel** protected by Firebase authentication to create and manage comics.
+- **Monochrome design** (black / grays / white) with industrial *Archivo* typography, film grain and micro-interactions on hover.
+- **Lazy-loaded images** for smoother rendering.
 
-## Tecnologías
+## Tech Stack
 
-| Área       | Tecnología                              |
+| Area       | Technology                              |
 | ---------- | --------------------------------------- |
 | Framework  | Vue 3 (Composition API, `<script setup>`) |
 | Build      | Vite                                    |
-| Estilos    | Tailwind CSS                            |
+| Styling    | Tailwind CSS                            |
 | Backend    | Firebase (Firestore + Storage + Auth)   |
 | Testing    | Vitest                                  |
-| Despliegue | Netlify                                 |
+| Deploy     | Netlify                                 |
 
-## Requisitos
+## Requirements
 
-- Node.js 18 o superior.
+- Node.js 18 or later.
 - npm.
-- Un proyecto de Firebase con Firestore, Storage y Authentication habilitados.
+- A Firebase project with Firestore, Storage and Authentication enabled.
 
-## Configuración
+## Setup
 
-1. Cloná el repositorio:
+1. Clone the repository:
    ```bash
    git clone https://github.com/0noxtackore/ONOFRIETTI-Comics.git
    cd ONOFRIETTI-Comics
    ```
 
-2. Instalá las dependencias:
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-3. Creá un archivo `.env` en la raíz con las credenciales públicas de tu proyecto Firebase:
+3. Create a `.env` file in the project root with your public Firebase credentials:
    ```env
-   VITE_FIREBASE_API_KEY=tu_api_key
-   VITE_FIREBASE_AUTH_DOMAIN=tu-proyecto.firebaseapp.com
-   VITE_FIREBASE_PROJECT_ID=tu-proyecto
-   VITE_FIREBASE_STORAGE_BUCKET=tu-proyecto.appspot.com
-   VITE_FIREBASE_MESSAGING_SENDER_ID=tu_sender_id
-   VITE_FIREBASE_APP_ID=tu_app_id
+   VITE_FIREBASE_API_KEY=your_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your-project
+   VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   VITE_FIREBASE_APP_ID=your_app_id
    ```
-   Estas variables son solo configuración pública del cliente; nunca incluyas credenciales privadas de administración.
+   These are only public client-side config values; never include private admin credentials.
 
 ## Scripts
 
-| Comando             | Descripción                              |
-| ------------------- | ---------------------------------------- |
-| `npm run dev`       | Servidor de desarrollo con recarga en caliente |
-| `npm run build`     | Compilación de producción                |
-| `npm run preview`   | Vista previa de la compilación           |
-| `npm run test`      | Ejecuta la suite de tests (Vitest)       |
+| Command              | Description                              |
+| -------------------- | ---------------------------------------- |
+| `npm run dev`        | Development server with hot reload       |
+| `npm run build`      | Production build                         |
+| `npm run preview`    | Preview the production build             |
+| `npm run test`       | Run the test suite (Vitest)              |
 
-## Rutas
+## Routes
 
-El sitio usa rutas por hash y renderizado del lado del cliente (SPA).
+The site uses hash-based routes and client-side rendering (SPA).
 
-| Ruta          | Descripción                                             |
-| ------------- | ------------------------------------------------------- |
-| `/`           | Página principal: hero + catálogo de cómics.            |
-| `/#/comics/<slug>` | Ficha de detalle de un cómic.                       |
-| `/#/admin`    | Panel de administración (requiere sesión de Firebase).  |
+| Route          | Description                                        |
+| -------------- | -------------------------------------------------- |
+| `/`            | Home page: hero + comics catalog.                  |
+| `/#/comics/<slug>` | Detail sheet for a comic.                      |
+| `/#/admin`     | Admin panel (requires Firebase session).           |
 
-## Estructura del proyecto
+## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── admin/        # Panel de administración
-│   ├── comic/        # Card, portada y detalle del cómic
-│   ├── layout/       # Header, footer y menú móvil
-│   ├── sections/     # Hero y catálogo de cómics
-│   └── ui/           # Logo y componentes de interfaz
-├── composables/      # Estado compartido (catálogo, menú, scroll)
-├── services/         # Integración con Firebase
-└── App.vue           # Enrutador por hash y estructura raíz
+│   ├── admin/        # Admin panel
+│   ├── comic/        # Comic card, cover and detail
+│   ├── layout/       # Header, footer and mobile menu
+│   ├── sections/     # Hero and comics catalog
+│   └── ui/           # Logo and UI components
+├── composables/      # Shared state (catalog, menu, scroll)
+├── services/         # Firebase integration
+└── App.vue           # Hash router and root structure
 ```
 
-## Licencia
+## License
 
 [MIT](LICENSE) © 2026 0noxtackore
