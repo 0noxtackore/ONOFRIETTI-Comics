@@ -40,7 +40,7 @@ const titleFontSize = computed(() => {
     <a
       :href="`/comics/${comic.slug}`"
       :aria-label="`View ${comic.title} details`"
-      class="group/cover relative block overflow-hidden border border-white/10 transition-colors duration-500 group-hover:border-da-400"
+      class="group/cover relative block overflow-hidden border border-white/10 transition-colors duration-500 group-hover:border-white/60"
     >
       <div class="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
         <ComicCover :comic="comic" :poster="comic.poster" />
@@ -73,7 +73,7 @@ const titleFontSize = computed(() => {
       class="mt-auto inline-flex w-full items-center justify-center gap-2 px-3 py-3 text-[11px] font-bold uppercase tracking-[0.15em] transition-all duration-300 sm:gap-3 sm:px-6 sm:py-3.5 sm:text-xs sm:tracking-[0.25em]"
       :class="
         isAvailable
-          ? 'bg-white text-black hover:bg-da-400 group-hover:bg-da-400'
+          ? 'bg-white text-black hover:bg-ink-200 group-hover:bg-ink-200'
           : 'pointer-events-none cursor-not-allowed border border-white/15 text-white/40'
       "
     >

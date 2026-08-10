@@ -119,7 +119,7 @@ watch(() => props.slug, load)
         <p class="text-sm uppercase tracking-[0.25em] text-ink-300">Comic not found</p>
         <button
           @click="emit('close')"
-          class="mt-6 bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-da-400"
+          class="mt-6 bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-ink-200"
         >
           Back
         </button>
@@ -130,7 +130,7 @@ watch(() => props.slug, load)
         <button
           @click="emit('close')"
           aria-label="Close sheet"
-          class="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center border border-ink-600 text-ink-200 transition-colors duration-300 hover:border-da-400 hover:text-da-400"
+          class="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center border border-ink-600 text-ink-200 transition-colors duration-300 hover:border-white hover:text-white"
         >
           ×
         </button>
@@ -179,7 +179,7 @@ watch(() => props.slug, load)
                   :href="shareUrl('whatsapp')"
                   target="_blank"
                   rel="noopener"
-                  class="inline-flex items-center gap-2 border border-ink-600 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-200 transition-colors duration-300 hover:border-da-400 hover:text-da-400"
+                  class="inline-flex items-center gap-2 border border-ink-600 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-200 transition-colors duration-300 hover:border-white hover:text-white"
                 >
                   <svg viewBox="0 0 448 512" width="14" height="14" fill="currentColor" aria-hidden="true">
                     <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
@@ -190,7 +190,7 @@ watch(() => props.slug, load)
                   :href="shareUrl('x')"
                   target="_blank"
                   rel="noopener"
-                  class="inline-flex items-center gap-2 border border-ink-600 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-200 transition-colors duration-300 hover:border-da-400 hover:text-da-400"
+                  class="inline-flex items-center gap-2 border border-ink-600 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-200 transition-colors duration-300 hover:border-white hover:text-white"
                 >
                   <svg viewBox="0 0 448 512" width="14" height="14" fill="currentColor" aria-hidden="true">
                     <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/>
@@ -201,7 +201,7 @@ watch(() => props.slug, load)
                   :href="shareUrl('facebook')"
                   target="_blank"
                   rel="noopener"
-                  class="inline-flex items-center gap-2 border border-ink-600 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-200 transition-colors duration-300 hover:border-da-400 hover:text-da-400"
+                  class="inline-flex items-center gap-2 border border-ink-600 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-200 transition-colors duration-300 hover:border-white hover:text-white"
                 >
                   <svg viewBox="0 0 448 512" width="14" height="14" fill="currentColor" aria-hidden="true">
                     <path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/>
@@ -212,7 +212,7 @@ watch(() => props.slug, load)
                   :href="shareUrl('reddit')"
                   target="_blank"
                   rel="noopener"
-                  class="inline-flex items-center gap-2 border border-ink-600 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-200 transition-colors duration-300 hover:border-da-400 hover:text-da-400"
+                  class="inline-flex items-center gap-2 border border-ink-600 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-200 transition-colors duration-300 hover:border-white hover:text-white"
                 >
                   <svg viewBox="0 0 30 30" width="14" height="14" fill="currentColor" aria-hidden="true">
                     <path d="M 17.662109 2 C 15.565005 2 14 3.7131367 14 5.6621094 L 14 9.0351562 C 11.24971 9.1810926 8.7344872 9.9143634 6.7265625 11.064453 C 5.9527826 10.321405 4.9166871 9.991448 3.9121094 9.9921875 C 2.8229214 9.9929893 1.7094525 10.370413 0.94140625 11.234375 L 0.92382812 11.253906 L 0.90625 11.273438 C 0.16947928 12.194228 -0.12225605 13.427747 0.07421875 14.652344 C 0.25365009 15.770711 0.90137168 16.893419 2.0273438 17.628906 C 2.0199689 17.753058 2 17.874618 2 18 C 2 22.962 7.832 27 15 27 C 22.168 27 28 22.962 28 18 C 28 17.874618 27.980031 17.753058 27.972656 17.628906 C 29.098628 16.893419 29.74635 15.770711 29.925781 14.652344 C 30.122256 13.427747 29.830521 12.194228 29.09375 11.273438 L 29.076172 11.253906 L 29.058594 11.234375 C 28.290448 10.370294 27.177168 9.9929893 26.087891 9.9921875 C 25.08323 9.991448 24.046988 10.321133 23.273438 11.064453 C 21.265513 9.9143634 18.75029 9.1810926 16 9.0351562 L 16 5.6621094 C 16 4.6830821 16.565214 4 17.662109 4 C 18.182797 4 18.817104 4.2609042 19.810547 4.609375 C 20.650361 4.9039572 21.743308 5.2016984 23.140625 5.2910156 C 23.474875 6.2790874 24.402814 7 25.5 7 C 26.875 7 28 5.875 28 4.5 C 28 3.125 26.875 2 25.5 2 C 24.561213 2 23.747538 2.5304211 23.320312 3.3007812 C 22.125831 3.2346294 21.248238 2.9947078 20.472656 2.7226562 C 19.568849 2.4056271 18.738422 2 17.662109 2 z M 3.9121094 11.992188 C 4.3072494 11.991896 4.6826692 12.095595 4.9921875 12.263672 C 3.8881963 13.18517 3.0505713 14.261821 2.5449219 15.4375 C 2.2764358 15.106087 2.114647 14.734002 2.0507812 14.335938 C 1.9430146 13.664243 2.1440212 12.966045 2.4628906 12.552734 C 2.7642172 12.228395 3.3144613 11.992626 3.9121094 11.992188 z M 26.085938 11.992188 C 26.683756 11.992627 27.235874 12.22849 27.537109 12.552734 C 27.855979 12.966045 28.056985 13.664243 27.949219 14.335938 C 27.885353 14.734002 27.723564 15.106087 27.455078 15.4375 C 26.949429 14.261821 26.111804 13.18517 25.007812 12.263672 C 25.316626 12.095792 25.69095 11.991896 26.085938 11.992188 z M 7.4921875 13.5 C 8.3222428 13.5 9 14.177757 9 15.007812 C 9 15.837868 8.3222428 16.515625 7.4921875 16.515625 C 6.6621322 16.515625 5.984375 15.837868 5.984375 15.007812 C 5.984375 14.177757 6.6621322 13.5 7.4921875 13.5 z M 22.507812 13.5 C 23.337868 13.5 24.015625 14.177757 24.015625 15.007812 C 24.015625 15.837868 23.337868 16.515625 22.507812 16.515625 C 21.677757 16.515625 21 15.837868 21 15.007812 C 21 14.177757 21.677757 13.5 22.507812 13.5 z M 7.5859375 18.828125 C 8.9025252 20.718654 11.793204 22 15 22 C 18.206796 22 21.097475 20.718654 22.414062 18.828125 C 22.69395 18.433406 23.219448 18.345859 23.614057 18.625884 C 24.008665 18.905909 24.096109 19.431638 23.816156 19.826367 C 22.097233 22.264128 18.703235 24 15 24 C 11.296765 24 7.902767 22.264128 6.1838438 19.826367 C 5.9038906 19.431638 5.9913346 18.905909 6.3859434 18.625884 C 6.7805522 18.345859 7.3060502 18.433406 7.5859375 18.828125 z"/>
@@ -221,7 +221,7 @@ watch(() => props.slug, load)
                 </a>
                 <button
                   @click="copyLink"
-                  class="inline-flex items-center gap-2 border border-ink-600 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-200 transition-colors duration-300 hover:border-da-400 hover:text-da-400"
+                  class="inline-flex items-center gap-2 border border-ink-600 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-200 transition-colors duration-300 hover:border-white hover:text-white"
                 >
                   <svg v-if="!copied" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">
                     <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
@@ -245,7 +245,7 @@ watch(() => props.slug, load)
               class="mt-8 flex w-full items-center justify-center gap-3 px-6 py-4 text-xs font-bold uppercase tracking-[0.25em] transition-colors duration-300 sm:inline-flex sm:w-auto"
               :class="
                 isAvailable
-                  ? 'bg-white text-black hover:bg-da-400'
+                  ? 'bg-white text-black hover:bg-ink-200'
                   : 'pointer-events-none cursor-not-allowed border border-ink-600 text-ink-400'
               "
             >
@@ -266,7 +266,7 @@ watch(() => props.slug, load)
           <h3 class="font-display mt-1 text-2xl font-black uppercase tracking-tight text-white">{{ comic.title }}</h3>
           <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
             <a v-for="r in related" :key="r.id" :href="`/comics/${r.slug}`" class="group block">
-              <div class="overflow-hidden border border-ink-700 bg-ink-900 transition-colors duration-300 group-hover:border-da-400">
+              <div class="overflow-hidden border border-ink-700 bg-ink-900 transition-colors duration-300 group-hover:border-white">
                 <img
                   :src="r.poster || '/images/no-image.webp'"
                   :alt="`Cover of ${r.title}`"

@@ -50,8 +50,8 @@ const visibleComics = computed(() => {
 
 function pill(active) {
   return active
-    ? 'border-da-400 bg-white text-black'
-    : 'border-white/20 text-white/60 hover:border-da-400 hover:text-da-400'
+    ? 'border-white bg-white text-black'
+    : 'border-white/20 text-white/60 hover:border-white hover:text-white'
 }
 
 function protagonistCount(p) {
@@ -103,7 +103,7 @@ onUnmounted(() => {
               type="search"
               placeholder="Search comics…"
               aria-label="Search comics"
-              class="w-full border border-white/15 bg-ink-950/60 py-2.5 pl-10 pr-9 text-sm text-white transition-colors duration-300 placeholder:text-white/40 focus:border-da-400 focus:outline-none"
+              class="w-full border border-white/15 bg-ink-950/60 py-2.5 pl-10 pr-9 text-sm text-white transition-colors duration-300 placeholder:text-white/40 focus:border-white focus:outline-none"
             />
             <button
               v-if="query"
@@ -183,7 +183,7 @@ onUnmounted(() => {
             <button
               type="button"
               @click="reset()"
-              class="link-line mt-4 text-[11px] font-bold uppercase tracking-[0.25em] text-white/70 transition-colors hover:text-da-400"
+              class="link-line mt-4 text-[11px] font-bold uppercase tracking-[0.25em] text-white/70 transition-colors hover:text-white"
             >
               Clear search and filters
             </button>
