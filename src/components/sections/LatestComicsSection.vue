@@ -9,12 +9,14 @@ import SectionHeading from '../ui/SectionHeading.vue'
 import ComicCard from '../comic/ComicCard.vue'
 import { fetchComics } from '../../services/comicsService'
 import { onAdminAuth } from '../../firebase/auth'
+import { useCatalog } from '../../composables/useCatalog'
 
 const comics = ref([])
 const loading = ref(true)
 const isAdmin = ref(false)
 
-const selectedProtagonist = ref('')
+// Búsqueda y filtros compartidos con el header (estilo DeviantArt).
+const { query, selectedProtagonist, reset } = useCatalog()
 
 const baseList = computed(() => {
   if (isAdmin.value) return comics.value
@@ -25,16 +27,31 @@ const baseList = computed(() => {
 const protagonists = computed(() => [...new Set(baseList.value.map((c) => c.protagonist))])
 
 const visibleComics = computed(() => {
+  const q = query.value.trim().toLowerCase()
+  let list = baseList.value
+
   if (selectedProtagonist.value) {
-    return baseList.value.filter((c) => c.protagonist === selectedProtagonist.value)
+    list = list.filter((c) => c.protagonist === selectedProtagonist.value)
   }
-  return baseList.value
+
+  if (q) {
+    list = list.filter(
+      (c) =>
+        c.title.toLowerCase().includes(q) ||
+        (c.protagonist || '').toLowerCase().includes(q) ||
+        (c.author || '').toLowerCase().includes(q) ||
+        String(c.issue) === q ||
+        String(c.year) === q
+    )
+  }
+
+  return list
 })
 
 function pill(active) {
   return active
-    ? 'border-white bg-white text-black'
-    : 'border-white/20 text-white/60 hover:border-white hover:text-white'
+    ? 'border-da-400 bg-white text-black'
+    : 'border-white/20 text-white/60 hover:border-da-400 hover:text-da-400'
 }
 
 function protagonistCount(p) {
@@ -70,6 +87,37 @@ onUnmounted(() => {
         <aside class="self-start border border-white/10 bg-ink-950/40 p-5 lg:sticky lg:top-24">
           <h3 class="border-b border-white/10 pb-4 text-xs font-bold uppercase tracking-[0.3em] text-white">Filters</h3>
 
+          <!-- Búsqueda (compartida con el header) -->
+          <div class="relative mt-5">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40"
+              aria-hidden="true"
+            >
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+            </svg>
+            <input
+              v-model="query"
+              type="search"
+              placeholder="Search comics…"
+              aria-label="Search comics"
+              class="w-full border border-white/15 bg-ink-950/60 py-2.5 pl-10 pr-9 text-sm text-white transition-colors duration-300 placeholder:text-white/40 focus:border-da-400 focus:outline-none"
+            />
+            <button
+              v-if="query"
+              type="button"
+              @click="query = ''"
+              aria-label="Clear search"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 transition-colors hover:text-white"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
+                <path d="M8 6.586 2.707 1.293 1.293 2.707 6.586 8l-5.293 5.293 1.414 1.414L8 9.414l5.293 5.293 1.414-1.414L9.414 8l5.293-5.293-1.414-1.414z"/>
+              </svg>
+            </button>
+          </div>
+
           <!-- Por protagonista -->
           <div class="mt-5">
             <p class="text-[11px] font-bold uppercase tracking-[0.25em] text-white/70">Character</p>
@@ -81,7 +129,7 @@ onUnmounted(() => {
                 :class="pill(selectedProtagonist === '')"
               >
                 <span>All</span>
-                <span class="shrink-0 text-[10px] opacity-50">{{ baseList.length }}</span>
+                <span class="shrink-0 bg-white/10 px-2 py-0.5 text-[10px] opacity-60">{{ baseList.length }}</span>
               </button>
               <button
                 v-for="p in protagonists"
@@ -92,7 +140,7 @@ onUnmounted(() => {
                 :class="pill(selectedProtagonist === p)"
               >
                 <span class="truncate">{{ p }}</span>
-                <span class="shrink-0 text-[10px] opacity-50">{{ protagonistCount(p) }}</span>
+                <span class="shrink-0 bg-white/10 px-2 py-0.5 text-[10px] opacity-60">{{ protagonistCount(p) }}</span>
               </button>
             </div>
           </div>
@@ -131,7 +179,14 @@ onUnmounted(() => {
 
           <!-- Sin resultados -->
           <div v-else-if="visibleComics.length === 0" class="mt-6 border border-white/10 p-10 text-center">
-            <p class="text-sm uppercase tracking-[0.25em] text-white/40">No comics match your filters.</p>
+            <p class="text-sm uppercase tracking-[0.25em] text-white/40">No comics match your search.</p>
+            <button
+              type="button"
+              @click="reset()"
+              class="link-line mt-4 text-[11px] font-bold uppercase tracking-[0.25em] text-white/70 transition-colors hover:text-da-400"
+            >
+              Clear search and filters
+            </button>
           </div>
 
           <!-- Grid de cómics -->

@@ -3,20 +3,27 @@ export default {
   content: ['./index.html', './src/**/*.{vue,js}'],
   theme: {
     extend: {
-      // Escala de grises propia: negro profundo a blanco puro.
+      // Escala de grises propia inspirada en DeviantArt (tonos neutros).
       colors: {
         ink: {
-          50: '#f5f5f5',
-          100: '#d4d4d4',
-          200: '#a3a3a3',
-          300: '#737373',
-          400: '#404040',
-          500: '#2a2a2a',
-          600: '#1f1f1f',
-          700: '#161616',
-          800: '#111111',
-          900: '#0a0a0a',
-          950: '#050505',
+          50: '#e7e9ea',
+          100: '#d0d3d6',
+          200: '#a9adb3',
+          300: '#8a8f96',
+          400: '#6e737a',
+          500: '#565a61',
+          600: '#41444c',
+          700: '#30333a',
+          800: '#242629',
+          900: '#1c1e21',
+          950: '#17181a',
+        },
+        // Azul cian acento estilo DeviantArt, usado en hovers y bordes.
+        da: {
+          300: '#a5fbfb',
+          400: '#13f2f2',
+          500: '#0fd0d0',
+          600: '#0ba3a3',
         },
       },
       fontFamily: {
