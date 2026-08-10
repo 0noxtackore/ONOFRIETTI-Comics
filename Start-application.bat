@@ -12,9 +12,9 @@ cd /d "%~dp0"
 
 if not exist node_modules (
     echo  [..] No se encontraron dependencias. Instalando...
-    call npm.cmd install
+    call npm install
     if errorlevel 1 (
-        echo  [ERROR] No se pudo instalar. Ejecuta install.bat para mas detalles.
+        echo  [ERROR] No se pudo instalar. Ejecuta install-dependencies.bat para mas detalles.
         pause
         exit /b 1
     )
