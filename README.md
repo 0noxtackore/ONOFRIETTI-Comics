@@ -2,6 +2,15 @@
   <img src="public/images/logo-solid.png" alt="Onofrietti Comics" width="100%" />
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Vue-3-42b883" />
+  <img src="https://img.shields.io/badge/Vite-6-646cff" />
+  <img src="https://img.shields.io/badge/Tailwind-3-38bdf8" />
+  <img src="https://img.shields.io/badge/Firebase-FFCA28" />
+  <img src="https://img.shields.io/badge/Vitest-4-e1c400" />
+  <img src="https://img.shields.io/badge/License-MIT-green" />
+</p>
+
 # Onofrietti Comics
 
 Official website of Onofrietti Comics — a young independent comics studio founded in 2026. A digital comics store with a catalog, a detail page for each issue and an admin panel to manage content.
