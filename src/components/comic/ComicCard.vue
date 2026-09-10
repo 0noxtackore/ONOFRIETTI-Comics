@@ -48,11 +48,17 @@ const titleFontSize = computed(() => {
     <a
       :href="`/comics/${comic.slug}`"
       :aria-label="`View ${comic.title} details`"
-      class="group/cover relative block overflow-hidden border-2 border-white/10 transition-all duration-500 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+      class="group/cover relative block overflow-hidden border-2 border-white/10 transition-colors duration-500"
     >
       <div class="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
         <ComicCover :comic="comic" :poster="comic.poster" />
       </div>
+
+      <!-- Brillo interior tipo metalico al hover -->
+      <span
+        class="pointer-events-none absolute inset-0 -translate-x-full bg-[linear-gradient(105deg,transparent_40%,rgba(255,255,255,0.25)_45%,rgba(255,255,255,0.4)_50%,rgba(255,255,255,0.25)_55%,transparent_60%)] transition-transform duration-700 ease-out group-hover/cover:translate-x-full"
+        aria-hidden="true"
+      ></span>
 
       <!-- Líneas diagonales blancas -->
       <span
