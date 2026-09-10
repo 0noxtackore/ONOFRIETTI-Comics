@@ -53,9 +53,9 @@ export async function deleteSeries(id) {
 }
 
 // Convierte una imagen a data URL para el logo.
-export async function fileToLogo(file, maxSize = 400) {
+export async function fileToLogo(file, maxSize = 800) {
   const dataUrl = await compressImage(file, maxSize)
-  if (dataUrl.length > 500000) {
+  if (dataUrl.length > 1000000) {
     throw new Error('La imagen es demasiado pesada. Usa una más pequeña.')
   }
   return dataUrl
