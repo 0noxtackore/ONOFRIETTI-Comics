@@ -19,6 +19,12 @@ const series = ref(null)
 const isAdmin = ref(false)
 
 const isAvailable = computed(() => ['Available', 'Limited Edition'].includes(comic.value?.status))
+const discountedPrice = computed(() => {
+  if (!comic.value?.price) return '0.00'
+  if (!comic.value?.discount) return comic.value.price.toFixed(2)
+  const final = comic.value.price * (1 - comic.value.discount / 100)
+  return final.toFixed(2)
+})
 
 async function load() {
   loading.value = true
@@ -170,9 +176,15 @@ watch(() => props.slug, load)
             </div>
 
             <!-- Price -->
-            <div class="mt-4 w-full text-center">
-              <p v-if="comic.price" class="font-display text-5xl font-black text-white md:text-6xl">
-                ${{ comic.price }}
+            <div v-if="comic.price" class="mt-4 w-full text-center">
+              <div v-if="comic.discount" class="flex items-center justify-center gap-3">
+                <p class="font-display text-2xl font-black text-red-500 line-through md:text-3xl">
+                  ${{ comic.price }}
+                </p>
+                <span class="rounded-full bg-red-500/20 px-3 py-1 text-xs font-bold text-red-400">-{{ comic.discount }}%</span>
+              </div>
+              <p class="font-display text-5xl font-black text-white md:text-6xl">
+                ${{ discountedPrice }}
               </p>
             </div>
 

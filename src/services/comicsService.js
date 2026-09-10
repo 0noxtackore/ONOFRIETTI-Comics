@@ -31,6 +31,7 @@ export function mapDoc(doc) {
     seriesId: d.seriesId || '',
     rating: num(d.rating),
     price: num(d.price),
+    discount: num(d.discount),
   }
 }
 

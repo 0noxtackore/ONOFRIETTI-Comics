@@ -49,6 +49,7 @@ const emptyForm = () => ({
   seriesId: '',
   rating: '',
   price: '',
+  discount: '',
 })
 const form = reactive(emptyForm())
 
@@ -198,6 +199,7 @@ async function save() {
       seriesId: form.seriesId || '',
       rating: form.rating === '' ? 0 : Math.min(100, Math.max(0, Number(form.rating))),
       price: form.price === '' ? 0 : Number(form.price),
+      discount: form.discount === '' ? 0 : Math.min(100, Math.max(0, Number(form.discount))),
     }
     await saveComic(newId, payload)
     // Si el ID cambió, el documento nuevo ya existe; elimina el antiguo.
@@ -800,6 +802,17 @@ watch(search, (v) => {
                       min="0"
                       step="0.01"
                       placeholder="9.99"
+                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                    />
+                  </label>
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                    Discount (%)
+                    <input
+                      v-model.number="form.discount"
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="10"
                       class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
                     />
                   </label>
