@@ -55,7 +55,6 @@ const emptySeriesForm = () => ({
   name: '',
   slug: '',
   logo: '',
-  description: '',
 })
 const seriesForm = reactive(emptySeriesForm())
 
@@ -274,10 +273,9 @@ async function saveSeriesData() {
   saving.value = true
   try {
     const payload = {
-      name: seriesForm.name.trim(),
+      name: seriesForm.name.trim().toUpperCase(),
       slug,
       logo: seriesForm.logo.trim(),
-      description: seriesForm.description.trim(),
     }
     await saveSeries(id, payload)
     await load()
@@ -663,7 +661,6 @@ watch(search, (v) => {
               </div>
               <div>
                 <h4 class="font-display text-lg font-black uppercase tracking-tight">{{ s.name }}</h4>
-                <p class="text-xs text-white/50">{{ s.description || 'No description' }}</p>
               </div>
             </div>
             <div class="flex items-center gap-3">
@@ -875,18 +872,9 @@ watch(search, (v) => {
                     Series Name *
                     <input
                       v-model="seriesForm.name"
-                      placeholder="The Origin Saga"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                      placeholder="THE ORIGIN SAGA"
+                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm uppercase placeholder:text-white/25 focus:border-white focus:outline-none"
                     />
-                  </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-2">
-                    Description
-                    <textarea
-                      v-model="seriesForm.description"
-                      rows="2"
-                      placeholder="Brief description of the series…"
-                      class="mt-2 w-full resize-y border border-white/20 bg-transparent px-4 py-3 text-sm leading-relaxed placeholder:text-white/25 focus:border-white focus:outline-none"
-                    ></textarea>
                   </label>
                 </div>
 
