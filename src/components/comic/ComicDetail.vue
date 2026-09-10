@@ -147,7 +147,7 @@ watch(() => props.slug, load)
         <!-- Top Section: Series/Issue/Buy + Cover -->
         <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
           <!-- Left: Series Logo, Issue, Buy Button -->
-          <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
+          <div class="flex flex-col items-center text-center lg:items-end lg:text-right">
             <!-- Series Logo -->
             <div v-if="series && series.logo" class="mb-6">
               <img
