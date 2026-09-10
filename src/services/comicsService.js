@@ -28,6 +28,7 @@ export function mapDoc(doc) {
     poster: d.poster || '',
     storagePath: d.storagePath || '',
     featured: Boolean(d.featured),
+    seriesId: d.seriesId || '',
   }
 }
 
