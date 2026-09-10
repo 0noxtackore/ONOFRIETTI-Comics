@@ -201,28 +201,8 @@ watch(() => props.slug, load)
         <section class="mt-16 border-t border-ink-800 pt-16 md:mt-24">
           <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">Comic Details</h2>
 
-          <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <!-- Author -->
-            <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-6">
-              <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Author</dt>
-              <dd class="mt-2 font-display text-xl font-black text-white">{{ comic.author }}</dd>
-            </div>
-
-            <!-- Year -->
-            <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-6">
-              <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Year</dt>
-              <dd class="mt-2 font-display text-xl font-black text-white">{{ comic.year }}</dd>
-            </div>
-
-            <!-- Pages -->
-            <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-6">
-              <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Pages</dt>
-              <dd class="mt-2 font-display text-xl font-black text-white">{{ comic.pages || '—' }}</dd>
-            </div>
-          </div>
-
           <!-- Description -->
-          <div v-if="comic.description" class="mt-10">
+          <div v-if="comic.description" class="mt-6">
             <p class="max-w-3xl text-lg leading-relaxed text-ink-200 md:text-xl">
               {{ comic.description }}
             </p>
