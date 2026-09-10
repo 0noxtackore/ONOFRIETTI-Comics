@@ -48,7 +48,7 @@ const titleFontSize = computed(() => {
     <a
       :href="`/comics/${comic.slug}`"
       :aria-label="`View ${comic.title} details`"
-      class="group/cover relative block overflow-hidden border-2 border-white/10 transition-colors duration-500"
+      class="group/cover relative block overflow-hidden border-2 border-white/10 transition-all duration-500 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)]"
     >
       <div class="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
         <ComicCover :comic="comic" :poster="comic.poster" />
