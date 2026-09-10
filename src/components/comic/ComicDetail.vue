@@ -145,8 +145,8 @@ watch(() => props.slug, load)
       <!-- Main Content -->
       <div class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
         <!-- Top Section: Series/Issue/Buy + Cover -->
-        <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
-          <!-- Left: Series Logo, Issue, Buy Button -->
+        <div class="flex flex-col gap-12 lg:flex-row-reverse lg:items-start lg:justify-between">
+          <!-- Right: Series Logo, Issue, Buy Button -->
           <div class="flex flex-col items-center text-center lg:items-end lg:text-right">
             <!-- Series Logo -->
             <div v-if="series && series.logo" class="mb-6">
@@ -210,7 +210,7 @@ watch(() => props.slug, load)
             </a>
           </div>
 
-          <!-- Right: Comic Cover -->
+          <!-- Left: Comic Cover -->
           <div class="flex justify-center lg:justify-end">
             <div class="overflow-hidden shadow-2xl shadow-black/50">
               <img
