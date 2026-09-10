@@ -267,7 +267,7 @@ watch(() => props.slug, load)
 
           <div class="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
             <a v-for="r in related" :key="r.id" :href="`/comics/${r.slug}`" class="group block">
-              <div class="overflow-hidden rounded-xl border border-ink-800 bg-ink-900 transition-all duration-300 group-hover:border-white group-hover:shadow-lg group-hover:shadow-white/5">
+              <div class="overflow-hidden border border-ink-800 bg-ink-900 transition-all duration-300 group-hover:border-white group-hover:shadow-lg group-hover:shadow-white/5">
                 <img
                   :src="r.poster || '/images/no-image.webp'"
                   :alt="`Cover of ${r.title}`"
