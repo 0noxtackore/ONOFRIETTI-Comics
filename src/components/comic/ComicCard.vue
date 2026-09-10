@@ -54,9 +54,9 @@ const titleFontSize = computed(() => {
         <ComicCover :comic="comic" :poster="comic.poster" />
       </div>
 
-      <!-- Líneas diagonales blancas al hover de la imagen -->
+      <!-- Líneas diagonales blancas -->
       <span
-        class="diagonal-stripes pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/cover:opacity-100"
+        class="diagonal-stripes pointer-events-none absolute inset-0 opacity-0"
         aria-hidden="true"
       ></span>
 
