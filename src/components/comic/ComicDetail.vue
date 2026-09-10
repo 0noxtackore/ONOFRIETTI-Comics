@@ -147,7 +147,7 @@ watch(() => props.slug, load)
               <img
                 :src="series.logo"
                 :alt="`Logo of ${series.name}`"
-                class="h-16 w-auto object-contain drop-shadow-lg md:h-20"
+                class="max-h-24 w-auto object-contain drop-shadow-lg md:max-h-32"
               />
             </div>
 
