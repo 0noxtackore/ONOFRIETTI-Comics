@@ -147,7 +147,7 @@ watch(() => props.slug, load)
               <img
                 :src="series.logo"
                 :alt="`Logo of ${series.name}`"
-                class="max-h-40 w-auto object-contain drop-shadow-lg md:max-h-48"
+                class="max-h-32 w-auto object-contain drop-shadow-lg md:max-h-36"
               />
             </div>
 
@@ -249,11 +249,11 @@ watch(() => props.slug, load)
 
           <!-- Right: Comic Cover -->
           <div class="flex justify-center lg:justify-end">
-            <div class="overflow-hidden rounded-2xl border border-ink-800 shadow-2xl shadow-black/50">
+            <div class="overflow-hidden shadow-2xl shadow-black/50">
               <img
                 :src="comic.poster || '/images/no-image.webp'"
                 :alt="`Cover of ${comic.title}`"
-                class="w-72 object-cover md:w-80"
+                class="w-80 object-cover md:w-96"
               />
             </div>
           </div>
