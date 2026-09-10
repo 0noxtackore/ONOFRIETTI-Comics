@@ -153,6 +153,7 @@ watch(() => props.slug, load)
               <img
                 :src="series.logo"
                 :alt="`Logo of ${series.name}`"
+                loading="lazy"
                 class="h-40 w-auto object-contain drop-shadow-lg md:h-48"
               />
             </div>
@@ -216,6 +217,7 @@ watch(() => props.slug, load)
               <img
                 :src="comic.poster || '/images/no-image.webp'"
                 :alt="`Cover of ${comic.title}`"
+                loading="lazy"
                 class="w-96 object-cover md:w-[28rem]"
               />
             </div>
@@ -271,6 +273,7 @@ watch(() => props.slug, load)
                 <img
                   :src="r.poster || '/images/no-image.webp'"
                   :alt="`Cover of ${r.title}`"
+                  loading="lazy"
                   class="aspect-[1920/2951] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
               </div>

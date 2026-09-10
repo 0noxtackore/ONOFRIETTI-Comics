@@ -14,6 +14,7 @@ defineProps({
     <img
       :src="poster || '/images/no-image.webp'"
       :alt="`Cover of ${comic.title}`"
+      loading="lazy"
       class="absolute inset-0 h-full w-full object-cover"
     />
   </div>
