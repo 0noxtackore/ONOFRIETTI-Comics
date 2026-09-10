@@ -147,17 +147,12 @@ watch(() => props.slug, load)
               <img
                 :src="series.logo"
                 :alt="`Logo of ${series.name}`"
-                class="max-h-24 w-auto object-contain drop-shadow-lg md:max-h-32"
+                class="max-h-40 w-auto object-contain drop-shadow-lg md:max-h-48"
               />
             </div>
 
-            <!-- Series Name -->
-            <h2 v-if="series" class="font-display text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
-              {{ series.name }}
-            </h2>
-
             <!-- Issue Number -->
-            <p class="mt-4 font-display text-5xl font-black uppercase text-white md:text-6xl">
+            <p class="font-display text-3xl font-black uppercase text-white md:text-4xl">
               ISSUE {{ comic.issue }}
             </p>
 
