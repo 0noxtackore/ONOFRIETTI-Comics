@@ -170,7 +170,7 @@ watch(() => props.slug, load)
             </div>
 
             <!-- Price -->
-            <p v-if="comic.price" class="mt-4 font-display text-2xl font-black text-white md:text-3xl">
+            <p v-if="comic.price" class="mt-4 text-center font-display text-4xl font-black text-white md:text-5xl lg:text-center">
               ${{ comic.price }}
             </p>
 
@@ -179,7 +179,7 @@ watch(() => props.slug, load)
               :href="isAvailable ? '#comics' : undefined"
               :aria-disabled="!isAvailable"
               @click="buy"
-              class="mt-8 flex w-full items-center justify-center gap-3 px-8 py-5 text-sm font-bold uppercase tracking-[0.25em] transition-all duration-300 lg:w-auto"
+              class="mt-8 flex w-full items-center justify-center gap-3 px-8 py-5 text-sm font-bold uppercase tracking-[0.25em] transition-all duration-300"
               :class="
                 isAvailable
                   ? 'bg-white text-black hover:bg-ink-200 hover:shadow-lg hover:shadow-white/10'
