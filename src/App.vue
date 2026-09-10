@@ -78,14 +78,16 @@ onUnmounted(() => {
 
     <main>
       <!-- Página principal -->
-      <HeroSection />
-      <!-- Sección de cómics -->
-      <LatestComicsSection />
+      <template v-if="!comicSlug">
+        <HeroSection />
+        <!-- Sección de cómics -->
+        <LatestComicsSection />
+      </template>
+
+      <!-- Ficha de detalle del cómic (solo en /comics/<slug>) -->
+      <ComicDetail v-else :slug="comicSlug" @close="closeDetail" />
     </main>
 
     <SiteFooter />
   </div>
-
-  <!-- Ficha de detalle del cómic (solo en /comics/<slug>) -->
-  <ComicDetail v-if="!isAdmin && comicSlug" :slug="comicSlug" @close="closeDetail" />
 </template>
