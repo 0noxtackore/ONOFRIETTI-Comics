@@ -61,23 +61,20 @@ export async function fileToLogo(file, maxSize = 400) {
   return dataUrl
 }
 
-// Comprime una imagen cuadrada para logo.
+// Comprime una imagen para logo sin recortar.
 function compressImage(file, maxSize) {
   return new Promise((resolve, reject) => {
     const img = new Image()
     const url = URL.createObjectURL(file)
     img.onload = () => {
       try {
-        const size = Math.min(img.width, img.height)
-        const sx = Math.round((img.width - size) / 2)
-        const sy = Math.round((img.height - size) / 2)
-        const scale = Math.min(1, maxSize / size)
-        const w = Math.max(1, Math.round(size * scale))
-        const h = w
+        const scale = Math.min(1, maxSize / Math.max(img.width, img.height))
+        const w = Math.max(1, Math.round(img.width * scale))
+        const h = Math.max(1, Math.round(img.height * scale))
         const canvas = document.createElement('canvas')
         canvas.width = w
         canvas.height = h
-        canvas.getContext('2d').drawImage(img, sx, sy, size, size, 0, 0, w, h)
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h)
         URL.revokeObjectURL(url)
         if (canvas.toBlob) {
           canvas.toBlob(
