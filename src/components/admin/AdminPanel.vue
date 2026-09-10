@@ -50,6 +50,7 @@ const emptyForm = () => ({
   rating: '',
   price: '',
   discount: '',
+  createdAt: '',
 })
 const form = reactive(emptyForm())
 
@@ -200,6 +201,7 @@ async function save() {
       rating: form.rating === '' ? 0 : Math.min(100, Math.max(0, Number(form.rating))),
       price: form.price === '' ? 0 : Number(form.price),
       discount: form.discount === '' ? 0 : Math.min(100, Math.max(0, Number(form.discount))),
+      createdAt: isEditing ? comic?.value?.createdAt || new Date().toISOString() : new Date().toISOString(),
     }
     await saveComic(newId, payload)
     // Si el ID cambió, el documento nuevo ya existe; elimina el antiguo.

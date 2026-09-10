@@ -32,6 +32,7 @@ export function mapDoc(doc) {
     rating: num(d.rating),
     price: num(d.price),
     discount: num(d.discount),
+    createdAt: d.createdAt || '',
   }
 }
 

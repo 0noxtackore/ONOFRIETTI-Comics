@@ -12,8 +12,15 @@ const props = defineProps({
 // Buyable statuses
 const isAvailable = computed(() => ['Available', 'Limited Edition'].includes(props.comic.status))
 
-// Cómics nuevos: del año actual
-const isNew = computed(() => props.comic.year === new Date().getFullYear())
+// Cómics nuevos: creados en la última semana
+const isNew = computed(() => {
+  if (!props.comic.createdAt) return false
+  const created = new Date(props.comic.createdAt)
+  const now = new Date()
+  const diffMs = now - created
+  const diffWeeks = diffMs / (1000 * 60 * 60 * 24 * 7)
+  return diffWeeks <= 1
+})
 
 const buyLabel = computed(() => {
   switch (props.comic.status) {
