@@ -73,7 +73,7 @@ const titleFontSize = computed(() => {
         v-if="isNew"
         src="/images/new-icon.png"
         alt="New"
-        class="pointer-events-none absolute right-2 top-2 z-10 h-16 w-16 drop-shadow-lg"
+        class="pointer-events-none absolute right-2 top-2 z-10 h-20 w-20 drop-shadow-lg"
       />
 
     </a>
