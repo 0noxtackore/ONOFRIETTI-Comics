@@ -27,9 +27,11 @@ async function load() {
   related.value = []
   series.value = null
   if (comic.value) {
+    console.log('Comic seriesId:', comic.value.seriesId)
     // Fetch series if comic has a seriesId
     if (comic.value.seriesId) {
       series.value = await getSeriesById(comic.value.seriesId)
+      console.log('Series loaded:', series.value)
     }
     const list = await fetchComics()
     const base = isAdmin.value
