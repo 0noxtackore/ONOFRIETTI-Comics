@@ -253,7 +253,7 @@ watch(() => props.slug, load)
               <img
                 :src="comic.poster || '/images/no-image.webp'"
                 :alt="`Cover of ${comic.title}`"
-                class="w-80 object-cover md:w-96"
+                class="w-96 object-cover md:w-[28rem]"
               />
             </div>
           </div>
