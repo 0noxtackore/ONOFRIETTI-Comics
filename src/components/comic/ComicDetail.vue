@@ -145,9 +145,20 @@ watch(() => props.slug, load)
       <!-- Main Content -->
       <div class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
         <!-- Top Section: Series/Issue/Buy + Cover -->
-        <div class="flex flex-col gap-12 lg:flex-row-reverse lg:items-start lg:justify-between">
+        <div class="flex flex-col gap-12 lg:flex-row lg:items-start">
+          <!-- Left: Comic Cover -->
+          <div class="flex justify-center lg:justify-start">
+            <div class="overflow-hidden shadow-2xl shadow-black/50">
+              <img
+                :src="comic.poster || '/images/no-image.webp'"
+                :alt="`Cover of ${comic.title}`"
+                class="w-96 object-cover md:w-[28rem]"
+              />
+            </div>
+          </div>
+
           <!-- Right: Series Logo, Issue, Buy Button -->
-          <div class="flex flex-col items-center text-center lg:items-end lg:text-right">
+          <div class="ml-auto flex flex-col items-center text-center lg:items-end lg:text-right">
             <!-- Series Logo -->
             <div v-if="series && series.logo" class="mb-6">
               <img
@@ -208,17 +219,6 @@ watch(() => props.slug, load)
               </svg>
               {{ isAvailable ? (added ? 'Added!' : 'Buy') : comic.status }}
             </a>
-          </div>
-
-          <!-- Left: Comic Cover -->
-          <div class="flex justify-center lg:justify-end">
-            <div class="overflow-hidden shadow-2xl shadow-black/50">
-              <img
-                :src="comic.poster || '/images/no-image.webp'"
-                :alt="`Cover of ${comic.title}`"
-                class="w-96 object-cover md:w-[28rem]"
-              />
-            </div>
           </div>
         </div>
 
