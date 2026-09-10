@@ -9,14 +9,6 @@ const props = defineProps({
   index: { type: Number, default: 0 },
 })
 
-// Esquineras de visor de cámara en la portada.
-const corners = [
-  'left-0 top-0 border-l-2 border-t-2',
-  'right-0 top-0 border-r-2 border-t-2',
-  'bottom-0 left-0 border-b-2 border-l-2',
-  'bottom-0 right-0 border-b-2 border-r-2',
-]
-
 // Buyable statuses
 const isAvailable = computed(() => ['Available', 'Limited Edition'].includes(props.comic.status))
 
@@ -66,14 +58,6 @@ const titleFontSize = computed(() => {
         aria-hidden="true"
       ></span>
 
-      <!-- Esquineras de visor de cámara (solo al hover) -->
-      <template v-for="corner in corners" :key="corner">
-        <span
-          class="pointer-events-none absolute z-10 h-6 w-6 border-white opacity-0 transition-opacity duration-300 group-hover/cover:opacity-100"
-          :class="corner"
-          aria-hidden="true"
-        ></span>
-      </template>
     </a>
 
     <div class="flex flex-1 flex-col justify-center pt-5 text-center">
