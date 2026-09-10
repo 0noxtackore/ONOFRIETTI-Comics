@@ -152,9 +152,16 @@ watch(() => props.slug, load)
             </div>
 
             <!-- Issue Number -->
-            <p class="font-display text-3xl font-black uppercase text-white md:text-4xl">
+            <p class="font-display text-xl font-black uppercase text-white md:text-2xl">
               ISSUE {{ comic.issue }}
             </p>
+
+            <!-- Comic Info -->
+            <div class="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-ink-400">
+              <span>Author: {{ comic.author }}</span>
+              <span>Year: {{ comic.year }}</span>
+              <span>Pages: {{ comic.pages || '—' }}</span>
+            </div>
 
             <!-- Buy Button -->
             <a
