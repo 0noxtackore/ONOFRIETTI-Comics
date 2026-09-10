@@ -11,7 +11,6 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 
 const comic = ref(null)
-const loading = ref(true)
 const copied = ref(false)
 const added = ref(false)
 const related = ref([])
@@ -27,7 +26,6 @@ const discountedPrice = computed(() => {
 })
 
 async function load() {
-  loading.value = true
   added.value = false
   comic.value = await fetchComicBySlug(props.slug)
   related.value = []
@@ -49,8 +47,7 @@ async function load() {
       .filter((c) => c.issue > comic.value.issue)
       .slice(0, 4)
   }
-  loading.value = false
-}
+  }
 
 function buy() {
   if (!isAvailable.value) return
@@ -112,12 +109,8 @@ watch(() => props.slug, load)
 <template>
   <div class="fixed inset-0 z-[90] overflow-y-auto bg-black" @click.self="emit('close')">
     <!-- Cargando -->
-    <div v-if="loading" class="min-h-screen animate-pulse bg-black">
-      <div class="h-screen bg-ink-900"></div>
-    </div>
-
     <!-- No encontrado -->
-    <div v-else-if="!comic" class="flex min-h-screen items-center justify-center p-10">
+    <div v-if="!comic" class="flex min-h-screen items-center justify-center p-10">
       <div class="text-center">
         <p class="text-sm uppercase tracking-[0.25em] text-ink-400">Comic not found</p>
         <button
@@ -130,7 +123,7 @@ watch(() => props.slug, load)
     </div>
 
     <!-- Comic Detail -->
-    <div v-else class="min-h-screen">
+    <div v-if="comic" class="min-h-screen">
       <!-- Close Button -->
       <button
         @click="emit('close')"
