@@ -47,6 +47,7 @@ const emptyForm = () => ({
   storagePath: '',
   featured: false,
   seriesId: '',
+  rating: '',
 })
 const form = reactive(emptyForm())
 
@@ -194,6 +195,7 @@ async function save() {
       storagePath: form.storagePath.trim(),
       featured: Boolean(form.featured),
       seriesId: form.seriesId || '',
+      rating: form.rating === '' ? 0 : Math.min(100, Math.max(0, Number(form.rating))),
     }
     await saveComic(newId, payload)
     // Si el ID cambió, el documento nuevo ya existe; elimina el antiguo.
@@ -776,6 +778,17 @@ watch(search, (v) => {
                   <label class="flex cursor-pointer items-center gap-3 self-end pb-3 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
                     <input v-model="form.featured" type="checkbox" class="h-4 w-4 accent-white" />
                     Featured
+                  </label>
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                    Rating (%)
+                    <input
+                      v-model.number="form.rating"
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="85"
+                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                    />
                   </label>
                   <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-3">
                     Series (optional)

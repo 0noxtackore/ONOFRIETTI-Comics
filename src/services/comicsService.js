@@ -29,6 +29,7 @@ export function mapDoc(doc) {
     storagePath: d.storagePath || '',
     featured: Boolean(d.featured),
     seriesId: d.seriesId || '',
+    rating: num(d.rating),
   }
 }
 
