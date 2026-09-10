@@ -170,9 +170,11 @@ watch(() => props.slug, load)
             </div>
 
             <!-- Price -->
-            <p v-if="comic.price" class="mt-4 text-center font-display text-4xl font-black text-white md:text-5xl lg:text-center">
-              ${{ comic.price }}
-            </p>
+            <div class="mt-4 w-full text-center">
+              <p v-if="comic.price" class="font-display text-5xl font-black text-white md:text-6xl">
+                ${{ comic.price }}
+              </p>
+            </div>
 
             <!-- Buy Button -->
             <a
