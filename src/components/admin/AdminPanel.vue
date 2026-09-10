@@ -2,24 +2,30 @@
 // Panel de administración oculto en /admin.
 // - Requiere sesión con Firebase Authentication (Email/Contraseña).
 // - Permite crear, editar, eliminar cómics y añadir portadas (imagen → enlace).
+// - Permite gestionar series de cómics con logos.
 // Se accede solo escribiendo la URL manualmente: https://sitio/admin
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { isConfigured } from '../../firebase/init'
 import { signInAdmin, signOutAdmin, onAdminAuth } from '../../firebase/auth'
 import { listComics, saveComic, deleteComic, fileToPoster } from '../../services/adminService'
+import { listSeries, saveSeries, deleteSeries, fileToLogo } from '../../services/seriesService'
 import { navigate } from '../../utils/router'
 
 const STATUSES = ['Available', 'Limited Edition', 'Sold Out', 'Coming Soon']
 
 const user = ref(null)
 const comics = ref([])
+const series = ref([])
 const loading = ref(true)
 const saving = ref(false)
 const uploading = ref(false)
 const showForm = ref(false)
+const showSeriesForm = ref(false)
 const editingId = ref(null)
+const editingSeriesId = ref(null)
 const error = ref('')
 const notice = ref('')
+const activeTab = ref('comics') // 'comics' o 'series'
 
 const email = ref('')
 const password = ref('')
@@ -40,8 +46,18 @@ const emptyForm = () => ({
   poster: '',
   storagePath: '',
   featured: false,
+  seriesId: '',
 })
 const form = reactive(emptyForm())
+
+const emptySeriesForm = () => ({
+  id: '',
+  name: '',
+  slug: '',
+  logo: '',
+  description: '',
+})
+const seriesForm = reactive(emptySeriesForm())
 
 // Slug de la parte que se genera automáticamente desde el título.
 function slugifyId(value) {
@@ -72,9 +88,11 @@ async function load() {
   loading.value = true
   error.value = ''
   try {
-    comics.value = await listComics()
+    const [comicsData, seriesData] = await Promise.all([listComics(), listSeries()])
+    comics.value = comicsData
+    series.value = seriesData
   } catch (e) {
-    error.value = 'Could not load the list: ' + e.message
+    error.value = 'Could not load data: ' + e.message
   } finally {
     loading.value = false
   }
@@ -176,6 +194,7 @@ async function save() {
       poster: form.poster.trim(),
       storagePath: form.storagePath.trim(),
       featured: Boolean(form.featured),
+      seriesId: form.seriesId || '',
     }
     await saveComic(newId, payload)
     // Si el ID cambió, el documento nuevo ya existe; elimina el antiguo.
@@ -213,6 +232,103 @@ async function remove(comic) {
   } catch (e) {
     error.value = 'Error deleting: ' + e.message
   }
+}
+
+// Funciones para gestionar series
+function slugifyName(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+function openNewSeries() {
+  Object.assign(seriesForm, emptySeriesForm())
+  editingSeriesId.value = null
+  showSeriesForm.value = true
+  error.value = ''
+}
+
+function openEditSeries(s) {
+  Object.assign(seriesForm, emptySeriesForm(), s)
+  editingSeriesId.value = s.id
+  showSeriesForm.value = true
+  error.value = ''
+}
+
+function cancelSeriesForm() {
+  showSeriesForm.value = false
+  editingSeriesId.value = null
+  error.value = ''
+}
+
+async function saveSeriesData() {
+  error.value = ''
+  if (!seriesForm.name.trim()) {
+    error.value = 'Series name is required.'
+    return
+  }
+  const slug = slugifyName(seriesForm.name)
+  const id = editingSeriesId.value || `series-${slug}`
+  saving.value = true
+  try {
+    const payload = {
+      name: seriesForm.name.trim(),
+      slug,
+      logo: seriesForm.logo.trim(),
+      description: seriesForm.description.trim(),
+    }
+    await saveSeries(id, payload)
+    await load()
+    showSeriesForm.value = false
+    editingSeriesId.value = null
+    notice.value = editingSeriesId.value ? 'Series updated.' : 'Series created.'
+  } catch (e) {
+    error.value = 'Error saving series: ' + e.message
+  } finally {
+    saving.value = false
+  }
+}
+
+async function removeSeries(s) {
+  if (!window.confirm(`Delete series "${s.name}"? This action cannot be undone.`)) return
+  error.value = ''
+  try {
+    await deleteSeries(s.id)
+    await load()
+    if (editingSeriesId.value === s.id) {
+      showSeriesForm.value = false
+      editingSeriesId.value = null
+    }
+    notice.value = 'Series deleted.'
+  } catch (e) {
+    error.value = 'Error deleting series: ' + e.message
+  }
+}
+
+async function processLogo(file) {
+  error.value = ''
+  if (!seriesForm.name.trim()) {
+    error.value = 'Write the series name first.'
+    return
+  }
+  uploading.value = true
+  try {
+    const logo = await fileToLogo(file)
+    seriesForm.logo = logo
+    notice.value = 'Logo ready to save.'
+  } catch (err) {
+    error.value = 'Error processing the image: ' + err.message
+  } finally {
+    uploading.value = false
+  }
+}
+
+function onLogoSelected(e) {
+  const file = e.target.files?.[0]
+  e.target.value = ''
+  if (file) processLogo(file)
 }
 
 async function processCover(file) {
@@ -360,7 +476,7 @@ watch(search, (v) => {
       <header class="flex flex-col gap-4 border-b border-white/15 pb-6 md:flex-row md:items-center md:justify-between">
         <div>
           <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/40">Signed in as · {{ user.email }}</p>
-          <h1 class="font-display mt-1 text-3xl font-black uppercase tracking-tight">Comics panel</h1>
+          <h1 class="font-display mt-1 text-3xl font-black uppercase tracking-tight">Admin panel</h1>
         </div>
         <div class="flex gap-3">
           <button
@@ -378,6 +494,24 @@ watch(search, (v) => {
         </div>
       </header>
 
+      <!-- Tabs -->
+      <div class="mt-6 flex gap-1 border-b border-white/10">
+        <button
+          @click="activeTab = 'comics'"
+          class="px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] transition-colors duration-300"
+          :class="activeTab === 'comics' ? 'border-b-2 border-white text-white' : 'text-white/50 hover:text-white'"
+        >
+          Comics ({{ comics.length }})
+        </button>
+        <button
+          @click="activeTab = 'series'"
+          class="px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] transition-colors duration-300"
+          :class="activeTab === 'series' ? 'border-b-2 border-white text-white' : 'text-white/50 hover:text-white'"
+        >
+          Series ({{ series.length }})
+        </button>
+      </div>
+
       <p v-if="notice" class="mt-5 border border-white/40 bg-white px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-black">
         {{ notice }}
       </p>
@@ -385,105 +519,169 @@ watch(search, (v) => {
         {{ error }}
       </p>
 
-      <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div class="flex-1">
-          <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-white/60">
-            Catalog ({{ filteredComics.length }} / {{ comics.length }})
-          </h2>
-          <div class="relative mt-3 max-w-md">
-            <input
-              v-model="search"
-              type="search"
-              placeholder="Search by title, character, ID, issue, status…"
-              class="w-full border border-white/20 bg-transparent py-3 pl-4 pr-10 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-            />
-            <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-white/40">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-binoculars-fill" viewBox="0 0 16 16">
-                <path d="M4.5 1A1.5 1.5 0 0 0 3 2.5V3h4v-.5A1.5 1.5 0 0 0 5.5 1zM7 4v1h2V4h4v.882a.5.5 0 0 0 .276.447l.895.447A1.5 1.5 0 0 1 15 7.118V13H9v-1.5a.5.5 0 0 1 .146-.354l.854-.853V9.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v.793l.854.853A.5.5 0 0 1 7 11.5V13H1V7.118a1.5 1.5 0 0 1 .83-1.342l.894-.447A.5.5 0 0 0 3 4.882V4zM1 14v.5A1.5 1.5 0 0 0 2.5 16h3A1.5 1.5 0 0 0 7 14.5V14zm8 0v.5a1.5 1.5 0 0 0 1.5 1.5h3a1.5 1.5 0 0 0 1.5-1.5V14zm4-11H9v-.5A1.5 1.5 0 0 1 10.5 1h1A1.5 1.5 0 0 1 13 2.5z"/>
-              </svg>
-            </span>
-          </div>
-        </div>
-        <button
-          @click="openNew"
-          class="bg-white px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-white/80"
-        >
-          + New comic
-        </button>
-      </div>
-
-      <!-- Cargando -->
-      <div v-if="loading" class="mt-6 space-y-3">
-        <div v-for="i in 3" :key="i" class="h-16 animate-pulse border border-white/10"></div>
-      </div>
-
-      <!-- Lista vacía -->
-      <div v-else-if="comics.length === 0" class="mt-6 border border-white/10 p-10 text-center">
-        <p class="text-sm uppercase tracking-[0.25em] text-white/40">No comics yet. Create the first one.</p>
-      </div>
-
-      <!-- Sin resultados de búsqueda -->
-      <div v-else-if="filteredComics.length === 0" class="mt-6 border border-white/10 p-10 text-center">
-        <p class="text-sm uppercase tracking-[0.25em] text-white/40">No comics match your search.</p>
-      </div>
-
-      <!-- Lista de cómics agrupada por protagonista -->
-      <div v-else class="mt-6 space-y-3">
-        <section v-for="group in groups" :key="group.name" class="border border-white/10">
-          <button
-            type="button"
-            @click="toggleGroup(group.name)"
-            class="flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition-colors duration-300 hover:bg-white/5"
-          >
-            <span class="flex items-center gap-3">
-              <span class="text-xs font-bold uppercase tracking-[0.3em] text-white">{{ group.name }}</span>
-              <span class="text-[11px] uppercase tracking-[0.2em] text-white/40">{{ group.items.length }} issues</span>
-            </span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              class="h-3 w-3 text-white/50 transition-transform duration-300"
-              :class="isGroupOpen(group.name) ? 'rotate-180' : ''"
-            >
-              <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
-            </svg>
-          </button>
-          <div v-if="isGroupOpen(group.name)" class="divide-y divide-white/10 border-t border-white/10">
-            <div v-for="comic in group.items" :key="comic.id" class="flex flex-col gap-3 py-4 px-4 md:flex-row md:items-center md:justify-between">
-              <div class="flex items-center gap-4">
-                <div class="h-16 w-11 shrink-0 overflow-hidden bg-ink-900">
-                  <img :src="comic.poster || '/images/no-image.webp'" :alt="`Cover of ${comic.title}`" class="h-full w-full object-cover" />
-                </div>
-                <div>
-                  <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">{{ comic.year }}</p>
-                  <h4 class="font-display text-lg font-black uppercase tracking-tight">{{ comic.title }}</h4>
-                  <p class="text-xs text-white/50">{{ comic.id }} · Issue {{ comic.issue }}</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="border border-white/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">
-                  {{ comic.status }}
-                </span>
-                <span v-if="comic.featured" class="border border-white bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-black">
-                  Featured
-                </span>
-                <button
-                  @click="openEdit(comic)"
-                  class="border border-white/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-white"
-                >
-                  Edit
-                </button>
-                <button
-                  @click="remove(comic)"
-                  class="border border-white/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 transition-colors duration-300 hover:border-red-400 hover:text-red-400"
-                >
-                  Delete
-                </button>
-              </div>
+      <!-- Comics Tab -->
+      <div v-if="activeTab === 'comics'">
+        <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div class="flex-1">
+            <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-white/60">
+              Catalog ({{ filteredComics.length }} / {{ comics.length }})
+            </h2>
+            <div class="relative mt-3 max-w-md">
+              <input
+                v-model="search"
+                type="search"
+                placeholder="Search by title, character, ID, issue, status…"
+                class="w-full border border-white/20 bg-transparent py-3 pl-4 pr-10 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
+              />
+              <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-white/40">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-binoculars-fill" viewBox="0 0 16 16">
+                  <path d="M4.5 1A1.5 1.5 0 0 0 3 2.5V3h4v-.5A1.5 1.5 0 0 0 5.5 1zM7 4v1h2V4h4v.882a.5.5 0 0 0 .276.447l.895.447A1.5 1.5 0 0 1 15 7.118V13H9v-1.5a.5.5 0 0 1 .146-.354l.854-.853V9.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v.793l.854.853A.5.5 0 0 1 7 11.5V13H1V7.118a1.5 1.5 0 0 1 .83-1.342l.894-.447A.5.5 0 0 0 3 4.882V4zM1 14v.5A1.5 1.5 0 0 0 2.5 16h3A1.5 1.5 0 0 0 7 14.5V14zm8 0v.5a1.5 1.5 0 0 0 1.5 1.5h3a1.5 1.5 0 0 0 1.5-1.5V14zm4-11H9v-.5A1.5 1.5 0 0 1 10.5 1h1A1.5 1.5 0 0 1 13 2.5z"/>
+                </svg>
+              </span>
             </div>
           </div>
-        </section>
+          <button
+            @click="openNew"
+            class="bg-white px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-white/80"
+          >
+            + New comic
+          </button>
+        </div>
+
+        <!-- Cargando -->
+        <div v-if="loading" class="mt-6 space-y-3">
+          <div v-for="i in 3" :key="i" class="h-16 animate-pulse border border-white/10"></div>
+        </div>
+
+        <!-- Lista vacía -->
+        <div v-else-if="comics.length === 0" class="mt-6 border border-white/10 p-10 text-center">
+          <p class="text-sm uppercase tracking-[0.25em] text-white/40">No comics yet. Create the first one.</p>
+        </div>
+
+        <!-- Sin resultados de búsqueda -->
+        <div v-else-if="filteredComics.length === 0" class="mt-6 border border-white/10 p-10 text-center">
+          <p class="text-sm uppercase tracking-[0.25em] text-white/40">No comics match your search.</p>
+        </div>
+
+        <!-- Lista de cómics agrupada por protagonista -->
+        <div v-else class="mt-6 space-y-3">
+          <section v-for="group in groups" :key="group.name" class="border border-white/10">
+            <button
+              type="button"
+              @click="toggleGroup(group.name)"
+              class="flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition-colors duration-300 hover:bg-white/5"
+            >
+              <span class="flex items-center gap-3">
+                <span class="text-xs font-bold uppercase tracking-[0.3em] text-white">{{ group.name }}</span>
+                <span class="text-[11px] uppercase tracking-[0.2em] text-white/40">{{ group.items.length }} issues</span>
+              </span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                class="h-3 w-3 text-white/50 transition-transform duration-300"
+                :class="isGroupOpen(group.name) ? 'rotate-180' : ''"
+              >
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+              </svg>
+            </button>
+            <div v-if="isGroupOpen(group.name)" class="divide-y divide-white/10 border-t border-white/10">
+              <div v-for="comic in group.items" :key="comic.id" class="flex flex-col gap-3 py-4 px-4 md:flex-row md:items-center md:justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="h-16 w-11 shrink-0 overflow-hidden bg-ink-900">
+                    <img :src="comic.poster || '/images/no-image.webp'" :alt="`Cover of ${comic.title}`" class="h-full w-full object-cover" />
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">{{ comic.year }}</p>
+                    <h4 class="font-display text-lg font-black uppercase tracking-tight">{{ comic.title }}</h4>
+                    <p class="text-xs text-white/50">{{ comic.id }} · Issue {{ comic.issue }}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="border border-white/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">
+                    {{ comic.status }}
+                  </span>
+                  <span v-if="comic.featured" class="border border-white bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-black">
+                    Featured
+                  </span>
+                  <button
+                    @click="openEdit(comic)"
+                    class="border border-white/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-white"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    @click="remove(comic)"
+                    class="border border-white/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 transition-colors duration-300 hover:border-red-400 hover:text-red-400"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Series Tab -->
+      <div v-if="activeTab === 'series'">
+        <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div class="flex-1">
+            <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-white/60">
+              Series ({{ series.length }})
+            </h2>
+          </div>
+          <button
+            @click="openNewSeries"
+            class="bg-white px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-white/80"
+          >
+            + New series
+          </button>
+        </div>
+
+        <!-- Cargando -->
+        <div v-if="loading" class="mt-6 space-y-3">
+          <div v-for="i in 3" :key="i" class="h-16 animate-pulse border border-white/10"></div>
+        </div>
+
+        <!-- Lista vacía -->
+        <div v-else-if="series.length === 0" class="mt-6 border border-white/10 p-10 text-center">
+          <p class="text-sm uppercase tracking-[0.25em] text-white/40">No series yet. Create the first one.</p>
+        </div>
+
+        <!-- Lista de series -->
+        <div v-else class="mt-6 space-y-3">
+          <div v-for="s in series" :key="s.id" class="flex flex-col gap-3 border border-white/10 py-4 px-4 md:flex-row md:items-center md:justify-between">
+            <div class="flex items-center gap-4">
+              <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-ink-900">
+                <img v-if="s.logo" :src="s.logo" :alt="`Logo of ${s.name}`" class="h-full w-full object-cover" />
+                <div v-else class="flex h-full w-full items-center justify-center text-white/30">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <h4 class="font-display text-lg font-black uppercase tracking-tight">{{ s.name }}</h4>
+                <p class="text-xs text-white/50">{{ s.description || 'No description' }}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                @click="openEditSeries(s)"
+                class="border border-white/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-white"
+              >
+                Edit
+              </button>
+              <button
+                @click="removeSeries(s)"
+                class="border border-white/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 transition-colors duration-300 hover:border-red-400 hover:text-red-400"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Modal crear / editar cómic -->
@@ -583,6 +781,16 @@ watch(search, (v) => {
                     Featured
                   </label>
                   <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-3">
+                    Series (optional)
+                    <select
+                      v-model="form.seriesId"
+                      class="mt-2 w-full border border-white/20 bg-black px-4 py-3 text-sm text-white focus:border-white focus:outline-none"
+                    >
+                      <option value="">No series</option>
+                      <option v-for="s in series" :key="s.id" :value="s.id">{{ s.name }}</option>
+                    </select>
+                  </label>
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-3">
                     Description
                     <textarea
                       v-model="form.description"
@@ -627,6 +835,100 @@ watch(search, (v) => {
                   </button>
                   <button
                     @click="cancelForm"
+                    class="border border-white/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white/60 transition-colors duration-300 hover:border-white hover:text-white"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
+
+      <!-- Modal crear / editar serie -->
+      <Teleport to="body">
+        <Transition name="admin-modal">
+          <div
+            v-if="showSeriesForm"
+            class="fixed inset-0 z-[110] flex items-start justify-center overflow-y-auto bg-black/80 p-4 py-10 backdrop-blur-sm md:p-8"
+            @click.self="cancelSeriesForm"
+            role="dialog"
+            aria-modal="true"
+            :aria-label="editingSeriesId ? 'Edit series' : 'New series'"
+          >
+            <div class="w-full max-w-2xl border border-white/15 bg-ink-950">
+              <div class="flex items-center justify-between border-b border-white/10 px-6 py-5 md:px-8">
+                <h2 class="font-display text-xl font-black uppercase tracking-tight">{{ editingSeriesId ? 'Edit series' : 'New series' }}</h2>
+                <button
+                  @click="cancelSeriesForm"
+                  class="flex h-9 w-9 items-center justify-center border border-white/20 text-sm text-white/60 transition-colors duration-300 hover:border-white hover:text-white"
+                  aria-label="Close form"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div class="px-6 py-6 md:px-8">
+                <div class="grid gap-6 md:grid-cols-2">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-2">
+                    Series Name *
+                    <input
+                      v-model="seriesForm.name"
+                      placeholder="The Origin Saga"
+                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                    />
+                  </label>
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-2">
+                    Description
+                    <textarea
+                      v-model="seriesForm.description"
+                      rows="2"
+                      placeholder="Brief description of the series…"
+                      class="mt-2 w-full resize-y border border-white/20 bg-transparent px-4 py-3 text-sm leading-relaxed placeholder:text-white/25 focus:border-white focus:outline-none"
+                    ></textarea>
+                  </label>
+                </div>
+
+                <div class="mt-6 border border-white/10 p-4">
+                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Series Logo</p>
+                  <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div class="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-ink-900">
+                      <img v-if="seriesForm.logo" :src="seriesForm.logo" alt="Logo preview" class="h-full w-full object-cover" />
+                      <div v-else class="flex h-full w-full items-center justify-center text-white/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <label
+                        class="inline-flex cursor-pointer border border-white/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:border-white"
+                      >
+                        {{ uploading ? 'Processing…' : 'Choose logo' }}
+                        <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onLogoSelected" />
+                      </label>
+                      <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-white/35">
+                        Square image recommended. Will be displayed in the comic detail.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <p v-if="error" class="mt-5 border border-red-400/40 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
+                  {{ error }}
+                </p>
+
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <button
+                    @click="saveSeriesData"
+                    :disabled="saving"
+                    class="bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-white/80 disabled:opacity-50"
+                  >
+                    {{ saving ? 'Saving…' : 'Save series' }}
+                  </button>
+                  <button
+                    @click="cancelSeriesForm"
                     class="border border-white/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white/60 transition-colors duration-300 hover:border-white hover:text-white"
                   >
                     Cancel

@@ -1,10 +1,10 @@
 <script setup>
-// Ficha de detalle del cómic (se abre en /comics/<slug>).
-// Página completa con hero section, secciones de detalles y compra.
+// Ficha de detalle del cómic (se abre en /comic/<slug>).
+// Diseño inspirado en Rockstar Games Store: hero full-bleed, secciones anchas, navegación sticky.
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { fetchComicBySlug, fetchComics } from '../../services/comicsService'
+import { getSeriesById } from '../../services/seriesService'
 import { onAdminAuth } from '../../firebase/auth'
-import { navigate } from '../../utils/router'
 
 const props = defineProps({
   slug: { type: String, required: true },
@@ -16,16 +16,30 @@ const loading = ref(true)
 const copied = ref(false)
 const added = ref(false)
 const related = ref([])
+const series = ref(null)
 const isAdmin = ref(false)
+const activeSection = ref('synopsis')
 
 const isAvailable = computed(() => ['Available', 'Limited Edition'].includes(comic.value?.status))
+
+const sections = [
+  { id: 'synopsis', label: 'Synopsis' },
+  { id: 'details', label: 'Details' },
+  { id: 'related', label: 'Related' },
+  { id: 'buy', label: 'Buy' },
+]
 
 async function load() {
   loading.value = true
   added.value = false
   comic.value = await fetchComicBySlug(props.slug)
   related.value = []
+  series.value = null
   if (comic.value) {
+    // Fetch series if comic has a seriesId
+    if (comic.value.seriesId) {
+      series.value = await getSeriesById(comic.value.seriesId)
+    }
     const list = await fetchComics()
     const base = isAdmin.value
       ? list
@@ -37,23 +51,25 @@ async function load() {
       .slice(0, 4)
   }
   loading.value = false
-  window.scrollTo(0, 0)
 }
 
 function buy() {
   if (!isAvailable.value) return
   added.value = true
-  setTimeout(() => {
-    navigate('/')
-  }, 1500)
+  emit('close')
 }
 
-function goBack() {
-  navigate('/')
+function onKey(e) {
+  if (e.key === 'Escape') emit('close')
+}
+
+function scrollToSection(id) {
+  activeSection.value = id
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 
 function productUrl() {
-  return window.location.origin + '/comics/' + props.slug
+  return window.location.origin + window.location.pathname.replace(/\/comics\/.*$/, '') + '/comics/' + props.slug
 }
 
 function shareText() {
@@ -82,6 +98,8 @@ async function copyLink() {
 
 let unsubscribeAuth = null
 onMounted(async () => {
+  window.addEventListener('keydown', onKey)
+  document.body.style.overflow = 'hidden'
   unsubscribeAuth = await onAdminAuth((u) => {
     isAdmin.value = Boolean(u)
     if (comic.value) load()
@@ -89,6 +107,8 @@ onMounted(async () => {
   load()
 })
 onUnmounted(() => {
+  window.removeEventListener('keydown', onKey)
+  document.body.style.overflow = ''
   if (unsubscribeAuth) unsubscribeAuth()
 })
 
@@ -96,32 +116,27 @@ watch(() => props.slug, load)
 </script>
 
 <template>
-  <div class="min-h-screen bg-black pt-20">
+  <div class="fixed inset-0 z-[90] overflow-y-auto bg-black" @click.self="emit('close')">
     <!-- Cargando -->
-    <div v-if="loading" class="animate-pulse">
-      <div class="h-[60vh] bg-ink-900"></div>
-      <div class="mx-auto max-w-6xl px-8 py-16">
-        <div class="h-8 w-64 bg-ink-800"></div>
-        <div class="mt-4 h-16 w-3/4 bg-ink-700"></div>
-        <div class="mt-8 h-4 w-1/2 bg-ink-800"></div>
-      </div>
+    <div v-if="loading" class="min-h-screen animate-pulse bg-black">
+      <div class="h-screen bg-ink-900"></div>
     </div>
 
     <!-- No encontrado -->
-    <div v-else-if="!comic" class="flex min-h-[60vh] items-center justify-center p-10">
+    <div v-else-if="!comic" class="flex min-h-screen items-center justify-center p-10">
       <div class="text-center">
         <p class="text-sm uppercase tracking-[0.25em] text-ink-400">Comic not found</p>
         <button
-          @click="goBack"
+          @click="emit('close')"
           class="mt-6 rounded-lg bg-white px-8 py-3 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-ink-200"
         >
-          Back to Home
+          Back
         </button>
       </div>
     </div>
 
     <!-- Comic Detail -->
-    <div v-else>
+    <div v-else class="min-h-screen">
       <!-- Hero Section -->
       <section class="relative h-[70vh] min-h-[500px] overflow-hidden">
         <!-- Background Image -->
@@ -129,25 +144,34 @@ watch(() => props.slug, load)
           <img
             :src="comic.poster || '/images/no-image.webp'"
             :alt="`Cover of ${comic.title}`"
-            class="h-full w-full object-cover"
+            class="h-full w-full object-cover animate-slow-zoom"
           />
           <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
           <div class="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent"></div>
         </div>
 
+        <!-- Close Button -->
+        <button
+          @click="emit('close')"
+          aria-label="Close"
+          class="absolute right-6 top-6 z-20 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-sm transition-all duration-300 hover:border-white hover:bg-white/10"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
         <!-- Hero Content -->
         <div class="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div class="mx-auto max-w-6xl">
-            <!-- Back Button -->
-            <button
-              @click="goBack"
-              class="mb-6 inline-flex items-center gap-2 text-sm text-ink-300 transition-colors hover:text-white"
-            >
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Catalog
-            </button>
+            <!-- Series Logo -->
+            <div v-if="series && series.logo" class="mb-4">
+              <img
+                :src="series.logo"
+                :alt="`Logo of ${series.name}`"
+                class="h-12 w-auto object-contain drop-shadow-lg"
+              />
+            </div>
 
             <!-- Status Badge -->
             <span
@@ -183,87 +207,117 @@ watch(() => props.slug, load)
         </div>
       </section>
 
-      <!-- Content Sections -->
-      <div class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
-        <div class="flex flex-col gap-16 lg:flex-row lg:gap-24">
-          <!-- Main Content -->
-          <div class="flex-1">
-            <!-- Synopsis -->
-            <section>
-              <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">Synopsis</h2>
-              <p
-                v-if="comic.description"
-                class="mt-6 text-lg leading-relaxed text-ink-200"
-              >
-                {{ comic.description }}
-              </p>
-              <p v-else class="mt-6 text-ink-500">No description available.</p>
-            </section>
-
-            <!-- Details Grid -->
-            <section class="mt-16">
-              <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">Details</h2>
-              <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-4">
-                  <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Author</dt>
-                  <dd class="mt-2 font-display text-lg font-black text-white">{{ comic.author }}</dd>
-                </div>
-                <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-4">
-                  <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Issue</dt>
-                  <dd class="mt-2 font-display text-lg font-black text-white">#{{ comic.issue }}</dd>
-                </div>
-                <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-4">
-                  <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Year</dt>
-                  <dd class="mt-2 font-display text-lg font-black text-white">{{ comic.year }}</dd>
-                </div>
-                <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-4">
-                  <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Pages</dt>
-                  <dd class="mt-2 font-display text-lg font-black text-white">{{ comic.pages || '—' }}</dd>
-                </div>
-              </div>
-            </section>
-
-            <!-- Related Comics -->
-            <section v-if="related.length" class="mt-16">
-              <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">More from this series</h2>
-              <h3 class="font-display mt-2 text-2xl font-black uppercase tracking-tight text-white">{{ comic.title }}</h3>
-              <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <a v-for="r in related" :key="r.id" :href="`/comics/${r.slug}`" class="group block">
-                  <div class="overflow-hidden rounded-xl border border-ink-800 bg-ink-900 transition-all duration-300 group-hover:border-white group-hover:shadow-lg group-hover:shadow-white/5">
-                    <img
-                      :src="r.poster || '/images/no-image.webp'"
-                      :alt="`Cover of ${r.title}`"
-                      class="aspect-[1920/2951] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                    />
-                  </div>
-                  <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-500">{{ r.year }}</p>
-                  <h4 class="font-display mt-1 text-sm font-black uppercase tracking-tight text-white">{{ r.title }}</h4>
-                  <p class="mt-0.5 text-xs text-ink-400">Issue {{ r.issue }}</p>
-                </a>
-              </div>
-            </section>
+      <!-- Sticky Navigation -->
+      <nav class="sticky top-0 z-10 border-b border-ink-800 bg-black/95 backdrop-blur-md">
+        <div class="mx-auto max-w-6xl px-8 md:px-16">
+          <div class="flex gap-8 overflow-x-auto py-4">
+            <button
+              v-for="section in sections"
+              :key="section.id"
+              @click="scrollToSection(section.id)"
+              class="whitespace-nowrap text-xs font-bold uppercase tracking-[0.2em] transition-colors duration-300"
+              :class="activeSection === section.id ? 'text-white' : 'text-ink-500 hover:text-ink-200'"
+            >
+              {{ section.label }}
+            </button>
           </div>
+        </div>
+      </nav>
 
-          <!-- Sidebar: Buy Box -->
-          <div class="w-full lg:w-80 lg:shrink-0">
-            <div class="sticky top-24">
-              <!-- Cover Image -->
-              <div class="overflow-hidden rounded-2xl border border-ink-800 shadow-2xl shadow-black/50">
+      <!-- Synopsis Section -->
+      <section id="synopsis" class="border-b border-ink-800 bg-ink-950 py-16 md:py-24">
+        <div class="mx-auto max-w-6xl px-8 md:px-16">
+          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">Synopsis</h2>
+          <p
+            v-if="comic.description"
+            class="mt-6 max-w-3xl text-lg leading-relaxed text-ink-200 md:text-xl"
+          >
+            {{ comic.description }}
+          </p>
+          <p v-else class="mt-6 text-ink-500">No description available.</p>
+        </div>
+      </section>
+
+      <!-- Details Section -->
+      <section id="details" class="border-b border-ink-800 bg-black py-16 md:py-24">
+        <div class="mx-auto max-w-6xl px-8 md:px-16">
+          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">Details</h2>
+
+          <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <!-- Author -->
+            <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-6">
+              <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Author</dt>
+              <dd class="mt-2 font-display text-xl font-black text-white">{{ comic.author }}</dd>
+            </div>
+
+            <!-- Issue -->
+            <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-6">
+              <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Issue</dt>
+              <dd class="mt-2 font-display text-xl font-black text-white">#{{ comic.issue }}</dd>
+            </div>
+
+            <!-- Year -->
+            <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-6">
+              <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Year</dt>
+              <dd class="mt-2 font-display text-xl font-black text-white">{{ comic.year }}</dd>
+            </div>
+
+            <!-- Pages -->
+            <div class="rounded-xl border border-ink-800 bg-ink-900/50 p-6">
+              <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Pages</dt>
+              <dd class="mt-2 font-display text-xl font-black text-white">{{ comic.pages || '—' }}</dd>
+            </div>
+
+            <!-- Series -->
+            <div v-if="series" class="rounded-xl border border-ink-800 bg-ink-900/50 p-6 sm:col-span-2 lg:col-span-4">
+              <dt class="text-[10px] font-bold uppercase tracking-[0.25em] text-ink-500">Series</dt>
+              <dd class="mt-2 flex items-center gap-3">
+                <img v-if="series.logo" :src="series.logo" :alt="series.name" class="h-8 w-8 rounded object-cover" />
+                <span class="font-display text-xl font-black text-white">{{ series.name }}</span>
+              </dd>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Related Comics Section -->
+      <section v-if="related.length" id="related" class="border-b border-ink-800 bg-ink-950 py-16 md:py-24">
+        <div class="mx-auto max-w-6xl px-8 md:px-16">
+          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">More from this series</h2>
+          <h3 class="font-display mt-2 text-3xl font-black uppercase tracking-tight text-white">{{ comic.title }}</h3>
+
+          <div class="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+            <a v-for="r in related" :key="r.id" :href="`/comics/${r.slug}`" class="group block">
+              <div class="overflow-hidden rounded-xl border border-ink-800 bg-ink-900 transition-all duration-300 group-hover:border-white group-hover:shadow-lg group-hover:shadow-white/5">
                 <img
-                  :src="comic.poster || '/images/no-image.webp'"
-                  :alt="`Cover of ${comic.title}`"
-                  class="w-full object-cover"
+                  :src="r.poster || '/images/no-image.webp'"
+                  :alt="`Cover of ${r.title}`"
+                  class="aspect-[1920/2951] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
               </div>
+              <p class="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-500">{{ r.year }}</p>
+              <h4 class="font-display mt-1 text-sm font-black uppercase tracking-tight text-white">{{ r.title }}</h4>
+              <p class="mt-0.5 text-xs text-ink-400">Issue {{ r.issue }}</p>
+            </a>
+          </div>
+        </div>
+      </section>
 
-              <!-- Buy Box -->
-              <div class="mt-6 rounded-xl border border-ink-800 bg-ink-900/50 p-6">
-                <!-- Status -->
+      <!-- Buy Section -->
+      <section id="buy" class="bg-black py-16 md:py-24">
+        <div class="mx-auto max-w-6xl px-8 md:px-16">
+          <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
+            <!-- Buy Box -->
+            <div class="w-full max-w-md">
+              <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">Purchase</h2>
+
+              <div class="mt-8 rounded-xl border border-ink-800 bg-ink-900/50 p-8">
+                <!-- Price / Status -->
                 <div class="text-center">
-                  <p v-if="isAvailable" class="font-display text-3xl font-black text-white">
+                  <p v-if="isAvailable" class="font-display text-4xl font-black text-white">
                     Buy Now
                   </p>
-                  <p v-else class="font-display text-xl font-black uppercase text-ink-400">
+                  <p v-else class="font-display text-2xl font-black uppercase text-ink-400">
                     {{ comic.status }}
                   </p>
                 </div>
@@ -273,7 +327,7 @@ watch(() => props.slug, load)
                   :href="isAvailable ? '#comics' : undefined"
                   :aria-disabled="!isAvailable"
                   @click="buy"
-                  class="mt-6 flex w-full items-center justify-center gap-3 rounded-xl px-6 py-4 text-sm font-bold uppercase tracking-[0.25em] transition-all duration-300"
+                  class="mt-8 flex w-full items-center justify-center gap-3 rounded-xl px-8 py-5 text-sm font-bold uppercase tracking-[0.25em] transition-all duration-300"
                   :class="
                     isAvailable
                       ? 'bg-white text-black hover:bg-ink-200 hover:shadow-lg hover:shadow-white/10'
@@ -290,16 +344,16 @@ watch(() => props.slug, load)
                 </a>
 
                 <!-- Share -->
-                <div class="mt-6 border-t border-ink-800 pt-6">
+                <div class="mt-8 border-t border-ink-800 pt-6">
                   <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-500">Share</p>
-                  <div class="mt-3 flex flex-wrap gap-2">
+                  <div class="mt-4 flex flex-wrap gap-2">
                     <a
                       :href="shareUrl('whatsapp')"
                       target="_blank"
                       rel="noopener"
-                      class="inline-flex items-center gap-1.5 rounded-lg border border-ink-700 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.1em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
+                      class="inline-flex items-center gap-2 rounded-lg border border-ink-700 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
                     >
-                      <svg viewBox="0 0 448 512" width="10" height="10" fill="currentColor" aria-hidden="true">
+                      <svg viewBox="0 0 448 512" width="12" height="12" fill="currentColor" aria-hidden="true">
                         <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
                       </svg>
                       WA
@@ -308,9 +362,9 @@ watch(() => props.slug, load)
                       :href="shareUrl('x')"
                       target="_blank"
                       rel="noopener"
-                      class="inline-flex items-center gap-1.5 rounded-lg border border-ink-700 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.1em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
+                      class="inline-flex items-center gap-2 rounded-lg border border-ink-700 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
                     >
-                      <svg viewBox="0 0 448 512" width="10" height="10" fill="currentColor" aria-hidden="true">
+                      <svg viewBox="0 0 448 512" width="12" height="12" fill="currentColor" aria-hidden="true">
                         <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/>
                       </svg>
                       X
@@ -319,22 +373,22 @@ watch(() => props.slug, load)
                       :href="shareUrl('facebook')"
                       target="_blank"
                       rel="noopener"
-                      class="inline-flex items-center gap-1.5 rounded-lg border border-ink-700 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.1em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
+                      class="inline-flex items-center gap-2 rounded-lg border border-ink-700 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
                     >
-                      <svg viewBox="0 0 448 512" width="10" height="10" fill="currentColor" aria-hidden="true">
+                      <svg viewBox="0 0 448 512" width="12" height="12" fill="currentColor" aria-hidden="true">
                         <path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/>
                       </svg>
                       FB
                     </a>
                     <button
                       @click="copyLink"
-                      class="inline-flex items-center gap-1.5 rounded-lg border border-ink-700 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.1em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
+                      class="inline-flex items-center gap-2 rounded-lg border border-ink-700 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
                     >
-                      <svg v-if="!copied" viewBox="0 0 16 16" width="10" height="10" fill="currentColor" aria-hidden="true">
+                      <svg v-if="!copied" viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true">
                         <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
                         <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
                       </svg>
-                      <svg v-else viewBox="0 0 16 16" width="10" height="10" fill="currentColor" aria-hidden="true">
+                      <svg v-else viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
                         <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
                         <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
@@ -345,9 +399,23 @@ watch(() => props.slug, load)
                 </div>
               </div>
             </div>
+
+            <!-- Comic Cover Preview -->
+            <div class="hidden lg:block">
+              <div class="overflow-hidden rounded-2xl border border-ink-800 shadow-2xl shadow-black/50">
+                <img
+                  :src="comic.poster || '/images/no-image.webp'"
+                  :alt="`Cover of ${comic.title}`"
+                  class="w-72 object-cover"
+                />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- Footer Spacer -->
+      <div class="h-16 bg-black"></div>
     </div>
   </div>
 </template>
