@@ -152,47 +152,42 @@ watch(() => props.slug, load)
             </div>
 
             <!-- Issue + Rating Row -->
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4">
               <!-- Menubar Logo -->
-              <img src="/images/logo-menubar.png" alt="Logo" class="h-24 w-auto object-contain md:h-32" />
+              <img src="/images/logo-menubar.png" alt="Logo" class="h-16 w-auto object-contain md:h-20" />
 
-              <div class="flex flex-col items-center gap-4 lg:items-start">
-                <!-- Issue Number -->
-                <p class="font-display text-xl font-black uppercase text-white md:text-2xl">
-                  ISSUE {{ comic.issue }}
-                </p>
-
-                <!-- Comic Info -->
-                <div class="flex flex-wrap gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-ink-400">
-                  <span>Author: {{ comic.author }}</span>
-                  <span>Year: {{ comic.year }}</span>
-                  <span>Pages: {{ comic.pages || '—' }}</span>
-                </div>
-              </div>
+              <!-- Issue Number -->
+              <p class="font-display text-xl font-black uppercase text-white md:text-2xl">
+                ISSUE {{ comic.issue }}
+              </p>
 
               <!-- Rating Circle -->
-              <div v-if="comic.rating != null" class="flex flex-col items-center gap-2">
-                <div class="relative h-32 w-32 md:h-40 md:w-40">
-                  <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" class="text-ink-700" />
-                    <circle
-                      cx="50" cy="50" r="44"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="4"
-                      stroke-linecap="round"
-                      :stroke-dasharray="276.46"
-                      :stroke-dashoffset="276.46 - (276.46 * comic.rating) / 100"
-                      class="text-white transition-all duration-700"
-                    />
-                  </svg>
-                  <div class="absolute inset-0 flex flex-col items-center justify-center">
-                    <span class="font-display text-3xl font-black text-white md:text-4xl">{{ comic.rating }}</span>
-                    <span class="text-[10px] uppercase tracking-wider text-ink-500">%</span>
-                  </div>
+              <div v-if="comic.rating != null" class="relative h-20 w-20 md:h-24 md:w-24">
+                <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" class="text-ink-700" />
+                  <circle
+                    cx="50" cy="50" r="44"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                    :stroke-dasharray="276.46"
+                    :stroke-dashoffset="276.46 - (276.46 * comic.rating) / 100"
+                    class="text-white transition-all duration-700"
+                  />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <span class="font-display text-2xl font-black text-white md:text-3xl">{{ comic.rating }}</span>
+                  <span class="text-[8px] uppercase tracking-wider text-ink-500">%</span>
                 </div>
-                <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-500">Rating</span>
               </div>
+            </div>
+
+            <!-- Comic Info -->
+            <div class="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-ink-400 lg:justify-start">
+              <span>Author: {{ comic.author }}</span>
+              <span>Year: {{ comic.year }}</span>
+              <span>Pages: {{ comic.pages || '—' }}</span>
             </div>
 
             <!-- Buy Button -->
