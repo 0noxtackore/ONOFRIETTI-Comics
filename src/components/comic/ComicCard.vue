@@ -12,6 +12,9 @@ const props = defineProps({
 // Buyable statuses
 const isAvailable = computed(() => ['Available', 'Limited Edition'].includes(props.comic.status))
 
+// Cómics nuevos: del año actual
+const isNew = computed(() => props.comic.year === new Date().getFullYear())
+
 const buyLabel = computed(() => {
   switch (props.comic.status) {
     case 'Limited Edition':
@@ -57,6 +60,14 @@ const titleFontSize = computed(() => {
         class="diagonal-stripes pointer-events-none absolute inset-0 opacity-0"
         aria-hidden="true"
       ></span>
+
+      <!-- Icono de nuevo -->
+      <img
+        v-if="isNew"
+        src="/images/new-icon.png"
+        alt="New"
+        class="pointer-events-none absolute right-2 top-2 z-10 h-8 w-8 drop-shadow-lg"
+      />
 
     </a>
 
