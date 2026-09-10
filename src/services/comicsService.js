@@ -30,6 +30,7 @@ export function mapDoc(doc) {
     featured: Boolean(d.featured),
     seriesId: d.seriesId || '',
     rating: num(d.rating),
+    price: num(d.price),
   }
 }
 

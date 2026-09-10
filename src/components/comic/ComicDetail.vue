@@ -174,7 +174,7 @@ watch(() => props.slug, load)
               :href="isAvailable ? '#comics' : undefined"
               :aria-disabled="!isAvailable"
               @click="buy"
-              class="mt-8 flex w-full items-center justify-center gap-3 rounded-xl px-8 py-5 text-sm font-bold uppercase tracking-[0.25em] transition-all duration-300 lg:w-auto"
+              class="mt-8 flex w-full items-center justify-center gap-3 px-8 py-5 text-sm font-bold uppercase tracking-[0.25em] transition-all duration-300 lg:w-auto"
               :class="
                 isAvailable
                   ? 'bg-white text-black hover:bg-ink-200 hover:shadow-lg hover:shadow-white/10'
@@ -187,7 +187,7 @@ watch(() => props.slug, load)
               <svg v-else viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true">
                 <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
               </svg>
-              {{ isAvailable ? (added ? 'Added!' : 'Add to Cart') : comic.status }}
+              {{ isAvailable ? (added ? 'Added!' : `Buy – $${comic.price}`) : comic.status }}
             </a>
           </div>
 
