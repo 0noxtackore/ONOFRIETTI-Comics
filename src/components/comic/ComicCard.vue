@@ -36,7 +36,7 @@ const titleFontSize = computed(() => {
 </script>
 
 <template>
-  <article v-reveal="{ delay: (index % 3) * 90 }" class="group flex flex-col transition-transform duration-300 ease-out hover:scale-[1.03]">
+  <article v-reveal="{ delay: (index % 3) * 90 }" class="group flex flex-col">
     <a
       :href="`/comics/${comic.slug}`"
       :aria-label="`View ${comic.title} details`"
