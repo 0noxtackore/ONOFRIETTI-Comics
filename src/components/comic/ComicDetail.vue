@@ -156,23 +156,6 @@ watch(() => props.slug, load)
               ISSUE {{ comic.issue }}
             </p>
 
-            <!-- Status Badge -->
-            <span
-              v-if="comic.status"
-              class="mt-4 inline-block rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.3em]"
-              :class="
-                comic.status === 'Available'
-                  ? 'bg-green-500/20 text-green-400'
-                  : comic.status === 'Limited Edition'
-                  ? 'bg-yellow-500/20 text-yellow-400'
-                  : comic.status === 'Sold Out'
-                  ? 'bg-red-500/20 text-red-400'
-                  : 'bg-ink-600/50 text-ink-300'
-              "
-            >
-              {{ comic.status }}
-            </span>
-
             <!-- Buy Button -->
             <a
               :href="isAvailable ? '#comics' : undefined"
@@ -193,58 +176,6 @@ watch(() => props.slug, load)
               </svg>
               {{ isAvailable ? (added ? 'Added!' : 'Add to Cart') : comic.status }}
             </a>
-
-            <!-- Share -->
-            <div class="mt-8 flex flex-wrap gap-2">
-              <a
-                :href="shareUrl('whatsapp')"
-                target="_blank"
-                rel="noopener"
-                class="inline-flex items-center gap-2 rounded-lg border border-ink-700 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
-              >
-                <svg viewBox="0 0 448 512" width="12" height="12" fill="currentColor" aria-hidden="true">
-                  <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
-                </svg>
-                WA
-              </a>
-              <a
-                :href="shareUrl('x')"
-                target="_blank"
-                rel="noopener"
-                class="inline-flex items-center gap-2 rounded-lg border border-ink-700 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
-              >
-                <svg viewBox="0 0 448 512" width="12" height="12" fill="currentColor" aria-hidden="true">
-                  <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/>
-                </svg>
-                X
-              </a>
-              <a
-                :href="shareUrl('facebook')"
-                target="_blank"
-                rel="noopener"
-                class="inline-flex items-center gap-2 rounded-lg border border-ink-700 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
-              >
-                <svg viewBox="0 0 448 512" width="12" height="12" fill="currentColor" aria-hidden="true">
-                  <path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/>
-                </svg>
-                FB
-              </a>
-              <button
-                @click="copyLink"
-                class="inline-flex items-center gap-2 rounded-lg border border-ink-700 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-ink-300 transition-colors duration-300 hover:border-white hover:text-white"
-              >
-                <svg v-if="!copied" viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true">
-                  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
-                  <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
-                </svg>
-                <svg v-else viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
-                  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
-                  <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
-                </svg>
-                {{ copied ? 'Copied!' : 'Link' }}
-              </button>
-            </div>
           </div>
 
           <!-- Right: Comic Cover -->
