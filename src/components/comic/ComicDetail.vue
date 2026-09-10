@@ -151,16 +151,48 @@ watch(() => props.slug, load)
               />
             </div>
 
-            <!-- Issue Number -->
-            <p class="font-display text-xl font-black uppercase text-white md:text-2xl">
-              ISSUE {{ comic.issue }}
-            </p>
+            <!-- Issue + Rating Row -->
+            <div class="flex items-center gap-6">
+              <!-- Menubar Logo -->
+              <img src="/images/logo-menubar.png" alt="Logo" class="h-24 w-auto object-contain md:h-32" />
 
-            <!-- Comic Info -->
-            <div class="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-ink-400">
-              <span>Author: {{ comic.author }}</span>
-              <span>Year: {{ comic.year }}</span>
-              <span>Pages: {{ comic.pages || '—' }}</span>
+              <div class="flex flex-col items-center gap-4 lg:items-start">
+                <!-- Issue Number -->
+                <p class="font-display text-xl font-black uppercase text-white md:text-2xl">
+                  ISSUE {{ comic.issue }}
+                </p>
+
+                <!-- Comic Info -->
+                <div class="flex flex-wrap gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-ink-400">
+                  <span>Author: {{ comic.author }}</span>
+                  <span>Year: {{ comic.year }}</span>
+                  <span>Pages: {{ comic.pages || '—' }}</span>
+                </div>
+              </div>
+
+              <!-- Rating Circle -->
+              <div v-if="comic.rating != null" class="flex flex-col items-center gap-2">
+                <div class="relative h-32 w-32 md:h-40 md:w-40">
+                  <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" class="text-ink-700" />
+                    <circle
+                      cx="50" cy="50" r="44"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                      :stroke-dasharray="276.46"
+                      :stroke-dashoffset="276.46 - (276.46 * comic.rating) / 100"
+                      class="text-white transition-all duration-700"
+                    />
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="font-display text-3xl font-black text-white md:text-4xl">{{ comic.rating }}</span>
+                    <span class="text-[10px] uppercase tracking-wider text-ink-500">%</span>
+                  </div>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-500">Rating</span>
+              </div>
             </div>
 
             <!-- Buy Button -->
@@ -201,36 +233,12 @@ watch(() => props.slug, load)
         <section class="mt-16 border-t border-ink-800 pt-16 md:mt-24">
           <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">Comic Details</h2>
 
-          <div class="mt-6 flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
+          <div class="mt-6">
             <!-- Description -->
-            <div v-if="comic.description" class="flex-1">
+            <div v-if="comic.description">
               <p class="max-w-3xl text-lg leading-relaxed text-ink-200 md:text-xl">
                 {{ comic.description }}
               </p>
-            </div>
-
-            <!-- Rating Circle -->
-            <div v-if="comic.rating != null" class="flex flex-col items-center gap-2">
-              <div class="relative h-24 w-24 md:h-28 md:w-28">
-                <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" class="text-ink-700" />
-                  <circle
-                    cx="50" cy="50" r="44"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                    :stroke-dasharray="276.46"
-                    :stroke-dashoffset="276.46 - (276.46 * comic.rating) / 100"
-                    class="text-white transition-all duration-700"
-                  />
-                </svg>
-                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                  <span class="font-display text-2xl font-black text-white">{{ comic.rating }}</span>
-                  <span class="text-[9px] uppercase tracking-wider text-ink-500">%</span>
-                </div>
-              </div>
-              <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-500">Rating</span>
             </div>
           </div>
         </section>
