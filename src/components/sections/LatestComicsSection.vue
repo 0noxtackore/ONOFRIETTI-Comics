@@ -72,7 +72,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section id="comics" class="relative bg-black py-24 md:py-36">
+  <section id="comics" class="relative bg-gradient-to-b from-black via-editorial-900/30 to-black py-24 md:py-36">
     <div class="mx-auto max-w-7xl px-5 md:px-8">
       <div class="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
         <SectionHeading

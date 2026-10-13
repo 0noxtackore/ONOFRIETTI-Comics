@@ -37,18 +37,18 @@ const legal = [
 </script>
 
 <template>
-  <footer class="border-t border-white/10 bg-ink-950">
+  <footer class="border-t border-white/10 bg-gradient-to-t from-black via-editorial-900/20 to-black">
     <!-- Newsletter -->
     <div class="border-b border-white/10">
       <div class="mx-auto max-w-7xl px-5 py-16 text-center md:px-8 md:py-20">
-        <p class="text-xs font-bold uppercase tracking-[0.35em] text-white/50">Newsletter</p>
-        <h2 class="font-display mt-4 text-3xl font-black uppercase leading-none tracking-tight text-white md:text-5xl">
-          Subscribe to the ink
-        </h2>
-        <p class="mx-auto mt-4 max-w-md text-sm text-white/60 md:text-base">
-          Be the first to know about every release, reprint, and limited edition.
-          No spam. Just ink.
-        </p>
+          <p class="text-xs font-bold uppercase tracking-[0.45em] text-marvel-400">Newsletter</p>
+          <h2 class="font-display mt-4 text-3xl font-black uppercase leading-[0.9] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl">
+            Subscribe to the ink
+          </h2>
+          <p class="editorial-text mx-auto mt-4 max-w-md text-sm text-white/80 md:text-base">
+            Be the first to know about every release, reprint, and limited edition.
+            No spam. Just ink.
+          </p>
 
         <form
           v-if="!subscribed"
@@ -62,12 +62,12 @@ const legal = [
             placeholder="your@email.com"
             class="w-full border border-white/20 bg-black/40 px-5 py-3.5 text-sm text-white transition-colors placeholder:text-white/30 focus:border-white focus:outline-none"
           />
-          <button
-            type="submit"
-            class="shrink-0 bg-white px-8 py-3.5 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors hover:bg-white/80"
-          >
-            Subscribe
-          </button>
+            <button
+              type="submit"
+              class="shrink-0 bg-marvel-500 px-8 py-3.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-all duration-300 hover:bg-marvel-600 focus:outline-none focus:ring-2 focus:ring-white/40"
+            >
+              Subscribe
+            </button>
         </form>
 
         <p v-else class="mx-auto mt-8 max-w-md border border-white/20 px-6 py-4 text-sm text-white/70">
@@ -79,7 +79,7 @@ const legal = [
     <!-- Wordmark gigante -->
     <div class="overflow-hidden border-b border-white/10 py-2">
       <p
-        class="font-display whitespace-nowrap text-center text-[clamp(2.5rem,10vw,12rem)] font-black uppercase leading-none tracking-tight text-white/10 select-none"
+        class="font-display whitespace-nowrap text-center text-[clamp(3rem,14vw,16rem)] font-black uppercase leading-[0.8] tracking-[-0.04em] text-white/5 select-none"
       >
         Onofrietti
       </p>

@@ -26,14 +26,15 @@ const tickerItems = [
     Para reactivarlo, descomenta todo el bloque <section id="inicio">.
   -->
   <!--
-  <section id="inicio" class="relative flex min-h-screen flex-col overflow-hidden">
-    <div class="absolute inset-0">
-      <div class="animate-slow-zoom absolute inset-0">
-        <MonoPoster variant="burst" />
-      </div>
-      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/70"></div>
-      <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/40"></div>
-    </div>
+   <section id="hero" class="relative flex min-h-screen flex-col overflow-hidden">
+     <div class="absolute inset-0">
+       <div class="animate-slow-zoom absolute inset-0">
+         <MonoPoster variant="burst" />
+       </div>
+       <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/90"></div>
+       <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/30 to-black/60"></div>
+       <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0)_0%,rgba(0,0,0,0.85)_100%)]"></div>
+     </div>
 
     <div class="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 pb-24 pt-32 md:px-8 md:pt-40">
       <div class="max-w-3xl">
@@ -42,12 +43,12 @@ const tickerItems = [
           Onofrietti Comics presents
         </p>
 
-        <h1 class="font-display text-[15vw] font-black uppercase leading-[0.85] tracking-tight text-white sm:text-8xl lg:text-[7rem]">
-          <span class="rise-in block" style="animation-delay: 200ms">El</span>
-          <span class="rise-in text-outline block" style="animation-delay: 300ms">Origen</span>
-        </h1>
+         <h1 class="font-display text-[14vw] font-black uppercase leading-[0.78] tracking-[-0.03em] text-white drop-shadow-[0_40px_120px_rgba(0,0,0,0.85)] sm:text-8xl lg:text-[clamp(6rem,10vw,10rem)]">
+           <span class="rise-in block" style="animation-delay: 200ms">El</span>
+           <span class="rise-in block" style="animation-delay: 300ms">Origen</span>
+         </h1>
 
-        <p class="rise-in mt-8 max-w-xl text-base leading-relaxed text-white/70 md:text-lg" style="animation-delay: 420ms">
+         <p class="rise-in editorial-text mt-8 max-w-xl text-base text-white/80 md:text-lg" style="animation-delay: 420ms">
           Where it all began. A story of ink, doodles, and the bottom of a
           third-grade notebook.
         </p>
@@ -62,15 +63,15 @@ const tickerItems = [
         <div class="rise-in mt-10 flex flex-wrap items-center gap-4" style="animation-delay: 620ms">
           <a
             href="#comics"
-            class="group inline-flex items-center gap-3 bg-white px-8 py-4 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors hover:bg-white/80"
-          >
+             class="group inline-flex items-center gap-3 bg-marvel-500 px-8 py-4 text-xs font-bold uppercase tracking-[0.25em] text-white shadow-[0_8px_40px_-20px_rgba(230,36,41,0.9)] transition-all duration-300 hover:bg-marvel-600 focus:outline-none focus:ring-2 focus:ring-white/40"
+           >
             See comics
             <span class="transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden="true">→</span>
           </a>
           <a
             href="#comics"
-            class="inline-flex items-center gap-3 border border-white/30 px-8 py-4 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors hover:border-white hover:bg-white hover:text-black"
-          >
+             class="inline-flex items-center gap-3 border border-white/40 bg-black/40 px-8 py-4 text-xs font-bold uppercase tracking-[0.25em] text-white backdrop-blur-sm transition-all duration-300 hover:border-white hover:bg-white hover:text-black"
+           >
             The catalog
           </a>
         </div>

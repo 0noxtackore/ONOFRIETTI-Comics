@@ -52,8 +52,25 @@
 @layer components {
   /* Tipografía display: Archivo expandida (eje de ancho) */
   .font-display {
+    font-family: 'Archivo Black', 'Archivo', Impact, Haettenschweiler,
+      ui-sans-serif, system-ui, sans-serif;
+    font-stretch: 100%;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+
+  .font-heading {
     font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
-    font-stretch: 125%;
+    font-stretch: 115%;
+    letter-spacing: -0.015em;
+    text-transform: uppercase;
+  }
+
+  .editorial-text {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+      Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.8;
+    letter-spacing: 0.01em;
   }
 
   /* Texto solo contorneado (estilo cartel de cómic) */
@@ -90,9 +107,9 @@
     inset: 0;
     z-index: 80;
     pointer-events: none;
-    opacity: 0.05;
+    opacity: 0.08;
     mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   /* Cinta en movimiento (marquee) */
@@ -106,12 +123,12 @@
   }
 
   /* Revelado por scroll — activado por la directiva v-reveal */
-  .reveal {
+   .reveal {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(32px);
     transition:
-      opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity 1s cubic-bezier(0.25, 0.1, 0.25, 1),
+      transform 1s cubic-bezier(0.25, 0.1, 0.25, 1);
     will-change: opacity, transform;
   }
   .reveal.is-visible {
@@ -123,17 +140,17 @@
   .link-line {
     position: relative;
   }
-  .link-line::after {
+   .link-line::after {
     content: '';
     position: absolute;
     left: 0;
-    bottom: -5px;
+    bottom: -4px;
     height: 1px;
     width: 100%;
     background: currentColor;
     transform: scaleX(0);
     transform-origin: right;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
   }
   .link-line:hover::after {
     transform: scaleX(1);
