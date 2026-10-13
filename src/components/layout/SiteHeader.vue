@@ -8,21 +8,16 @@ const { isScrolled } = useScrollState(32)
 const { isOpen, toggle } = useMenu()
 
 const navLinks = [
+  { href: '#hero', label: 'Home' },
   { href: '#comics', label: 'Comics' },
-  { href: '#characters', label: 'Characters' },
-  { href: '#universe', label: 'Universe' },
-  { href: '#journal', label: 'Journal' },
+  { href: '#about', label: 'About' },
 ]
 </script>
 
 <template>
   <header
     class="fixed inset-x-0 top-0 z-50 transition-all duration-500"
-    :class="
-      isScrolled
-        ? 'border-b border-white/10 bg-black/95 backdrop-blur-lg'
-        : 'bg-gradient-to-b from-black/70 via-black/30 to-transparent'
-    "
+    :class="isScrolled ? 'border-b border-white/10 bg-ink-950/90 backdrop-blur-md' : 'bg-transparent'"
   >
     <div class="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5 sm:h-20 md:px-8">
       <AppLogo size="sm" class="mx-auto" />
@@ -33,8 +28,8 @@ const navLinks = [
           v-for="link in navLinks"
           :key="link.href"
           :href="link.href"
-           class="link-line text-xs font-semibold uppercase tracking-[0.2em] text-white/70 transition-all duration-300 hover:text-white hover:tracking-[0.25em]"
-         >
+          class="link-line text-xs font-semibold uppercase tracking-[0.25em] text-white/70 transition-colors hover:text-white"
+        >
           {{ link.label }}
         </a>
       </nav>
@@ -46,7 +41,7 @@ const navLinks = [
         aria-haspopup="dialog"
         :aria-label="isOpen ? 'Close menu' : 'Open menu'"
         @click="toggle"
-        class="absolute right-5 inline-flex h-11 w-11 flex-col items-center justify-center gap-1.5 border border-white/20 backdrop-blur-sm transition-colors hover:border-marvel-400/80 hover:bg-black/40 md:hidden"
+        class="absolute right-5 inline-flex h-11 w-11 flex-col items-center justify-center gap-1.5 border border-white/20 transition-colors hover:border-white md:hidden"
       >
         <span
           class="h-px w-5 bg-white transition-transform duration-300"

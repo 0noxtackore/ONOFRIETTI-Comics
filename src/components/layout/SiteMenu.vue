@@ -7,11 +7,6 @@ const { isOpen, close } = useMenu()
 const links = [
   { label: 'Home', href: '#inicio', index: '01' },
   { label: 'Comics', href: '#comics', index: '02' },
-  { label: 'Editorial', href: '#editorial', index: '03' },
-  { label: 'Characters', href: '#characters', index: '04' },
-  { label: 'Universe', href: '#universe', index: '05' },
-  { label: 'Journal', href: '#journal', index: '06' },
-  { label: 'Newsletter', href: '#newsletter', index: '07' },
 ]
 
 const socials = ['Instagram', 'X', 'YouTube', 'TikTok']
@@ -27,7 +22,7 @@ const socials = ['Instagram', 'X', 'YouTube', 'TikTok']
       aria-modal="true"
       aria-label="Navigation menu"
     >
-      <div class="flex flex-1 flex-col justify-between overflow-y-auto px-5 pb-8 pt-28 md:px-8 md:pt-36">
+      <div class="flex flex-1 flex-col justify-between px-5 pb-8 pt-28 md:px-8 md:pt-36">
         <nav aria-label="Menu">
           <ul class="flex flex-col">
             <li v-for="(link, i) in links" :key="link.href">
