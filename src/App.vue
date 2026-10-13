@@ -8,6 +8,11 @@ import SiteMenu from './components/layout/SiteMenu.vue'
 import SiteFooter from './components/layout/SiteFooter.vue'
 import HeroSection from './components/sections/HeroSection.vue'
 import LatestComicsSection from './components/sections/LatestComicsSection.vue'
+import EditorialSpotlight from './components/sections/EditorialSpotlight.vue'
+import CharactersDossier from './components/sections/CharactersDossier.vue'
+import UniverseSection from './components/sections/UniverseSection.vue'
+import ArticlesSection from './components/sections/ArticlesSection.vue'
+import NewsletterSection from './components/sections/NewsletterSection.vue'
 import AdminPanel from './components/admin/AdminPanel.vue'
 import ComicDetail from './components/comic/ComicDetail.vue'
 import { navigate } from './utils/router'
@@ -82,8 +87,18 @@ onUnmounted(() => {
     <main>
       <!-- Página principal -->
       <HeroSection />
-      <!-- Sección de cómics -->
+      <!-- Catálogo de cómics -->
       <LatestComicsSection />
+      <!-- Destacado editorial -->
+      <EditorialSpotlight />
+      <!-- Dossier de personajes -->
+      <CharactersDossier />
+      <!-- Universo -->
+      <UniverseSection />
+      <!-- Bitácora / artículos -->
+      <ArticlesSection />
+      <!-- Newsletter -->
+      <NewsletterSection />
     </main>
 
     <SiteFooter />

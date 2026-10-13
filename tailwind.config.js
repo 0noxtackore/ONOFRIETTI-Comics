@@ -44,13 +44,47 @@ export default {
           800: '#262626',
           900: '#171717',
         },
+        // Design tokens del tema (Stitch)
+        stitch: {
+          DEFAULT: '#0a0a0b',
+          bg: '#08080a',
+          surface: '#121216',
+          'surface-alt': '#1a1a20',
+          border: '#26262e',
+          muted: '#8a8a95',
+          subtle: '#55555f',
+          ink: '#f5f5f7',
+          accent: '#e62429',
+          'accent-soft': '#ff5c5c',
+          gold: '#f5c542',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        display: ['Archivo Black', 'Archivo', 'Impact', 'Haettenschweiler', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        heading: ['Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Space Grotesk es la display/heading principal del tema Stitch.
+        display: ['Space Grotesk', 'Archivo Black', 'Archivo', 'Impact', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        heading: ['Space Grotesk', 'Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        body: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        label: ['Space Grotesk', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         anton: ['Anton', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         serif: ['Georgia', 'Times New Roman', 'Times', 'serif'],
+      },
+      // Espaciado vertical de las secciones del home.
+      spacing: {
+        section: '5.5rem',
+        'section-lg': '9rem',
+        gutter: '1.25rem',
+      },
+      // Escala tipográfica display del tema.
+      fontSize: {
+        kicker: ['0.6875rem', { lineHeight: '1', letterSpacing: '0.4em' }],
+        'display-xs': ['2.25rem', { lineHeight: '0.95', letterSpacing: '-0.02em' }],
+        'display-sm': ['3.25rem', { lineHeight: '0.92', letterSpacing: '-0.02em' }],
+        display: ['4.5rem', { lineHeight: '0.9', letterSpacing: '-0.03em' }],
+        'display-lg': ['clamp(3rem, 10vw, 9rem)', { lineHeight: '0.82', letterSpacing: '-0.04em' }],
+      },
+      maxWidth: {
+        shell: '80rem',
       },
     },
   },

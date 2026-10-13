@@ -72,8 +72,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section id="comics" class="relative bg-gradient-to-b from-black via-editorial-900/30 to-black py-24 md:py-36">
-    <div class="mx-auto max-w-7xl px-5 md:px-8">
+  <section id="comics" class="relative bg-gradient-to-b from-stitch-bg via-stitch-surface/40 to-stitch-bg py-section md:py-section-lg">
+    <div class="section-shell">
       <div class="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
         <SectionHeading
           kicker="Latest issues"
@@ -84,7 +84,7 @@ onUnmounted(() => {
 
       <div class="mt-12 lg:grid lg:grid-cols-[260px_1fr] lg:gap-10">
         <!-- Sidebar de filtros -->
-        <aside class="self-start border border-white/10 bg-ink-950/40 p-5 lg:sticky lg:top-24">
+        <aside class="self-start border border-white/10 bg-stitch-surface/60 p-5 lg:sticky lg:top-24">
           <h3 class="border-b border-white/10 pb-4 text-xs font-bold uppercase tracking-[0.3em] text-white">Filters</h3>
 
           <!-- Búsqueda (compartida con el header) -->
@@ -103,7 +103,7 @@ onUnmounted(() => {
               type="search"
               placeholder="Search comics…"
               aria-label="Search comics"
-              class="w-full border border-white/15 bg-ink-950/60 py-2.5 pl-10 pr-9 text-sm text-white transition-colors duration-300 placeholder:text-white/40 focus:border-white focus:outline-none"
+              class="w-full border border-white/15 bg-stitch-bg/60 py-2.5 pl-10 pr-9 text-sm text-white transition-colors duration-300 placeholder:text-white/40 focus:border-white focus:outline-none"
             />
             <button
               v-if="query"
@@ -151,7 +151,7 @@ onUnmounted(() => {
           <!-- Aviso solo para admin -->
           <div
             v-if="isAdmin"
-            class="mb-6 flex items-center gap-3 border border-white/20 bg-ink-950/60 px-4 py-3"
+            class="mb-6 flex items-center gap-3 border border-white/20 bg-stitch-surface/60 px-4 py-3"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-4 w-4 shrink-0 text-white/70" aria-hidden="true">
               <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
@@ -169,10 +169,10 @@ onUnmounted(() => {
           <!-- Esqueleto de carga -->
           <div v-if="loading" class="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
             <div v-for="i in 6" :key="i" class="animate-pulse">
-              <div class="aspect-[1920/2951] bg-ink-800"></div>
+              <div class="aspect-[1920/2951] bg-stitch-surface-alt"></div>
               <div class="mt-5 space-y-2">
-                <div class="h-3 w-24 bg-ink-800"></div>
-                <div class="h-5 w-40 bg-ink-700"></div>
+                <div class="h-3 w-24 bg-stitch-surface-alt"></div>
+                <div class="h-5 w-40 bg-stitch-surface"></div>
               </div>
             </div>
           </div>

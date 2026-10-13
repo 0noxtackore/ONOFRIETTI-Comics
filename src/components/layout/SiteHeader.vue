@@ -8,9 +8,10 @@ const { isScrolled } = useScrollState(32)
 const { isOpen, toggle } = useMenu()
 
 const navLinks = [
-  { href: '#hero', label: 'Home' },
   { href: '#comics', label: 'Comics' },
-  { href: '#about', label: 'About' },
+  { href: '#characters', label: 'Characters' },
+  { href: '#universe', label: 'Universe' },
+  { href: '#journal', label: 'Journal' },
 ]
 </script>
 
