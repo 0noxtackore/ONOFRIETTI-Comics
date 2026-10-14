@@ -936,12 +936,12 @@ watch(search, (v) => {
                             <div class="flex-1 min-w-0" :class="block.imagePosition === 'left' ? 'order-2' : 'order-1'">
                               <div class="flex items-center gap-2 mb-2">
                                 <label class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Image position</label>
-                                <select v-model="block.imagePosition" class="rounded-sm border border-white/30 bg-transparent px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
+                                <select v-model="block.imagePosition" class="rounded-sm border border-white/30 bg-ink-800 px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
                                   <option value="left">Left</option>
                                   <option value="right">Right</option>
                                 </select>
                                 <label class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Aspect ratio</label>
-                                <select v-model="block.aspectRatio" class="rounded-sm border border-white/30 bg-transparent px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
+                                <select v-model="block.aspectRatio" class="rounded-sm border border-white/30 bg-ink-800 px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
                                   <option value="16:9">16:9</option>
                                   <option value="4:3">4:3</option>
                                   <option value="1:1">1:1</option>
