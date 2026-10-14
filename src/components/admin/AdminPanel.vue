@@ -12,6 +12,11 @@ import { listSeries, saveSeries, deleteSeries, fileToLogo } from '../../services
 import { listCharacters, saveCharacter, deleteCharacter, fileToCharacterImage } from '../../services/charactersService'
 import { navigate } from '../../utils/router'
 
+const props = defineProps({
+  action: { type: String, default: null }, // 'new', 'edit', or null
+  slug: { type: String, default: null }
+})
+
 const STATUSES = ['Available', 'Limited Edition', 'Sold Out', 'Coming Soon']
 
 const user = ref(null)
@@ -38,7 +43,7 @@ const busy = ref(false)
 const search = ref('')
 
 function emptyDescriptionBlocks() {
-  return [{ text: '', image: '', imagePosition: 'right', aspectRatio: '16:9' }]
+  return [{ text: '', image: '', imagePosition: 'right', aspectRatio: '9:16' }]
 }
 
 function addDescriptionBlock() {
@@ -232,6 +237,21 @@ function fieldLabel(key) {
 }
 
 // Borde rojo para campos obligatorios vacíos (solo tras intentar guardar).
+const attempted = ref(false)
+const FIELD_LABELS = { title: 'Title', issue: 'Issue', price: 'Price', poster: 'Cover' }
+const missingFields = computed(() => {
+  const missing = []
+  if (!form.title.trim()) missing.push('title')
+  if (form.issue === '' || form.issue == null) missing.push('issue')
+  if (form.price === '' || form.price == null) missing.push('price')
+  if (!String(form.poster || '').trim()) missing.push('poster')
+  return missing
+})
+
+function fieldLabel(key) {
+  return FIELD_LABELS[key] || key
+}
+
 function boxBorder(key) {
   return attempted.value && missingFields.value.includes(key) ? 'border-red-500' : 'border-white/40'
 }

@@ -13,13 +13,30 @@ import ComicDetail from './components/comic/ComicDetail.vue'
 import { navigate } from './utils/router'
 
 const isAdmin = ref(false)
+const adminAction = ref(null) // null, 'new', 'edit'
+const adminSlug = ref(null)
 const isComicsPage = ref(false)
 const isComicDetailPage = ref(false)
 const comicSlug = ref(null)
 
 function parseRoute() {
   const path = window.location.pathname
-  isAdmin.value = path.startsWith('/admin')
+  const adminMatch = path.match(/^\/admin(?:\/(.+))?$/)
+  if (adminMatch) {
+    isAdmin.value = true
+    const slug = adminMatch[1]
+    if (!slug || slug === 'new') {
+      adminAction.value = 'new'
+      adminSlug.value = null
+    } else {
+      adminAction.value = 'edit'
+      adminSlug.value = slug
+    }
+  } else {
+    isAdmin.value = false
+    adminAction.value = null
+    adminSlug.value = null
+  }
   isComicsPage.value = path === '/comics'
   const m = path.match(/^\/comics\/(.+)$/)
   if (m) {
@@ -76,7 +93,7 @@ onUnmounted(() => {
 
 <template>
   <!-- Panel de administración (solo en /admin) -->
-  <AdminPanel v-if="isAdmin" />
+  <AdminPanel v-if="isAdmin" :action="adminAction" :slug="adminSlug" />
 
   <div v-else class="min-h-screen overflow-x-clip bg-ink-50 text-ink-950 antialiased selection:bg-ink-950 selection:text-white">
     <!-- Grano de película sobre toda la página -->
