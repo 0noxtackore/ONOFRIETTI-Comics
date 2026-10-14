@@ -38,8 +38,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section id="comics" class="relative bg-ink-50 py-24 text-ink-950 md:py-36">
-    <div class="mx-auto max-w-7xl px-5 md:px-8">
+  <section id="comics" class="relative bg-white py-16 text-ink-950 md:py-24">
+    <div class="mx-auto max-w-screen-default px-5 md:px-8">
       <div class="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
         <SectionHeading />
       </div>
@@ -63,18 +63,18 @@ onUnmounted(() => {
           </div>
 
           <!-- Esqueleto de carga -->
-          <div v-if="loading" class="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-            <div v-for="i in 6" :key="i" class="animate-pulse">
-              <div class="aspect-[1920/2951] bg-ink-800"></div>
-              <div class="mt-5 space-y-2">
-                <div class="h-3 w-24 bg-ink-800"></div>
-                <div class="h-5 w-40 bg-ink-700"></div>
+          <div v-if="loading" class="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-5">
+            <div v-for="i in 10" :key="i" class="animate-pulse">
+              <div class="aspect-[1920/2951] bg-ink-200"></div>
+              <div class="mt-3 space-y-2">
+                <div class="h-3 w-24 bg-ink-200"></div>
+                <div class="h-4 w-40 bg-ink-200"></div>
               </div>
             </div>
           </div>
 
           <!-- Grid de cómics -->
-          <div v-else class="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+          <div v-else class="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-5">
             <ComicCard v-for="(comic, i) in visibleComics" :key="comic.id" :comic="comic" :index="i" />
           </div>
         </div>

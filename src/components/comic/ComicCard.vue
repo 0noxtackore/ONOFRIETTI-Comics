@@ -50,25 +50,22 @@ const titleFontSize = computed(() => {
     <a
       :href="`/comics/${comic.slug}`"
       :aria-label="`View ${comic.title} details`"
-      class="group/cover relative block overflow-hidden border-2 border-ink-950/10 transition-colors duration-500"
+      class="group/cover relative block overflow-hidden transition-colors duration-500"
     >
       <div class="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
         <ComicCover :comic="comic" :poster="comic.poster" />
       </div>
 
-      <!-- Brillo interior tipo metalico al hover -->
       <span
         class="pointer-events-none absolute inset-0 -translate-x-full bg-[linear-gradient(105deg,transparent_40%,rgba(255,255,255,0.25)_45%,rgba(255,255,255,0.4)_50%,rgba(255,255,255,0.25)_55%,transparent_60%)] transition-transform duration-700 ease-out group-hover/cover:translate-x-full"
         aria-hidden="true"
       ></span>
 
-      <!-- Líneas diagonales blancas -->
       <span
         class="diagonal-stripes pointer-events-none absolute inset-0 opacity-0"
         aria-hidden="true"
       ></span>
 
-      <!-- Icono de nuevo -->
       <img
         v-if="isNew"
         src="/images/new-icon.png"
@@ -76,49 +73,18 @@ const titleFontSize = computed(() => {
         loading="lazy"
         class="pointer-events-none absolute right-2 top-2 z-10 h-20 w-20 drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
       />
-
     </a>
 
-    <div class="flex flex-1 flex-col justify-center pt-5 text-center">
-      <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-950/50">
+    <div class="flex flex-1 flex-col justify-start pt-3">
+      <h3 class="font-condensed text-[0.875rem] font-semibold uppercase leading-tight text-[#202020] line-clamp-2 group-hover:text-[#e62429]">
+        {{ comic.title }}
+      </h3>
+      <p class="mt-1 text-[0.75rem] font-medium uppercase tracking-[0.02em] text-[#4c5067]">
+        {{ comic.protagonist || comic.author }}
+      </p>
+      <p class="mt-1 text-[0.75rem] uppercase text-[#4c5067]">
         {{ comic.year }}
       </p>
-      <div class="mt-1 flex min-h-[2.5em] items-center justify-center">
-        <h3 class="font-display line-clamp-2 font-black uppercase leading-tight tracking-tight text-ink-950"
-          :style="{ fontSize: titleFontSize }">
-          {{ comic.title }}
-        </h3>
-      </div>
-      <p class="mb-6 mt-1 text-sm text-ink-950/50">Issue {{ comic.issue }}</p>
     </div>
-
-    <!-- Botón de compra. TODO: apuntar al futuro checkout / tienda. -->
-    <a
-      :href="isAvailable ? '#comics' : undefined"
-      :aria-disabled="!isAvailable"
-      class="mt-auto inline-flex w-full items-center justify-center gap-2 px-3 py-3 text-[11px] font-bold uppercase tracking-[0.15em] transition-all duration-300 sm:gap-3 sm:px-6 sm:py-3.5 sm:text-xs sm:tracking-[0.25em]"
-      :class="
-        isAvailable
-          ? 'bg-ink-950 text-white hover:bg-ink-800 group-hover:bg-ink-800'
-          : 'pointer-events-none cursor-not-allowed border border-ink-950/15 text-ink-950/40'
-      "
-    >
-      <span class="hidden sm:inline">{{ buyLabel }}</span>
-      <span class="sm:hidden" aria-hidden="true">Buy</span>
-      <span
-        v-if="isAvailable"
-        class="inline-block h-4 w-4 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5"
-        aria-hidden="true"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          class="block h-full w-full"
-        >
-          <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-        </svg>
-      </span>
-    </a>
   </article>
 </template>

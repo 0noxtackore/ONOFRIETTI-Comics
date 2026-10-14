@@ -30,6 +30,9 @@ export default {
         sans: ['Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         anton: ['Anton', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
+      maxWidth: {
+        'screen-default': '1248px',
+      },
     },
   },
   plugins: [],
