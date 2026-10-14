@@ -37,6 +37,52 @@ const busy = ref(false)
 
 const search = ref('')
 
+function emptyDescriptionBlocks() {
+  return [{ text: '', image: '', imagePosition: 'right' }]
+}
+
+function addDescriptionBlock() {
+  form.description.push({ text: '', image: '', imagePosition: 'right' })
+}
+
+function removeDescriptionBlock(index) {
+  if (form.description.length <= 1) return
+  form.description.splice(index, 1)
+}
+
+function moveDescriptionBlock(index, direction) {
+  const newIndex = index + direction
+  if (newIndex < 0 || newIndex >= form.description.length) return
+  const temp = form.description[index]
+  form.description[index] = form.description[newIndex]
+  form.description[newIndex] = temp
+}
+
+function descriptionBlockImageUpload(index, file) {
+  uploading.value = true
+  fileToPoster(file).then(({ poster }) => {
+    form.description[index].image = poster
+    uploading.value = false
+  }).catch((err) => {
+    error.value = 'Error uploading image: ' + err.message
+    uploading.value = false
+  })
+}
+
+function onDescriptionBlockImageSelected(index, e) {
+  const file = e.target.files?.[0]
+  e.target.value = ''
+  if (file) descriptionBlockImageUpload(index, file)
+}
+
+function onDescriptionBlockPaste(index, e) {
+  const file = e.clipboardData?.files?.[0]
+  if (file && file.type.startsWith('image/')) {
+    e.preventDefault()
+    descriptionBlockImageUpload(index, file)
+  }
+}
+
 const emptyForm = () => ({
   id: '',
   title: '',
@@ -46,7 +92,7 @@ const emptyForm = () => ({
   pages: '',
   status: 'Available',
   author: 'Angello Aponte',
-  description: '',
+  description: [],
   poster: '',
   storagePath: '',
   featured: false,
@@ -227,6 +273,14 @@ function openNew() {
 
 function openEdit(comic) {
   Object.assign(form, emptyForm(), comic)
+  // Convert old string description to block format if needed
+  if (typeof form.description === 'string') {
+    form.description = form.description.trim()
+      ? [{ text: form.description.trim(), image: '', imagePosition: 'right' }]
+      : emptyDescriptionBlocks()
+  } else if (!Array.isArray(form.description) || form.description.length === 0) {
+    form.description = emptyDescriptionBlocks()
+  }
   editingId.value = comic.id
   showForm.value = true
   error.value = ''
@@ -265,7 +319,7 @@ async function save() {
       pages: form.pages === '' ? 0 : Number(form.pages),
       status: form.status,
       author: form.author.trim() || 'Angello Aponte',
-      description: form.description.trim(),
+      description: form.description,
       poster: form.poster.trim(),
       storagePath: form.storagePath.trim(),
       featured: Boolean(form.featured),
@@ -864,12 +918,46 @@ watch(search, (v) => {
                     </label>
                     <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
                       Description
-                      <textarea
-                        v-model="form.description"
-                        rows="4"
-                        placeholder="Comic synopsis, shown on the product page…"
-                        class="mt-1 w-full resize-y rounded-sm border border-white/40 bg-transparent px-4 py-3 text-sm leading-relaxed text-white placeholder:text-white/30 focus:border-white focus:outline-none"
-                      ></textarea>
+                      <div class="mt-3 space-y-4" @paste="onDescriptionBlockPaste">
+                        <div v-for="(block, index) in form.description" :key="index" class="flex flex-col gap-3 p-4 border border-white/20 bg-white/5">
+                          <div class="flex items-start gap-3">
+                            <!-- Image side (optional) -->
+                            <div class="relative w-32 h-32 md:w-40 md:h-40 flex-shrink-0 overflow-hidden border border-white/20 bg-white/5" :class="block.imagePosition === 'left' ? 'order-1' : 'order-2'">
+                              <img v-if="block.image" :src="block.image" alt="Block image" class="w-full h-full object-cover" />
+                              <label v-else class="absolute inset-0 flex items-center justify-center cursor-pointer bg-white/5 hover:bg-white/10">
+                                <svg class="h-8 w-8 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <input type="file" accept="image/*" class="hidden" @change="onDescriptionBlockImageSelected(index, $event)" />
+                              </label>
+                            </div>
+
+                            <!-- Text side -->
+                            <div class="flex-1 min-w-0" :class="block.imagePosition === 'left' ? 'order-2' : 'order-1'">
+                              <div class="flex items-center gap-2 mb-2">
+                                <label class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Image position</label>
+                                <select v-model="block.imagePosition" class="rounded-sm border border-white/30 bg-transparent px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
+                                  <option value="left">Left</option>
+                                  <option value="right">Right</option>
+                                </select>
+                                <button type="button" @click="moveDescriptionBlock(index, -1)" class="ml-auto px-2 py-1 text-xs text-white/70 hover:text-white">↑ Up</button>
+                                <button type="button" @click="moveDescriptionBlock(index, 1)" class="px-2 py-1 text-xs text-white/70 hover:text-white">↓ Down</button>
+                                <button type="button" @click="removeDescriptionBlock(index)" class="px-2 py-1 text-xs text-red-400 hover:text-red-300">✕ Remove</button>
+                              </div>
+                              <textarea
+                                v-model="block.text"
+                                rows="3"
+                                placeholder="Write your description block here..."
+                                class="w-full resize-y rounded-sm border border-white/30 bg-transparent px-4 py-3 text-sm leading-relaxed text-white placeholder:text-white/30 focus:border-white focus:outline-none"
+                              ></textarea>
+                            </div>
+                          </div>
+                        </div>
+                        <button type="button" @click="addDescriptionBlock" class="flex items-center gap-2 text-white/70 hover:text-white text-xs font-bold uppercase tracking-[0.2em]">
+                          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                          Add description block
+                        </button>
+                      </div>
                     </label>
                   </div>
 

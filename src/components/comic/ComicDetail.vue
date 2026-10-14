@@ -218,7 +218,21 @@ watch(() => props.slug, load)
           <div class="mt-6 flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
             <!-- Description -->
             <div v-if="comic.description" class="flex-1">
-              <p class="max-w-3xl text-lg leading-relaxed text-white/70 md:text-xl">
+              <div v-if="Array.isArray(comic.description)" class="space-y-8">
+                <div v-for="(block, index) in comic.description" :key="index" class="flex flex-col gap-4 md:flex-row md:items-center">
+                  <div class="relative w-full md:w-1/2 overflow-hidden border border-white/20 bg-white/5" :class="block.imagePosition === 'left' ? 'order-2' : 'order-1'">
+                    <img v-if="block.image" :src="block.image" :alt="`Description block ${index + 1}`" class="w-full h-auto object-cover" />
+                  </div>
+                  <div class="w-full md:w-1/2" :class="block.imagePosition === 'left' ? 'order-1' : 'order-2'">
+                    <div class="p-6 md:p-8">
+                      <div v-if="block.text" class="text-lg leading-relaxed text-white/80 md:text-xl whitespace-pre-wrap">
+                        {{ block.text }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p v-else class="max-w-3xl text-lg leading-relaxed text-white/70 md:text-xl">
                 {{ comic.description }}
               </p>
             </div>
