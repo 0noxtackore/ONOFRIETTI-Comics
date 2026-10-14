@@ -38,7 +38,7 @@ const busy = ref(false)
 const search = ref('')
 
 function emptyDescriptionBlocks() {
-  return [{ text: '', image: '', imagePosition: 'right' }]
+  return [{ text: '', image: '', imagePosition: 'right', aspectRatio: '16:9' }]
 }
 
 function addDescriptionBlock() {
@@ -939,6 +939,14 @@ watch(search, (v) => {
                                 <select v-model="block.imagePosition" class="rounded-sm border border-white/30 bg-transparent px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
                                   <option value="left">Left</option>
                                   <option value="right">Right</option>
+                                </select>
+                                <label class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Aspect ratio</label>
+                                <select v-model="block.aspectRatio" class="rounded-sm border border-white/30 bg-transparent px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
+                                  <option value="16:9">16:9</option>
+                                  <option value="4:3">4:3</option>
+                                  <option value="1:1">1:1</option>
+                                  <option value="3:4">3:4</option>
+                                  <option value="9:16">9:16</option>
                                 </select>
                                 <button type="button" @click="moveDescriptionBlock(index, -1)" class="ml-auto px-2 py-1 text-xs text-white/70 hover:text-white">↑ Up</button>
                                 <button type="button" @click="moveDescriptionBlock(index, 1)" class="px-2 py-1 text-xs text-white/70 hover:text-white">↓ Down</button>

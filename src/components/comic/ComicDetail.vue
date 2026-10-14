@@ -221,7 +221,7 @@ watch(() => props.slug, load)
               <div v-if="Array.isArray(comic.description)" class="space-y-8">
                 <div v-for="(block, index) in comic.description" :key="index" class="flex flex-col gap-4 md:flex-row md:items-center">
                   <div class="relative w-full md:w-1/2 overflow-hidden border border-white/20 bg-white/5" :class="block.imagePosition === 'left' ? 'order-2' : 'order-1'">
-                    <img v-if="block.image" :src="block.image" :alt="`Description block ${index + 1}`" class="w-full h-auto object-cover" />
+                    <img v-if="block.image" :src="block.image" :alt="`Description block ${index + 1}`" :style="{ aspectRatio: block.aspectRatio || '16/9' }" class="w-full object-cover" />
                   </div>
                   <div class="w-full md:w-1/2" :class="block.imagePosition === 'left' ? 'order-1' : 'order-2'">
                     <div class="p-6 md:p-8">
