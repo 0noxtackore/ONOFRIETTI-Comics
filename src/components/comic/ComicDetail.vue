@@ -110,7 +110,7 @@ watch(() => props.slug, load)
 </script>
 
 <template>
-  <div class="fixed inset-0 z-[90] overflow-y-auto bg-ink-50" @click.self="emit('close')">
+  <div class="bg-ink-50 text-ink-950">
     <!-- Cargando -->
     <div v-if="loading" class="flex min-h-screen items-center justify-center">
       <div class="h-8 w-8 animate-spin rounded-full border-2 border-ink-950 border-t-transparent"></div>
@@ -120,28 +120,17 @@ watch(() => props.slug, load)
     <div v-else-if="!comic" class="flex min-h-screen items-center justify-center p-10">
       <div class="text-center">
         <p class="text-sm uppercase tracking-[0.25em] text-ink-400">Comic not found</p>
-        <button
-          @click="emit('close')"
-          class="mt-6 rounded-lg bg-ink-950 px-8 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800"
+        <a
+          href="/"
+          class="mt-6 inline-block rounded-lg bg-ink-950 px-8 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800"
         >
-          Back
-        </button>
+          Back to Home
+        </a>
       </div>
     </div>
 
     <!-- Comic Detail -->
-    <div v-if="comic" class="min-h-screen">
-      <!-- Close Button -->
-      <button
-        @click="emit('close')"
-        aria-label="Close"
-        class="fixed right-6 top-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-ink-950/20 bg-ink-950/50 text-ink-950 backdrop-blur-sm transition-all duration-300 hover:border-ink-950 hover:bg-ink-950/10"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-
+    <div v-if="comic">
       <!-- Main Content -->
       <div class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
         <!-- Top Section: Series/Issue/Buy + Cover -->
@@ -190,9 +179,8 @@ watch(() => props.slug, load)
             </div>
 
             <!-- Buy Button -->
-            <a
-              :href="isAvailable ? '#comics' : undefined"
-              :aria-disabled="!isAvailable"
+            <button
+              :disabled="!isAvailable"
               @click="buy"
               class="mt-8 flex w-full items-center justify-center gap-3 px-8 py-5 text-sm font-bold uppercase tracking-[0.25em] transition-all duration-300"
               :class="
