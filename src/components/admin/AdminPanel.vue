@@ -427,21 +427,21 @@ watch(search, (v) => {
 </script>
 
 <template>
-  <div class="fixed inset-0 z-[100] overflow-y-auto bg-black text-white antialiased">
+  <div class="fixed inset-0 z-[100] overflow-y-auto bg-white text-ink-950 antialiased">
     <!-- Aviso: Firebase no configurado -->
     <div v-if="!isConfigured" class="flex min-h-screen items-center justify-center p-8">
-      <p class="max-w-md border border-white/15 p-8 text-center text-sm uppercase tracking-[0.25em] text-white/60">
-        Firebase is not configured. Complete the <span class="font-bold text-white">.env</span> file to use the panel.
+      <p class="max-w-md border border-ink-950/15 p-8 text-center text-sm uppercase tracking-[0.25em] text-ink-950/60">
+        Firebase is not configured. Complete the <span class="font-bold text-ink-950">.env</span> file to use the panel.
       </p>
     </div>
 
     <!-- Pantalla de login -->
     <div v-else-if="!user" class="flex min-h-screen items-center justify-center p-8">
-      <form class="w-full max-w-sm border border-white/15 p-10" @submit.prevent="login">
-        <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/40">Restricted system</p>
-        <h1 class="font-display mt-2 text-2xl font-black uppercase tracking-tight text-white">Admin access</h1>
+      <form class="w-full max-w-sm border border-ink-950/15 p-10" @submit.prevent="login">
+        <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/40">Restricted system</p>
+        <h1 class="font-display mt-2 text-2xl font-black uppercase tracking-tight text-ink-950">Admin access</h1>
 
-        <label class="mt-8 block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+        <label class="mt-8 block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
           Email
           <input
             v-model="email"
@@ -449,11 +449,11 @@ watch(search, (v) => {
             required
             autocomplete="username"
             placeholder="you@example.com"
-            class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
+            class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm text-ink-950 placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
           />
         </label>
 
-        <label class="mt-5 block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+        <label class="mt-5 block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
           Password
           <input
             v-model="password"
@@ -461,16 +461,16 @@ watch(search, (v) => {
             required
             autocomplete="current-password"
             placeholder="Enter your password"
-            class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
+            class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm text-ink-950 placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
           />
         </label>
 
-        <p v-if="error" class="mt-4 text-xs uppercase tracking-[0.2em] text-red-400">{{ error }}</p>
+        <p v-if="error" class="mt-4 text-xs uppercase tracking-[0.2em] text-red-600">{{ error }}</p>
 
         <button
           type="submit"
           :disabled="busy"
-          class="mt-8 w-full bg-white px-6 py-3.5 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-white/80 disabled:opacity-50"
+          class="mt-8 w-full bg-ink-950 px-6 py-3.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800 disabled:opacity-50"
         >
           {{ busy ? 'Signing in…' : 'Sign in' }}
         </button>
@@ -478,50 +478,54 @@ watch(search, (v) => {
     </div>
 
     <!-- Panel -->
-    <div v-else class="mx-auto max-w-6xl px-5 py-10 md:px-8">
-      <header class="flex flex-col gap-4 border-b border-white/15 pb-6 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/40">Signed in as · {{ user.email }}</p>
-          <h1 class="font-display mt-1 text-3xl font-black uppercase tracking-tight">Admin panel</h1>
-        </div>
-        <div class="flex gap-3">
-          <button
-            @click="goToSite"
-            class="border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:border-white"
-          >
-            Back to site
-          </button>
-          <button
-            @click="logout"
-            class="border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white/50 transition-colors duration-300 hover:border-white hover:text-white"
-          >
-            Sign out
-          </button>
+    <div v-else>
+      <!-- Barra superior negra -->
+      <header class="bg-black text-white">
+        <div class="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-6 md:flex-row md:items-center md:justify-between md:px-8">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/40">Signed in as · {{ user.email }}</p>
+            <h1 class="font-display mt-1 text-3xl font-black uppercase tracking-tight">Admin panel</h1>
+          </div>
+          <div class="flex gap-3">
+            <button
+              @click="goToSite"
+              class="border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:border-white"
+            >
+              Back to site
+            </button>
+            <button
+              @click="logout"
+              class="border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white/50 transition-colors duration-300 hover:border-white hover:text-white"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
+      <div class="mx-auto max-w-6xl px-5 py-10 md:px-8">
       <!-- Tabs -->
-      <div class="mt-6 flex gap-1 border-b border-white/10">
+      <div class="flex gap-1 border-b border-ink-950/10">
         <button
           @click="activeTab = 'comics'"
           class="px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] transition-colors duration-300"
-          :class="activeTab === 'comics' ? 'border-b-2 border-white text-white' : 'text-white/50 hover:text-white'"
+          :class="activeTab === 'comics' ? 'border-b-2 border-ink-950 text-ink-950' : 'text-ink-950/50 hover:text-ink-950'"
         >
           Comics ({{ comics.length }})
         </button>
         <button
           @click="activeTab = 'series'"
           class="px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] transition-colors duration-300"
-          :class="activeTab === 'series' ? 'border-b-2 border-white text-white' : 'text-white/50 hover:text-white'"
+          :class="activeTab === 'series' ? 'border-b-2 border-ink-950 text-ink-950' : 'text-ink-950/50 hover:text-ink-950'"
         >
           Series ({{ series.length }})
         </button>
       </div>
 
-      <p v-if="notice" class="mt-5 border border-white/40 bg-white px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-black">
+      <p v-if="notice" class="mt-5 border border-ink-950 bg-ink-950 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white">
         {{ notice }}
       </p>
-      <p v-if="error" class="mt-5 border border-red-400/40 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
+      <p v-if="error" class="mt-5 border border-red-500/40 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-red-600">
         {{ error }}
       </p>
 
@@ -529,7 +533,7 @@ watch(search, (v) => {
       <div v-if="activeTab === 'comics'">
         <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div class="flex-1">
-            <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-white/60">
+            <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-ink-950/60">
               Catalog ({{ filteredComics.length }} / {{ comics.length }})
             </h2>
             <div class="relative mt-3 max-w-md">
@@ -537,9 +541,9 @@ watch(search, (v) => {
                 v-model="search"
                 type="search"
                 placeholder="Search by title, character, ID, issue, status…"
-                class="w-full border border-white/20 bg-transparent py-3 pl-4 pr-10 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
+                class="w-full border border-ink-950/20 bg-transparent py-3 pl-4 pr-10 text-sm text-ink-950 placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
               />
-              <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-white/40">
+              <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-ink-950/40">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-binoculars-fill" viewBox="0 0 16 16">
                   <path d="M4.5 1A1.5 1.5 0 0 0 3 2.5V3h4v-.5A1.5 1.5 0 0 0 5.5 1zM7 4v1h2V4h4v.882a.5.5 0 0 0 .276.447l.895.447A1.5 1.5 0 0 1 15 7.118V13H9v-1.5a.5.5 0 0 1 .146-.354l.854-.853V9.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v.793l.854.853A.5.5 0 0 1 7 11.5V13H1V7.118a1.5 1.5 0 0 1 .83-1.342l.894-.447A.5.5 0 0 0 3 4.882V4zM1 14v.5A1.5 1.5 0 0 0 2.5 16h3A1.5 1.5 0 0 0 7 14.5V14zm8 0v.5a1.5 1.5 0 0 0 1.5 1.5h3a1.5 1.5 0 0 0 1.5-1.5V14zm4-11H9v-.5A1.5 1.5 0 0 1 10.5 1h1A1.5 1.5 0 0 1 13 2.5z"/>
                 </svg>
@@ -548,7 +552,7 @@ watch(search, (v) => {
           </div>
           <button
             @click="openNew"
-            class="bg-white px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-white/80"
+            class="bg-ink-950 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800"
           >
             + New comic
           </button>
@@ -556,69 +560,69 @@ watch(search, (v) => {
 
         <!-- Cargando -->
         <div v-if="loading" class="mt-6 space-y-3">
-          <div v-for="i in 3" :key="i" class="h-16 animate-pulse border border-white/10"></div>
+          <div v-for="i in 3" :key="i" class="h-16 animate-pulse border border-ink-950/10"></div>
         </div>
 
         <!-- Lista vacía -->
-        <div v-else-if="comics.length === 0" class="mt-6 border border-white/10 p-10 text-center">
-          <p class="text-sm uppercase tracking-[0.25em] text-white/40">No comics yet. Create the first one.</p>
+        <div v-else-if="comics.length === 0" class="mt-6 border border-ink-950/10 p-10 text-center">
+          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">No comics yet. Create the first one.</p>
         </div>
 
         <!-- Sin resultados de búsqueda -->
-        <div v-else-if="filteredComics.length === 0" class="mt-6 border border-white/10 p-10 text-center">
-          <p class="text-sm uppercase tracking-[0.25em] text-white/40">No comics match your search.</p>
+        <div v-else-if="filteredComics.length === 0" class="mt-6 border border-ink-950/10 p-10 text-center">
+          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">No comics match your search.</p>
         </div>
 
         <!-- Lista de cómics agrupada por protagonista -->
         <div v-else class="mt-6 space-y-3">
-          <section v-for="group in groups" :key="group.name" class="border border-white/10">
+          <section v-for="group in groups" :key="group.name" class="border border-ink-950/10">
             <button
               type="button"
               @click="toggleGroup(group.name)"
-              class="flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition-colors duration-300 hover:bg-white/5"
+              class="flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition-colors duration-300 hover:bg-ink-950/5"
             >
               <span class="flex items-center gap-3">
-                <span class="text-xs font-bold uppercase tracking-[0.3em] text-white">{{ group.name }}</span>
-                <span class="text-[11px] uppercase tracking-[0.2em] text-white/40">{{ group.items.length }} issues</span>
+                <span class="text-xs font-bold uppercase tracking-[0.3em] text-ink-950">{{ group.name }}</span>
+                <span class="text-[11px] uppercase tracking-[0.2em] text-ink-950/40">{{ group.items.length }} issues</span>
               </span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
                 fill="currentColor"
-                class="h-3 w-3 text-white/50 transition-transform duration-300"
+                class="h-3 w-3 text-ink-950/50 transition-transform duration-300"
                 :class="isGroupOpen(group.name) ? 'rotate-180' : ''"
               >
                 <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
               </svg>
             </button>
-            <div v-if="isGroupOpen(group.name)" class="divide-y divide-white/10 border-t border-white/10">
+            <div v-if="isGroupOpen(group.name)" class="divide-y divide-ink-950/10 border-t border-ink-950/10">
               <div v-for="comic in group.items" :key="comic.id" class="flex flex-col gap-3 py-4 px-4 md:flex-row md:items-center md:justify-between">
                 <div class="flex items-center gap-4">
-                  <div class="h-16 w-11 shrink-0 overflow-hidden bg-ink-900">
+                  <div class="h-16 w-11 shrink-0 overflow-hidden bg-ink-100">
                     <img :src="comic.poster || '/images/no-image.webp'" :alt="`Cover of ${comic.title}`" class="h-full w-full object-cover" />
                   </div>
                   <div>
-                    <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">{{ comic.year }}</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-950/40">{{ comic.year }}</p>
                     <h4 class="font-display text-lg font-black uppercase tracking-tight">{{ comic.title }}</h4>
-                    <p class="text-xs text-white/50">{{ comic.id }} · Issue {{ comic.issue }}</p>
+                    <p class="text-xs text-ink-950/50">{{ comic.id }} · Issue {{ comic.issue }}</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
-                  <span class="border border-white/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">
+                  <span class="border border-ink-950/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-ink-950/70">
                     {{ comic.status }}
                   </span>
-                  <span v-if="comic.featured" class="border border-white bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-black">
+                  <span v-if="comic.featured" class="border border-ink-950 bg-ink-950 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white">
                     Featured
                   </span>
                   <button
                     @click="openEdit(comic)"
-                    class="border border-white/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-white"
+                    class="border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-ink-950"
                   >
                     Edit
                   </button>
                   <button
                     @click="remove(comic)"
-                    class="border border-white/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 transition-colors duration-300 hover:border-red-400 hover:text-red-400"
+                    class="border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-950/50 transition-colors duration-300 hover:border-red-500 hover:text-red-600"
                   >
                     Delete
                   </button>
@@ -633,13 +637,13 @@ watch(search, (v) => {
       <div v-if="activeTab === 'series'">
         <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div class="flex-1">
-            <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-white/60">
+            <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-ink-950/60">
               Series ({{ series.length }})
             </h2>
           </div>
           <button
             @click="openNewSeries"
-            class="bg-white px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-white/80"
+            class="bg-ink-950 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800"
           >
             + New series
           </button>
@@ -647,21 +651,21 @@ watch(search, (v) => {
 
         <!-- Cargando -->
         <div v-if="loading" class="mt-6 space-y-3">
-          <div v-for="i in 3" :key="i" class="h-16 animate-pulse border border-white/10"></div>
+          <div v-for="i in 3" :key="i" class="h-16 animate-pulse border border-ink-950/10"></div>
         </div>
 
         <!-- Lista vacía -->
-        <div v-else-if="series.length === 0" class="mt-6 border border-white/10 p-10 text-center">
-          <p class="text-sm uppercase tracking-[0.25em] text-white/40">No series yet. Create the first one.</p>
+        <div v-else-if="series.length === 0" class="mt-6 border border-ink-950/10 p-10 text-center">
+          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">No series yet. Create the first one.</p>
         </div>
 
         <!-- Lista de series -->
         <div v-else class="mt-6 space-y-3">
-          <div v-for="s in series" :key="s.id" class="flex flex-col gap-3 border border-white/10 py-4 px-4 md:flex-row md:items-center md:justify-between">
+          <div v-for="s in series" :key="s.id" class="flex flex-col gap-3 border border-ink-950/10 py-4 px-4 md:flex-row md:items-center md:justify-between">
             <div class="flex items-center gap-4">
-              <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-ink-900">
+              <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-ink-100">
                 <img v-if="s.logo" :src="s.logo" :alt="`Logo of ${s.name}`" class="h-full w-full object-cover" />
-                <div v-else class="flex h-full w-full items-center justify-center text-white/30">
+                <div v-else class="flex h-full w-full items-center justify-center text-ink-950/30">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -674,19 +678,20 @@ watch(search, (v) => {
             <div class="flex items-center gap-3">
               <button
                 @click="openEditSeries(s)"
-                class="border border-white/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-white"
+                class="border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-ink-950"
               >
                 Edit
               </button>
               <button
                 @click="removeSeries(s)"
-                class="border border-white/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 transition-colors duration-300 hover:border-red-400 hover:text-red-400"
+                class="border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-950/50 transition-colors duration-300 hover:border-red-500 hover:text-red-600"
               >
                 Delete
               </button>
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       <!-- Modal crear / editar cómic -->
@@ -700,12 +705,12 @@ watch(search, (v) => {
             aria-modal="true"
             :aria-label="editingId ? 'Edit comic' : 'New comic'"
           >
-            <div class="w-full max-w-3xl border border-white/15 bg-ink-950" @paste="onPaste">
-              <div class="flex items-center justify-between border-b border-white/10 px-6 py-5 md:px-8">
+            <div class="w-full max-w-3xl border border-ink-950/15 bg-white text-ink-950" @paste="onPaste">
+              <div class="flex items-center justify-between border-b border-ink-950/10 px-6 py-5 md:px-8">
                 <h2 class="font-display text-xl font-black uppercase tracking-tight">{{ editingId ? 'Edit comic' : 'New comic' }}</h2>
                 <button
                   @click="cancelForm"
-                  class="flex h-9 w-9 items-center justify-center border border-white/20 text-sm text-white/60 transition-colors duration-300 hover:border-white hover:text-white"
+                  class="flex h-9 w-9 items-center justify-center border border-ink-950/20 text-sm text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
                   aria-label="Close form"
                 >
                   ×
@@ -714,36 +719,36 @@ watch(search, (v) => {
 
               <div class="px-6 py-6 md:px-8">
                 <div class="grid gap-6 md:grid-cols-3">
-                  <p class="text-[10px] uppercase tracking-[0.3em] text-white/40 md:col-span-3">
-                    Product ID (auto-generated): <span class="font-bold text-white">{{ generatedId() || '…' }}</span>
+                  <p class="text-[10px] uppercase tracking-[0.3em] text-ink-950/40 md:col-span-3">
+                    Product ID (auto-generated): <span class="font-bold text-ink-950">{{ generatedId() || '…' }}</span>
                   </p>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
                     Title *
                     <input
                       v-model="form.title"
                       placeholder="The Origin"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     />
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
                     Character / Protagonist (auto: without "THE")
                     <input
                       v-model="form.protagonist"
                       placeholder="TUTEQUE-MAN"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     />
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
                     Issue ({{ form.issue }})
                     <input
                       v-model.number="form.issue"
                       type="number"
                       min="1"
                       placeholder="1"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     />
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
                     Year (current year detected, editable)
                     <input
                       v-model.number="form.year"
@@ -751,41 +756,41 @@ watch(search, (v) => {
                       min="1900"
                       max="2100"
                       placeholder="2026"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     />
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
                     Pages
                     <input
                       v-model.number="form.pages"
                       type="number"
                       min="1"
                       placeholder="32"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     />
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
                     Author / Artist
                     <input
                       v-model="form.author"
                       placeholder="Angello Aponte"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     />
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
                     Status
                     <select
                       v-model="form.status"
-                      class="mt-2 w-full border border-white/20 bg-black px-4 py-3 text-sm text-white focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-white px-4 py-3 text-sm text-ink-950 focus:border-ink-950 focus:outline-none"
                     >
                       <option v-for="s in STATUSES" :key="s" :value="s">{{ s }}</option>
                     </select>
                   </label>
-                  <label class="flex cursor-pointer items-center gap-3 self-end pb-3 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                    <input v-model="form.featured" type="checkbox" class="h-4 w-4 accent-white" />
+                  <label class="flex cursor-pointer items-center gap-3 self-end pb-3 text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
+                    <input v-model="form.featured" type="checkbox" class="h-4 w-4 accent-ink-950" />
                     Featured
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
                     Rating (%)
                     <input
                       v-model.number="form.rating"
@@ -793,10 +798,10 @@ watch(search, (v) => {
                       min="0"
                       max="100"
                       placeholder="85"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     />
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
                     Price ($)
                     <input
                       v-model.number="form.price"
@@ -804,10 +809,10 @@ watch(search, (v) => {
                       min="0"
                       step="0.01"
                       placeholder="9.99"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     />
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
                     Discount (%)
                     <input
                       v-model.number="form.discount"
@@ -815,51 +820,51 @@ watch(search, (v) => {
                       min="0"
                       max="100"
                       placeholder="10"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     />
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-3">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50 md:col-span-3">
                     Series (optional)
                     <select
                       v-model="form.seriesId"
-                      class="mt-2 w-full border border-white/20 bg-black px-4 py-3 text-sm text-white focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-white px-4 py-3 text-sm text-ink-950 focus:border-ink-950 focus:outline-none"
                     >
                       <option value="">No series</option>
                       <option v-for="s in series" :key="s.id" :value="s.id">{{ s.name }}</option>
                     </select>
                   </label>
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-3">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50 md:col-span-3">
                     Description
                     <textarea
                       v-model="form.description"
                       rows="3"
                       placeholder="Comic synopsis, shown on the product page…"
-                      class="mt-2 w-full resize-y border border-white/20 bg-transparent px-4 py-3 text-sm leading-relaxed placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full resize-y border border-ink-950/20 bg-transparent px-4 py-3 text-sm leading-relaxed placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     ></textarea>
                   </label>
                 </div>
 
-                <div class="mt-6 border border-white/10 p-4">
-                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Cover (converted to image link)</p>
+                <div class="mt-6 border border-ink-950/10 p-4">
+                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">Cover (converted to image link)</p>
                   <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center">
-                    <div class="w-24 shrink-0 overflow-hidden bg-ink-900">
+                    <div class="w-24 shrink-0 overflow-hidden bg-ink-100">
                       <img :src="form.poster || '/images/no-image.webp'" alt="Cover preview" class="aspect-[1920/2951] w-full object-cover" />
                     </div>
                     <div class="flex-1">
                       <label
-                        class="inline-flex cursor-pointer border border-white/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:border-white"
+                        class="inline-flex cursor-pointer border border-ink-950/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:border-ink-950"
                       >
                         {{ uploading ? 'Processing…' : 'Choose image' }}
                         <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onCoverSelected" />
                       </label>
-                      <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-white/35">
+                      <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-ink-950/35">
                         Or paste a screenshot with Ctrl+V. The image is compressed and stored inside the comic itself.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <p v-if="error" class="mt-5 border border-red-400/40 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
+                <p v-if="error" class="mt-5 border border-red-500/40 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-red-600">
                   {{ error }}
                 </p>
 
@@ -867,13 +872,13 @@ watch(search, (v) => {
                   <button
                     @click="save"
                     :disabled="saving"
-                    class="bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-white/80 disabled:opacity-50"
+                    class="bg-ink-950 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800 disabled:opacity-50"
                   >
                     {{ saving ? 'Saving…' : 'Save comic' }}
                   </button>
                   <button
                     @click="cancelForm"
-                    class="border border-white/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white/60 transition-colors duration-300 hover:border-white hover:text-white"
+                    class="border border-ink-950/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
                   >
                     Cancel
                   </button>
@@ -895,12 +900,12 @@ watch(search, (v) => {
             aria-modal="true"
             :aria-label="editingSeriesId ? 'Edit series' : 'New series'"
           >
-            <div class="w-full max-w-2xl border border-white/15 bg-ink-950">
-              <div class="flex items-center justify-between border-b border-white/10 px-6 py-5 md:px-8">
+            <div class="w-full max-w-2xl border border-ink-950/15 bg-white text-ink-950">
+              <div class="flex items-center justify-between border-b border-ink-950/10 px-6 py-5 md:px-8">
                 <h2 class="font-display text-xl font-black uppercase tracking-tight">{{ editingSeriesId ? 'Edit series' : 'New series' }}</h2>
                 <button
                   @click="cancelSeriesForm"
-                  class="flex h-9 w-9 items-center justify-center border border-white/20 text-sm text-white/60 transition-colors duration-300 hover:border-white hover:text-white"
+                  class="flex h-9 w-9 items-center justify-center border border-ink-950/20 text-sm text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
                   aria-label="Close form"
                 >
                   ×
@@ -909,22 +914,22 @@ watch(search, (v) => {
 
               <div class="px-6 py-6 md:px-8">
                 <div class="grid gap-6 md:grid-cols-2">
-                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-2">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50 md:col-span-2">
                     Series Name *
                     <input
                       v-model="seriesForm.name"
                       placeholder="THE ORIGIN SAGA"
-                      class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm uppercase placeholder:text-white/25 focus:border-white focus:outline-none"
+                      class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm uppercase placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                     />
                   </label>
                 </div>
 
-                <div class="mt-6 border border-white/10 p-4">
-                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Series Logo</p>
+                <div class="mt-6 border border-ink-950/10 p-4">
+                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">Series Logo</p>
                   <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center">
-                    <div class="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-ink-900">
+                    <div class="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-ink-100">
                       <img v-if="seriesForm.logo" :src="seriesForm.logo" alt="Logo preview" class="h-full w-full object-cover" />
-                      <div v-else class="flex h-full w-full items-center justify-center text-white/30">
+                      <div v-else class="flex h-full w-full items-center justify-center text-ink-950/30">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -932,19 +937,19 @@ watch(search, (v) => {
                     </div>
                     <div class="flex-1">
                       <label
-                        class="inline-flex cursor-pointer border border-white/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:border-white"
+                        class="inline-flex cursor-pointer border border-ink-950/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:border-ink-950"
                       >
                         {{ uploading ? 'Processing…' : 'Choose logo' }}
                         <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onLogoSelected" />
                       </label>
-                      <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-white/35">
+                      <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-ink-950/35">
                         Square image recommended. Will be displayed in the comic detail.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <p v-if="error" class="mt-5 border border-red-400/40 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
+                <p v-if="error" class="mt-5 border border-red-500/40 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-red-600">
                   {{ error }}
                 </p>
 
@@ -952,13 +957,13 @@ watch(search, (v) => {
                   <button
                     @click="saveSeriesData"
                     :disabled="saving"
-                    class="bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-white/80 disabled:opacity-50"
+                    class="bg-ink-950 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800 disabled:opacity-50"
                   >
                     {{ saving ? 'Saving…' : 'Save series' }}
                   </button>
                   <button
                     @click="cancelSeriesForm"
-                    class="border border-white/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white/60 transition-colors duration-300 hover:border-white hover:text-white"
+                    class="border border-ink-950/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
                   >
                     Cancel
                   </button>
