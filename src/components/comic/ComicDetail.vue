@@ -273,8 +273,7 @@ watch(() => props.slug, load)
         </section>
       </div>
 
-      <!-- Footer Spacer -->
-      <div class="h-16 bg-ink-50"></div>
+
     </div>
   </div>
 </template>
