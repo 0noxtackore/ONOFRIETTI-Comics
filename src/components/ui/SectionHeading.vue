@@ -9,7 +9,7 @@ defineProps({
 
 <template>
   <div v-reveal class="max-w-3xl" :class="align === 'center' ? 'mx-auto text-center' : ''">
-    <div class="mb-4 flex items-center gap-3" :class="align === 'center' ? 'justify-center' : ''">
+    <div v-if="kicker" class="mb-4 flex items-center gap-3" :class="align === 'center' ? 'justify-center' : ''">
       <span class="h-px w-10 bg-ink-950"></span>
       <p class="text-xs font-bold uppercase tracking-[0.35em] text-ink-950/60">{{ kicker }}</p>
     </div>
