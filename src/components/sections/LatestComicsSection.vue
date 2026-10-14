@@ -78,7 +78,6 @@ onUnmounted(() => {
         <SectionHeading
           kicker="New This Week"
           title="Fresh off the press"
-          description="Each issue is a collectible. Ink on paper, no rush, just as it should be."
         />
       </div>
 
