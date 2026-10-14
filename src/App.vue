@@ -85,7 +85,7 @@ onUnmounted(() => {
       <LatestComicsSection />
     </main>
 
-    <SiteFooter v-if="!isComicsPage" />
+    <SiteFooter />
   </div>
 
   <!-- Ficha de detalle del cómic (solo en /comics/<slug>) -->
