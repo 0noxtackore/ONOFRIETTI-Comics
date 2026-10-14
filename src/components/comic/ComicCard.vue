@@ -79,7 +79,7 @@ const titleFontSize = computed(() => {
       <h3 class="font-condensed text-[0.875rem] font-bold uppercase leading-tight text-[#202020] line-clamp-2 group-hover:text-[#e62429]">
         {{ comic.title }}
       </h3>
-      <p class="mt-1 text-[0.75rem] uppercase text-[#4c5067]">#{{ comic.issue }}</p>
+      <p class="mt-1 text-[0.75rem] uppercase text-[#4c5067]">({{ comic.year }}) #{{ comic.issue }}</p>
     </div>
   </article>
 </template>
