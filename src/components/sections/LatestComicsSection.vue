@@ -14,8 +14,6 @@ const comics = ref([])
 const loading = ref(true)
 const isAdmin = ref(false)
 
-const { reset } = useCatalog()
-
 const baseList = computed(() => {
   if (isAdmin.value) return comics.value
   return comics.value.filter((c) => ['Available', 'Limited Edition'].includes(c.status))
@@ -79,18 +77,6 @@ onUnmounted(() => {
                 <div class="h-5 w-40 bg-ink-700"></div>
               </div>
             </div>
-          </div>
-
-          <!-- Sin resultados -->
-          <div v-else-if="visibleComics.length === 0" class="mt-6 border border-ink-950/10 p-10 text-center">
-            <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">No comics match your search.</p>
-            <button
-              type="button"
-              @click="reset()"
-              class="link-line mt-4 text-[11px] font-bold uppercase tracking-[0.25em] text-ink-950/70 transition-colors hover:text-ink-950"
-            >
-              Clear search and filters
-            </button>
           </div>
 
           <!-- Grid de cómics -->
