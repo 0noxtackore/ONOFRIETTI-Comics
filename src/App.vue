@@ -69,7 +69,7 @@ onUnmounted(() => {
   <!-- Panel de administración (solo en /admin) -->
   <AdminPanel v-if="isAdmin" />
 
-  <div v-else class="min-h-screen overflow-x-clip bg-black text-white antialiased selection:bg-white selection:text-black">
+  <div v-else class="min-h-screen overflow-x-clip bg-ink-50 text-ink-950 antialiased selection:bg-ink-950 selection:text-white">
     <!-- Grano de película sobre toda la página -->
     <div class="noise-overlay" aria-hidden="true"></div>
 

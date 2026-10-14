@@ -110,10 +110,10 @@ watch(() => props.slug, load)
 </script>
 
 <template>
-  <div class="fixed inset-0 z-[90] overflow-y-auto bg-black" @click.self="emit('close')">
+  <div class="fixed inset-0 z-[90] overflow-y-auto bg-ink-50" @click.self="emit('close')">
     <!-- Cargando -->
     <div v-if="loading" class="flex min-h-screen items-center justify-center">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+      <div class="h-8 w-8 animate-spin rounded-full border-2 border-ink-950 border-t-transparent"></div>
     </div>
 
     <!-- No encontrado -->
@@ -122,7 +122,7 @@ watch(() => props.slug, load)
         <p class="text-sm uppercase tracking-[0.25em] text-ink-400">Comic not found</p>
         <button
           @click="emit('close')"
-          class="mt-6 rounded-lg bg-white px-8 py-3 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors duration-300 hover:bg-ink-200"
+          class="mt-6 rounded-lg bg-ink-950 px-8 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800"
         >
           Back
         </button>
@@ -135,7 +135,7 @@ watch(() => props.slug, load)
       <button
         @click="emit('close')"
         aria-label="Close"
-        class="fixed right-6 top-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-sm transition-all duration-300 hover:border-white hover:bg-white/10"
+        class="fixed right-6 top-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-ink-950/20 bg-ink-950/50 text-ink-950 backdrop-blur-sm transition-all duration-300 hover:border-ink-950 hover:bg-ink-950/10"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -164,13 +164,13 @@ watch(() => props.slug, load)
               <img src="/images/logo-menubar.png" alt="Logo" class="h-16 w-auto object-contain md:h-20" />
 
               <!-- Issue Number -->
-              <p class="font-display text-xl font-black uppercase text-white md:text-2xl">
+              <p class="font-display text-xl font-black uppercase text-ink-950 md:text-2xl">
                 ISSUE {{ comic.issue }}
               </p>
             </div>
 
             <!-- Comic Info -->
-            <div class="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-ink-400 lg:justify-start">
+              <div class="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-ink-950/50 lg:justify-start">
               <span>Author: {{ comic.author }}</span>
               <span>Year: {{ comic.year }}</span>
               <span>Pages: {{ comic.pages || '—' }}</span>
@@ -182,9 +182,9 @@ watch(() => props.slug, load)
                 <p class="font-display text-2xl font-black text-red-500 line-through md:text-3xl">
                   ${{ comic.price }}
                 </p>
-                <span class="rounded-full bg-red-500/20 px-3 py-1 text-xs font-bold text-red-400">-{{ comic.discount }}%</span>
+                <span class="rounded-full bg-red-500/10 px-3 py-1 text-xs font-bold text-red-600">-{{ comic.discount }}%</span>
               </div>
-              <p class="font-display text-5xl font-black text-white md:text-6xl">
+              <p class="font-display text-5xl font-black text-ink-950 md:text-6xl">
                 ${{ discountedPrice }}
               </p>
             </div>
@@ -197,7 +197,7 @@ watch(() => props.slug, load)
               class="mt-8 flex w-full items-center justify-center gap-3 px-8 py-5 text-sm font-bold uppercase tracking-[0.25em] transition-all duration-300"
               :class="
                 isAvailable
-                  ? 'bg-white text-black hover:bg-ink-200 hover:shadow-lg hover:shadow-white/10'
+                  ? 'bg-ink-950 text-white hover:bg-ink-800 hover:shadow-lg hover:shadow-ink-950/10'
                   : 'pointer-events-none cursor-not-allowed border border-ink-700 text-ink-500'
               "
             >
@@ -225,13 +225,13 @@ watch(() => props.slug, load)
         </div>
 
         <!-- Comic Details Section -->
-        <section class="mt-16 border-t border-ink-800 pt-16 md:mt-24">
-          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">Comic Details</h2>
+        <section class="mt-16 border-t border-ink-950/10 pt-16 md:mt-24">
+          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/50">Comic Details</h2>
 
           <div class="mt-6 flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
             <!-- Description -->
             <div v-if="comic.description" class="flex-1">
-              <p class="max-w-3xl text-lg leading-relaxed text-ink-200 md:text-xl">
+              <p class="max-w-3xl text-lg leading-relaxed text-ink-950/70 md:text-xl">
                 {{ comic.description }}
               </p>
             </div>
@@ -240,7 +240,7 @@ watch(() => props.slug, load)
             <div v-if="comic.rating != null" class="flex flex-col items-center gap-2">
               <div class="relative h-32 w-32 md:h-40 md:w-40">
                 <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" class="text-ink-700" />
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" class="text-ink-950/20" />
                   <circle
                     cx="50" cy="50" r="44"
                     fill="none"
@@ -249,27 +249,27 @@ watch(() => props.slug, load)
                     stroke-linecap="round"
                     :stroke-dasharray="276.46"
                     :stroke-dashoffset="276.46 - (276.46 * comic.rating) / 100"
-                    class="text-white transition-all duration-700"
+                    class="text-ink-950 transition-all duration-700"
                   />
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center">
-                  <span class="font-display text-3xl font-black text-white md:text-4xl">{{ comic.rating }}</span>
-                  <span class="text-[10px] uppercase tracking-wider text-ink-500">%</span>
+                  <span class="font-display text-3xl font-black text-ink-950 md:text-4xl">{{ comic.rating }}</span>
+                  <span class="text-[10px] uppercase tracking-wider text-ink-950/50">%</span>
                 </div>
               </div>
-              <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-500">Rating</span>
+              <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">Rating</span>
             </div>
           </div>
         </section>
 
         <!-- More from this series -->
-        <section v-if="related.length" class="mt-16 border-t border-ink-800 pt-16 md:mt-24">
-          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-500">More from this series</h2>
-          <h3 class="font-display mt-2 text-3xl font-black uppercase tracking-tight text-white">{{ comic.title }}</h3>
+        <section v-if="related.length" class="mt-16 border-t border-ink-950/10 pt-16 md:mt-24">
+          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/50">More from this series</h2>
+          <h3 class="font-display mt-2 text-3xl font-black uppercase tracking-tight text-ink-950">{{ comic.title }}</h3>
 
           <div class="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
             <a v-for="r in related" :key="r.id" :href="`/comics/${r.slug}`" class="group block">
-              <div class="overflow-hidden border border-ink-800 bg-ink-900 transition-all duration-300 group-hover:border-white group-hover:shadow-lg group-hover:shadow-white/5">
+              <div class="overflow-hidden border border-ink-950/10 bg-white transition-all duration-300 group-hover:border-ink-950 group-hover:shadow-lg group-hover:shadow-ink-950/5">
                 <img
                   :src="r.poster || '/images/no-image.webp'"
                   :alt="`Cover of ${r.title}`"
@@ -277,16 +277,16 @@ watch(() => props.slug, load)
                   class="aspect-[1920/2951] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
               </div>
-              <p class="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-500">{{ r.year }}</p>
-              <h4 class="font-display mt-1 text-sm font-black uppercase tracking-tight text-white">{{ r.title }}</h4>
-              <p class="mt-0.5 text-xs text-ink-400">Issue {{ r.issue }}</p>
+              <p class="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-950/50">{{ r.year }}</p>
+              <h4 class="font-display mt-1 text-sm font-black uppercase tracking-tight text-ink-950">{{ r.title }}</h4>
+              <p class="mt-0.5 text-xs text-ink-950/40">Issue {{ r.issue }}</p>
             </a>
           </div>
         </section>
       </div>
 
       <!-- Footer Spacer -->
-      <div class="h-16 bg-black"></div>
+      <div class="h-16 bg-ink-50"></div>
     </div>
   </div>
 </template>

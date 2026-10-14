@@ -50,7 +50,7 @@ const titleFontSize = computed(() => {
     <a
       :href="`/comics/${comic.slug}`"
       :aria-label="`View ${comic.title} details`"
-      class="group/cover relative block overflow-hidden border-2 border-white/10 transition-colors duration-500"
+      class="group/cover relative block overflow-hidden border-2 border-ink-950/10 transition-colors duration-500"
     >
       <div class="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
         <ComicCover :comic="comic" :poster="comic.poster" />
@@ -80,16 +80,16 @@ const titleFontSize = computed(() => {
     </a>
 
     <div class="flex flex-1 flex-col justify-center pt-5 text-center">
-      <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/50">
+      <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-950/50">
         {{ comic.year }}
       </p>
       <div class="mt-1 flex min-h-[2.5em] items-center justify-center">
-        <h3 class="font-display line-clamp-2 font-black uppercase leading-tight tracking-tight text-white"
+        <h3 class="font-display line-clamp-2 font-black uppercase leading-tight tracking-tight text-ink-950"
           :style="{ fontSize: titleFontSize }">
           {{ comic.title }}
         </h3>
       </div>
-      <p class="mb-6 mt-1 text-sm text-white/50">Issue {{ comic.issue }}</p>
+      <p class="mb-6 mt-1 text-sm text-ink-950/50">Issue {{ comic.issue }}</p>
     </div>
 
     <!-- Botón de compra. TODO: apuntar al futuro checkout / tienda. -->
@@ -99,8 +99,8 @@ const titleFontSize = computed(() => {
       class="mt-auto inline-flex w-full items-center justify-center gap-2 px-3 py-3 text-[11px] font-bold uppercase tracking-[0.15em] transition-all duration-300 sm:gap-3 sm:px-6 sm:py-3.5 sm:text-xs sm:tracking-[0.25em]"
       :class="
         isAvailable
-          ? 'bg-white text-black hover:bg-ink-200 group-hover:bg-ink-200'
-          : 'pointer-events-none cursor-not-allowed border border-white/15 text-white/40'
+          ? 'bg-ink-950 text-white hover:bg-ink-800 group-hover:bg-ink-800'
+          : 'pointer-events-none cursor-not-allowed border border-ink-950/15 text-ink-950/40'
       "
     >
       <span class="hidden sm:inline">{{ buyLabel }}</span>

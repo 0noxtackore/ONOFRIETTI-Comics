@@ -17,7 +17,7 @@ const navLinks = [
 <template>
   <header
     class="fixed inset-x-0 top-0 z-50 transition-all duration-500"
-    :class="isScrolled ? 'border-b border-white/10 bg-ink-950/90 backdrop-blur-md' : 'bg-transparent'"
+    :class="isScrolled ? 'border-b border-white/10 bg-ink-950/90 backdrop-blur-md' : 'bg-ink-950'"
   >
     <div class="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5 sm:h-20 md:px-8">
       <AppLogo size="sm" class="mx-auto" />
