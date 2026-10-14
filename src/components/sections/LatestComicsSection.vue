@@ -15,8 +15,7 @@ const comics = ref([])
 const loading = ref(true)
 const isAdmin = ref(false)
 
-// Búsqueda y filtros compartidos con el header (estilo DeviantArt).
-const { query, selectedProtagonist, reset } = useCatalog()
+const { reset } = useCatalog()
 
 const baseList = computed(() => {
   if (isAdmin.value) return comics.value
@@ -26,37 +25,7 @@ const baseList = computed(() => {
 // Categorías visibles: solo las que tienen cómics en la lista base.
 const protagonists = computed(() => [...new Set(baseList.value.map((c) => c.protagonist))])
 
-const visibleComics = computed(() => {
-  const q = query.value.trim().toLowerCase()
-  let list = baseList.value
-
-  if (selectedProtagonist.value) {
-    list = list.filter((c) => c.protagonist === selectedProtagonist.value)
-  }
-
-  if (q) {
-    list = list.filter(
-      (c) =>
-        c.title.toLowerCase().includes(q) ||
-        (c.protagonist || '').toLowerCase().includes(q) ||
-        (c.author || '').toLowerCase().includes(q) ||
-        String(c.issue) === q ||
-        String(c.year) === q
-    )
-  }
-
-  return list
-})
-
-function pill(active) {
-  return active
-    ? 'border-ink-950 bg-ink-950 text-white'
-    : 'border-ink-950/20 text-ink-950/60 hover:border-ink-950 hover:text-ink-950'
-}
-
-function protagonistCount(p) {
-  return baseList.value.filter((c) => c.protagonist === p).length
-}
+const visibleComics = computed(() => baseList.value)
 
 let unsubscribeAuth = null
 onMounted(async () => {
@@ -77,7 +46,6 @@ onUnmounted(() => {
       <div class="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
         <SectionHeading
           kicker="New This Week"
-          title="Fresh off the press"
         />
       </div>
 

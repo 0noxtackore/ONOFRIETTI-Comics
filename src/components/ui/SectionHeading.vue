@@ -1,10 +1,9 @@
 <script setup>
-// Encabezado de sección reutilizable: kicker + título display + descripción.
 defineProps({
   kicker: { type: String, default: '' },
-  title: { type: String, required: true },
+  title: { type: String, default: '' },
   description: { type: String, default: '' },
-  align: { type: String, default: 'left' }, // 'left' | 'center'
+  align: { type: String, default: 'left' },
 })
 </script>
 
@@ -15,7 +14,7 @@ defineProps({
       <p class="text-xs font-bold uppercase tracking-[0.35em] text-ink-950/60">{{ kicker }}</p>
     </div>
 
-    <h2 class="font-display text-3xl font-black uppercase leading-[0.95] tracking-tight text-ink-950 sm:text-5xl md:text-6xl">
+    <h2 v-if="title" class="font-display text-3xl font-black uppercase leading-[0.95] tracking-tight text-ink-950 sm:text-5xl md:text-6xl">
       <slot name="title">{{ title }}</slot>
     </h2>
 
