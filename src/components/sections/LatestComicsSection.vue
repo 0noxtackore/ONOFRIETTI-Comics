@@ -9,7 +9,6 @@ import SectionHeading from '../ui/SectionHeading.vue'
 import ComicCard from '../comic/ComicCard.vue'
 import { fetchComics } from '../../services/comicsService'
 import { onAdminAuth } from '../../firebase/auth'
-import { useCatalog } from '../../composables/useCatalog'
 
 const comics = ref([])
 const loading = ref(true)
@@ -45,7 +44,7 @@ onUnmounted(() => {
     <div class="mx-auto max-w-7xl px-5 md:px-8">
       <div class="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
         <SectionHeading
-          kicker="New This Week"
+          kicker="Comics"
         />
       </div>
 

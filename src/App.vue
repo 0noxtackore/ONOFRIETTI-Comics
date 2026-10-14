@@ -14,10 +14,12 @@ import { navigate } from './utils/router'
 
 const isAdmin = ref(false)
 const comicSlug = ref(null)
+const isComicsPage = ref(false)
 
 function parseRoute() {
   const path = window.location.pathname
   isAdmin.value = path.startsWith('/admin')
+  isComicsPage.value = path === '/comics'
   const m = path.match(/^\/comics\/(.+)$/)
   comicSlug.value = m ? decodeURIComponent(m[1]) : null
 }
@@ -78,7 +80,7 @@ onUnmounted(() => {
 
     <main>
       <!-- Página principal -->
-      <HeroSection />
+      <HeroSection v-if="!isComicsPage" />
       <!-- Sección de cómics -->
       <LatestComicsSection />
     </main>
