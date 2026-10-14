@@ -129,8 +129,9 @@ watch(() => props.slug, load)
 
     <!-- Comic Detail -->
     <div v-if="comic">
-      <!-- Main Content -->
-      <div class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
+      <!-- Dark gray section: Issue/Buy/Info + Comic Details -->
+      <div class="bg-ink-900 text-white">
+        <div class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
         <!-- Top Section: Series/Issue/Buy + Cover -->
         <div class="flex flex-col gap-12 lg:flex-row lg:items-center lg:justify-between">
           <!-- Left: Series Logo, Issue, Buy Button -->
@@ -151,13 +152,13 @@ watch(() => props.slug, load)
               <img src="/images/logo-menubar.png" alt="Logo" class="h-16 w-auto object-contain md:h-20" />
 
               <!-- Issue Number -->
-              <p class="font-display text-xl font-black uppercase text-ink-950 md:text-2xl">
+              <p class="font-display text-xl font-black uppercase text-white md:text-2xl">
                 ISSUE {{ comic.issue }}
               </p>
             </div>
 
             <!-- Comic Info -->
-              <div class="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-ink-950/50 lg:justify-start">
+              <div class="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-white/50 lg:justify-start">
               <span>Author: {{ comic.author }}</span>
               <span>Year: {{ comic.year }}</span>
               <span>Pages: {{ comic.pages || '—' }}</span>
@@ -171,7 +172,7 @@ watch(() => props.slug, load)
                 </p>
                 <span class="rounded-full bg-red-500/10 px-3 py-1 text-xs font-bold text-red-600">-{{ comic.discount }}%</span>
               </div>
-              <p class="font-display text-5xl font-black text-ink-950 md:text-6xl">
+              <p class="font-display text-5xl font-black text-white md:text-6xl">
                 ${{ discountedPrice }}
               </p>
             </div>
@@ -183,8 +184,8 @@ watch(() => props.slug, load)
               class="mt-8 flex w-full items-center justify-center gap-3 px-8 py-5 text-sm font-bold uppercase tracking-[0.25em] transition-all duration-300"
               :class="
                 isAvailable
-                  ? 'bg-ink-950 text-white hover:bg-ink-800 hover:shadow-lg hover:shadow-ink-950/10'
-                  : 'pointer-events-none cursor-not-allowed border border-ink-700 text-ink-500'
+                  ? 'bg-white text-ink-950 hover:bg-ink-100 hover:shadow-lg hover:shadow-black/20'
+                  : 'pointer-events-none cursor-not-allowed border border-white/20 text-white/40'
               "
             >
               <svg v-if="isAvailable && added" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true">
@@ -211,13 +212,13 @@ watch(() => props.slug, load)
         </div>
 
         <!-- Comic Details Section -->
-        <section class="mt-16 border-t border-ink-950/10 pt-16 md:mt-24">
-          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/50">Comic Details</h2>
+        <section class="mt-16 border-t border-white/10 pt-16 md:mt-24">
+          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">Comic Details</h2>
 
           <div class="mt-6 flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
             <!-- Description -->
             <div v-if="comic.description" class="flex-1">
-              <p class="max-w-3xl text-lg leading-relaxed text-ink-950/70 md:text-xl">
+              <p class="max-w-3xl text-lg leading-relaxed text-white/70 md:text-xl">
                 {{ comic.description }}
               </p>
             </div>
@@ -226,7 +227,7 @@ watch(() => props.slug, load)
             <div v-if="comic.rating != null" class="flex flex-col items-center gap-2">
               <div class="relative h-32 w-32 md:h-40 md:w-40">
                 <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" class="text-ink-950/20" />
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" class="text-white/20" />
                   <circle
                     cx="50" cy="50" r="44"
                     fill="none"
@@ -235,21 +236,23 @@ watch(() => props.slug, load)
                     stroke-linecap="round"
                     :stroke-dasharray="276.46"
                     :stroke-dashoffset="276.46 - (276.46 * comic.rating) / 100"
-                    class="text-ink-950 transition-all duration-700"
+                    class="text-white transition-all duration-700"
                   />
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center">
-                  <span class="font-display text-3xl font-black text-ink-950 md:text-4xl">{{ comic.rating }}</span>
-                  <span class="text-[10px] uppercase tracking-wider text-ink-950/50">%</span>
+                  <span class="font-display text-3xl font-black text-white md:text-4xl">{{ comic.rating }}</span>
+                  <span class="text-[10px] uppercase tracking-wider text-white/50">%</span>
                 </div>
               </div>
-              <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">Rating</span>
+              <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Rating</span>
             </div>
           </div>
         </section>
+        </div>
+      </div>
 
         <!-- More from this series -->
-        <section v-if="related.length" class="mt-16 border-t border-ink-950/10 pt-16 md:mt-24">
+        <section v-if="related.length" class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
           <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/50">More from this series</h2>
           <h3 class="font-display mt-2 text-3xl font-black uppercase tracking-tight text-ink-950">{{ comic.title }}</h3>
 
@@ -269,7 +272,6 @@ watch(() => props.slug, load)
             </a>
           </div>
         </section>
-      </div>
 
 
     </div>
