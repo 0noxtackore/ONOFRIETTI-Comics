@@ -9,6 +9,7 @@ import { isConfigured } from '../../firebase/init'
 import { signInAdmin, signOutAdmin, onAdminAuth } from '../../firebase/auth'
 import { listComics, saveComic, deleteComic, fileToPoster } from '../../services/adminService'
 import { listSeries, saveSeries, deleteSeries, fileToLogo } from '../../services/seriesService'
+import { listCharacters, saveCharacter, deleteCharacter, fileToCharacterImage } from '../../services/charactersService'
 import { navigate } from '../../utils/router'
 
 const STATUSES = ['Available', 'Limited Edition', 'Sold Out', 'Coming Soon']
@@ -16,16 +17,19 @@ const STATUSES = ['Available', 'Limited Edition', 'Sold Out', 'Coming Soon']
 const user = ref(null)
 const comics = ref([])
 const series = ref([])
+const characters = ref([])
 const loading = ref(true)
 const saving = ref(false)
 const uploading = ref(false)
 const showForm = ref(false)
 const showSeriesForm = ref(false)
+const showCharacterForm = ref(false)
 const editingId = ref(null)
 const editingSeriesId = ref(null)
+const editingCharacterId = ref(null)
 const error = ref('')
 const notice = ref('')
-const activeTab = ref('comics') // 'comics' o 'series'
+const activeTab = ref('comics') // 'comics', 'series' o 'characters'
 
 const email = ref('')
 const password = ref('')
@@ -62,6 +66,15 @@ const emptySeriesForm = () => ({
 })
 const seriesForm = reactive(emptySeriesForm())
 
+const emptyCharacterForm = () => ({
+  id: '',
+  name: '',
+  slug: '',
+  image: '',
+  description: '',
+})
+const characterForm = reactive(emptyCharacterForm())
+
 // Slug de la parte que se genera automáticamente desde el título.
 function slugifyId(value) {
   return String(value || '')
@@ -91,9 +104,14 @@ async function load() {
   loading.value = true
   error.value = ''
   try {
-    const [comicsData, seriesData] = await Promise.all([listComics(), listSeries()])
+    const [comicsData, seriesData, charactersData] = await Promise.all([
+      listComics(),
+      listSeries(),
+      listCharacters(),
+    ])
     comics.value = comicsData
     series.value = seriesData
+    characters.value = charactersData
   } catch (e) {
     error.value = 'Could not load data: ' + e.message
   } finally {
@@ -323,6 +341,100 @@ async function removeSeries(s) {
   }
 }
 
+// Funciones para gestionar personajes
+function slugifyCharacterName(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+function openNewCharacter() {
+  Object.assign(characterForm, emptyCharacterForm())
+  editingCharacterId.value = null
+  showCharacterForm.value = true
+  error.value = ''
+}
+
+function openEditCharacter(c) {
+  Object.assign(characterForm, emptyCharacterForm(), c)
+  editingCharacterId.value = c.id
+  showCharacterForm.value = true
+  error.value = ''
+}
+
+function cancelCharacterForm() {
+  showCharacterForm.value = false
+  editingCharacterId.value = null
+  error.value = ''
+}
+
+async function saveCharacterData() {
+  error.value = ''
+  if (!characterForm.name.trim()) {
+    error.value = 'Character name is required.'
+    return
+  }
+  const slug = slugifyCharacterName(characterForm.name)
+  const id = editingCharacterId.value || `character-${slug}`
+  const isEditing = Boolean(editingCharacterId.value)
+  saving.value = true
+  try {
+    const payload = {
+      name: characterForm.name.trim(),
+      slug,
+      image: characterForm.image.trim(),
+      description: characterForm.description.trim(),
+    }
+    await saveCharacter(id, payload)
+    await load()
+    showCharacterForm.value = false
+    editingCharacterId.value = null
+    notice.value = isEditing ? 'Character updated.' : 'Character created.'
+  } catch (e) {
+    error.value = 'Error saving character: ' + e.message
+  } finally {
+    saving.value = false
+  }
+}
+
+async function removeCharacter(c) {
+  if (!window.confirm(`Delete character "${c.name}"? This action cannot be undone.`)) return
+  error.value = ''
+  try {
+    await deleteCharacter(c.id)
+    await load()
+    if (editingCharacterId.value === c.id) {
+      showCharacterForm.value = false
+      editingCharacterId.value = null
+    }
+    notice.value = 'Character deleted.'
+  } catch (e) {
+    error.value = 'Error deleting character: ' + e.message
+  }
+}
+
+async function processCharacterImage(file) {
+  error.value = ''
+  uploading.value = true
+  try {
+    const image = await fileToCharacterImage(file)
+    characterForm.image = image
+    notice.value = 'Image ready to save.'
+  } catch (err) {
+    error.value = 'Error processing the image: ' + err.message
+  } finally {
+    uploading.value = false
+  }
+}
+
+function onCharacterImageSelected(e) {
+  const file = e.target.files?.[0]
+  e.target.value = ''
+  if (file) processCharacterImage(file)
+}
+
 async function processLogo(file) {
   error.value = ''
   if (!seriesForm.name.trim()) {
@@ -422,7 +534,9 @@ onUnmounted(() => {
 })
 
 function onGlobalKey(e) {
-  if (e.key === 'Escape' && showForm.value) cancelForm()
+  if (e.key !== 'Escape') return
+  if (showCharacterForm.value) cancelCharacterForm()
+  else if (showForm.value) cancelForm()
 }
 
 watch(notice, (v) => {
@@ -789,6 +903,13 @@ watch(search, (v) => {
         >
           Series ({{ series.length }})
         </button>
+        <button
+          @click="activeTab = 'characters'"
+          class="px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] transition-colors duration-300"
+          :class="activeTab === 'characters' ? 'border-b-2 border-ink-950 text-ink-950' : 'text-ink-950/50 hover:text-ink-950'"
+        >
+          Characters ({{ characters.length }})
+        </button>
       </div>
 
       <p v-if="notice" class="mt-5 border border-ink-950 bg-ink-950 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white">
@@ -966,6 +1087,67 @@ watch(search, (v) => {
           </div>
         </div>
       </div>
+
+      <!-- Characters Tab -->
+      <div v-if="activeTab === 'characters'">
+        <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div class="flex-1">
+            <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-ink-950/60">
+              Characters ({{ characters.length }})
+            </h2>
+          </div>
+          <button
+            @click="openNewCharacter"
+            class="bg-ink-950 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800"
+          >
+            + New character
+          </button>
+        </div>
+
+        <!-- Cargando -->
+        <div v-if="loading" class="mt-6 space-y-3">
+          <div v-for="i in 3" :key="i" class="h-20 animate-pulse border border-ink-950/10"></div>
+        </div>
+
+        <!-- Lista vacía -->
+        <div v-else-if="characters.length === 0" class="mt-6 border border-ink-950/10 p-10 text-center">
+          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">No characters yet. Create the first one.</p>
+        </div>
+
+        <!-- Lista de personajes -->
+        <div v-else class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div v-for="c in characters" :key="c.id" class="flex flex-col border border-ink-950/10">
+            <div class="flex items-center gap-4 p-4">
+              <div class="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-ink-100">
+                <img v-if="c.image" :src="c.image" :alt="`Photo of ${c.name}`" class="h-full w-full object-cover" />
+                <div v-else class="flex h-full w-full items-center justify-center text-ink-950/30">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="min-w-0">
+                <h4 class="font-display text-lg font-black uppercase tracking-tight">{{ c.name }}</h4>
+                <p class="mt-1 text-xs text-ink-950/50">{{ c.description || 'No description.' }}</p>
+              </div>
+            </div>
+            <div class="mt-auto flex items-center gap-3 border-t border-ink-950/10 p-4">
+              <button
+                @click="openEditCharacter(c)"
+                class="flex-1 border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-ink-950"
+              >
+                Edit
+              </button>
+              <button
+                @click="removeCharacter(c)"
+                class="border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-950/50 transition-colors duration-300 hover:border-red-500 hover:text-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
 
       <!-- Modal crear / editar serie -->
@@ -1016,7 +1198,7 @@ watch(search, (v) => {
                     </div>
                     <div class="flex-1">
                       <label
-                        class="inline-flex cursor-pointer border border-ink-950/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:border-ink-950"
+                        class="inline-flex cursor-pointer border border-ink-950/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-ink-950 transition-colors duration-300 hover:border-ink-950"
                       >
                         {{ uploading ? 'Processing…' : 'Choose logo' }}
                         <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onLogoSelected" />
@@ -1042,6 +1224,97 @@ watch(search, (v) => {
                   </button>
                   <button
                     @click="cancelSeriesForm"
+                    class="border border-ink-950/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
+
+      <!-- Modal crear / editar personaje -->
+      <Teleport to="body">
+        <Transition name="admin-modal">
+          <div
+            v-if="showCharacterForm"
+            class="fixed inset-0 z-[110] flex items-start justify-center overflow-y-auto bg-black/80 p-4 py-10 backdrop-blur-sm md:p-8"
+            @click.self="cancelCharacterForm"
+            role="dialog"
+            aria-modal="true"
+            :aria-label="editingCharacterId ? 'Edit character' : 'New character'"
+          >
+            <div class="w-full max-w-2xl border border-ink-950/15 bg-white text-ink-950">
+              <div class="flex items-center justify-between border-b border-ink-950/10 px-6 py-5 md:px-8">
+                <h2 class="font-display text-xl font-black uppercase tracking-tight">{{ editingCharacterId ? 'Edit character' : 'New character' }}</h2>
+                <button
+                  @click="cancelCharacterForm"
+                  class="flex h-9 w-9 items-center justify-center border border-ink-950/20 text-sm text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
+                  aria-label="Close form"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div class="px-6 py-6 md:px-8">
+                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
+                  Character Name *
+                  <input
+                    v-model="characterForm.name"
+                    placeholder="TUTEQUE MAN"
+                    class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm uppercase placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
+                  />
+                </label>
+
+                <label class="mt-5 block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
+                  Description
+                  <textarea
+                    v-model="characterForm.description"
+                    rows="3"
+                    placeholder="Short biography or notes…"
+                    class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
+                  ></textarea>
+                </label>
+
+                <div class="mt-6 border border-ink-950/10 p-4">
+                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">Photo</p>
+                  <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div class="h-24 w-24 shrink-0 overflow-hidden rounded-full bg-ink-100">
+                      <img v-if="characterForm.image" :src="characterForm.image" alt="Photo preview" class="h-full w-full object-cover" />
+                      <div v-else class="flex h-full w-full items-center justify-center text-ink-950/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <label class="inline-flex cursor-pointer border border-ink-950/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-ink-950 transition-colors duration-300 hover:border-ink-950">
+                        {{ uploading ? 'Processing…' : 'Choose photo' }}
+                        <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onCharacterImageSelected" />
+                      </label>
+                      <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-ink-950/35">
+                        Square image recommended. Stored inside the character.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <p v-if="error" class="mt-5 border border-red-500/40 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-red-600">
+                  {{ error }}
+                </p>
+
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <button
+                    @click="saveCharacterData"
+                    :disabled="saving"
+                    class="bg-ink-950 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800 disabled:opacity-50"
+                  >
+                    {{ saving ? 'Saving…' : 'Save character' }}
+                  </button>
+                  <button
+                    @click="cancelCharacterForm"
                     class="border border-ink-950/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
                   >
                     Cancel
