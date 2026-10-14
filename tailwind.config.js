@@ -27,9 +27,10 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Libre Franklin', 'Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         anton: ['Anton', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        condensed: ['Archivo Narrow', 'Libre Franklin', 'Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        condensed: ['Archivo Narrow', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Archivo Narrow', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       maxWidth: {
         'screen-default': '1248px',
