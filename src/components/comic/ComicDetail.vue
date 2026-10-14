@@ -93,16 +93,14 @@ async function copyLink() {
 let unsubscribeAuth = null
 onMounted(async () => {
   window.addEventListener('keydown', onKey)
-  document.body.style.overflow = 'hidden'
   unsubscribeAuth = await onAdminAuth((u) => {
     isAdmin.value = Boolean(u)
     if (comic.value) load()
   })
-  load()
+  await load()
 })
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
-  document.body.style.overflow = ''
   if (unsubscribeAuth) unsubscribeAuth()
 })
 
