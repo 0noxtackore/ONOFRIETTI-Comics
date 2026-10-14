@@ -236,22 +236,6 @@ function fieldLabel(key) {
   return FIELD_LABELS[key] || key
 }
 
-// Borde rojo para campos obligatorios vacíos (solo tras intentar guardar).
-const attempted = ref(false)
-const FIELD_LABELS = { title: 'Title', issue: 'Issue', price: 'Price', poster: 'Cover' }
-const missingFields = computed(() => {
-  const missing = []
-  if (!form.title.trim()) missing.push('title')
-  if (form.issue === '' || form.issue == null) missing.push('issue')
-  if (form.price === '' || form.price == null) missing.push('price')
-  if (!String(form.poster || '').trim()) missing.push('poster')
-  return missing
-})
-
-function fieldLabel(key) {
-  return FIELD_LABELS[key] || key
-}
-
 function boxBorder(key) {
   return attempted.value && missingFields.value.includes(key) ? 'border-red-500' : 'border-white/40'
 }
