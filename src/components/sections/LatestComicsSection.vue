@@ -41,9 +41,7 @@ onUnmounted(() => {
   <section id="comics" class="relative bg-ink-50 py-24 text-ink-950 md:py-36">
     <div class="mx-auto max-w-7xl px-5 md:px-8">
       <div class="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
-        <SectionHeading
-          kicker="Comics"
-        />
+        <SectionHeading />
       </div>
 
       <div class="mt-12">
@@ -63,10 +61,6 @@ onUnmounted(() => {
               You are viewing Coming Soon comics because you are the admin. Other visitors won't see them.
             </p>
           </div>
-
-          <p class="text-xs uppercase tracking-[0.25em] text-ink-950/40">
-            {{ visibleComics.length }} {{ visibleComics.length === 1 ? 'result' : 'results' }}
-          </p>
 
           <!-- Esqueleto de carga -->
           <div v-if="loading" class="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
