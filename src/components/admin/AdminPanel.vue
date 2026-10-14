@@ -103,20 +103,24 @@ function generatedId() {
 async function load() {
   loading.value = true
   error.value = ''
-  try {
-    const [comicsData, seriesData, charactersData] = await Promise.all([
-      listComics(),
-      listSeries(),
-      listCharacters(),
-    ])
-    comics.value = comicsData
-    series.value = seriesData
-    characters.value = charactersData
-  } catch (e) {
-    error.value = 'Could not load data: ' + e.message
-  } finally {
-    loading.value = false
+  const [comicsRes, seriesRes, charactersRes] = await Promise.allSettled([
+    listComics(),
+    listSeries(),
+    listCharacters(),
+  ])
+  if (comicsRes.status === 'fulfilled') comics.value = comicsRes.value
+  if (seriesRes.status === 'fulfilled') series.value = seriesRes.value
+  if (charactersRes.status === 'fulfilled') characters.value = charactersRes.value
+  const failed = [
+    comicsRes.status === 'rejected' && 'comics',
+    seriesRes.status === 'rejected' && 'series',
+    charactersRes.status === 'rejected' && 'characters',
+  ].filter(Boolean)
+  if (failed.length) {
+    const reason = [comicsRes, seriesRes, charactersRes].find((r) => r.status === 'rejected')?.reason
+    error.value = `Could not load: ${failed.join(', ')}. Check the Firestore rules. (${reason?.message || reason})`
   }
+  loading.value = false
 }
 
 // Cómic con protagonista derivado si la BD no lo trae.
