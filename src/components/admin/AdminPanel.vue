@@ -154,6 +154,9 @@ const previewPrice = computed(() => {
   return (discount ? price * (1 - discount / 100) : price).toFixed(2)
 })
 
+// Si el estado elegido permite comprar (afecta al botón de la ficha).
+const isFormAvailable = computed(() => ['Available', 'Limited Edition'].includes(form.status))
+
 // Agrupa por protagonista, ordenado alfabéticamente.
 const groups = computed(() => {
   const map = new Map()
@@ -631,7 +634,7 @@ watch(search, (v) => {
         </div>
       </header>
 
-      <!-- Editor: simulacro de la ficha de cómic -->
+      <!-- Editor: mismo layout que la ficha de cómic (campos editables) -->
       <div v-if="showForm && activeTab === 'comics'" @paste="onPaste">
         <!-- Barra de acciones -->
         <div class="sticky top-0 z-10 flex flex-col gap-3 border-b border-ink-950/10 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
@@ -664,228 +667,223 @@ watch(search, (v) => {
           </div>
         </div>
 
-        <!-- Sección gris oscura (ficha) -->
+        <!-- Ficha (sección gris oscura) -->
         <div class="bg-ink-900 text-white">
-          <div class="mx-auto max-w-6xl px-8 py-14 md:px-16 md:py-20">
+          <div class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
             <div class="flex flex-col gap-12 lg:flex-row lg:items-center lg:justify-between">
-              <!-- Izquierda: logo de serie, issue, info, precio -->
-              <div class="flex flex-col items-center text-center">
-                <div v-if="selectedSeries && selectedSeries.logo" class="mb-6">
+              <!-- Izquierda: logo de serie, issue, info, precio, botón -->
+              <div class="flex w-full flex-col items-center text-center lg:max-w-md">
+                <!-- Logo de serie + selector -->
+                <div class="mb-6 flex w-full flex-col items-center">
                   <img
+                    v-if="selectedSeries && selectedSeries.logo"
                     :src="selectedSeries.logo"
                     :alt="`Logo of ${selectedSeries.name}`"
                     class="h-40 w-auto object-contain drop-shadow-lg md:h-48"
                   />
-                </div>
-
-                <div class="flex items-center gap-4">
-                  <img src="/images/logo-menubar.png" alt="Logo" class="h-16 w-auto object-contain md:h-20" />
-                  <p class="font-display text-xl font-black uppercase text-white md:text-2xl">
-                    ISSUE {{ form.issue || 1 }}
-                  </p>
-                </div>
-
-                <div class="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-white/50">
-                  <span>Author: {{ form.author || '—' }}</span>
-                  <span>Year: {{ form.year || '—' }}</span>
-                  <span>Pages: {{ form.pages || '—' }}</span>
-                </div>
-
-                <div v-if="form.price" class="mt-4 w-full text-center">
-                  <div v-if="form.discount" class="flex items-center justify-center gap-3">
-                    <p class="font-display text-2xl font-black text-red-500 line-through md:text-3xl">
-                      ${{ form.price }}
-                    </p>
-                    <span class="rounded-full bg-red-500/10 px-3 py-1 text-xs font-bold text-red-600">-{{ form.discount }}%</span>
-                  </div>
-                  <p class="font-display text-5xl font-black text-white md:text-6xl">${{ previewPrice }}</p>
-                </div>
-
-                <div class="mt-8 flex w-full items-center justify-center gap-3 bg-white px-8 py-5 text-sm font-bold uppercase tracking-[0.25em] text-ink-950/60">
-                  Buy (preview)
-                </div>
-              </div>
-
-              <!-- Derecha: portada -->
-              <div class="flex justify-center lg:justify-end">
-                <div class="overflow-hidden shadow-2xl shadow-black/50">
-                  <img
-                    :src="form.poster || '/images/no-image.webp'"
-                    :alt="`Cover of ${form.title || 'comic'}`"
-                    class="w-96 object-cover md:w-[28rem]"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <!-- Sección de detalles (formulario) -->
-            <section class="mt-16 border-t border-white/10 pt-16 md:mt-24">
-              <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">Comic details</h2>
-              <p class="mt-2 text-[10px] uppercase tracking-[0.3em] text-white/40">
-                Product ID (auto-generated): <span class="font-bold text-white">{{ generatedId() || '…' }}</span>
-              </p>
-
-              <div class="mt-8 grid gap-6 md:grid-cols-3">
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-2">
-                  Title *
-                  <input
-                    v-model="form.title"
-                    placeholder="The Origin"
-                    class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-                  />
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                  Character / Protagonist
-                  <input
-                    v-model="form.protagonist"
-                    placeholder="TUTEQUE-MAN"
-                    class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-                  />
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                  Issue ({{ form.issue }})
-                  <input
-                    v-model.number="form.issue"
-                    type="number"
-                    min="1"
-                    placeholder="1"
-                    class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-                  />
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                  Year
-                  <input
-                    v-model.number="form.year"
-                    type="number"
-                    min="1900"
-                    max="2100"
-                    placeholder="2026"
-                    class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-                  />
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                  Pages
-                  <input
-                    v-model.number="form.pages"
-                    type="number"
-                    min="1"
-                    placeholder="32"
-                    class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-                  />
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                  Author / Artist
-                  <input
-                    v-model="form.author"
-                    placeholder="Angello Aponte"
-                    class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-                  />
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                  Status
-                  <select
-                    v-model="form.status"
-                    class="mt-2 w-full border border-white/20 bg-ink-900 px-4 py-3 text-sm text-white focus:border-white focus:outline-none"
-                  >
-                    <option v-for="s in STATUSES" :key="s" :value="s">{{ s }}</option>
-                  </select>
-                </label>
-                <label class="flex cursor-pointer items-center gap-3 self-end pb-3 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                  <input v-model="form.featured" type="checkbox" class="h-4 w-4 accent-white" />
-                  Featured
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                  Rating (%)
-                  <input
-                    v-model.number="form.rating"
-                    type="number"
-                    min="0"
-                    max="100"
-                    placeholder="85"
-                    class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-                  />
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                  Price ($)
-                  <input
-                    v-model.number="form.price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="9.99"
-                    class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-                  />
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                  Discount (%)
-                  <input
-                    v-model.number="form.discount"
-                    type="number"
-                    min="0"
-                    max="100"
-                    placeholder="10"
-                    class="mt-2 w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-                  />
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-3">
-                  Series (optional)
                   <select
                     v-model="form.seriesId"
-                    class="mt-2 w-full border border-white/20 bg-ink-900 px-4 py-3 text-sm text-white focus:border-white focus:outline-none"
+                    class="mt-4 border-b border-white/20 bg-transparent pb-1 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/60 focus:border-white focus:outline-none"
                   >
                     <option value="">No series</option>
                     <option v-for="s in series" :key="s.id" :value="s.id">{{ s.name }}</option>
                   </select>
-                </label>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 md:col-span-3">
-                  Description
-                  <textarea
-                    v-model="form.description"
-                    rows="3"
-                    placeholder="Comic synopsis, shown on the product page…"
-                    class="mt-2 w-full resize-y border border-white/20 bg-transparent px-4 py-3 text-sm leading-relaxed text-white placeholder:text-white/25 focus:border-white focus:outline-none"
-                  ></textarea>
-                </label>
-              </div>
+                </div>
 
-              <div class="mt-8 border border-white/10 p-5">
-                <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Cover (converted to image link)</p>
-                <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center">
-                  <div class="w-24 shrink-0 overflow-hidden bg-ink-800">
-                    <img :src="form.poster || '/images/no-image.webp'" alt="Cover preview" class="aspect-[1920/2951] w-full object-cover" />
-                  </div>
-                  <div class="flex-1">
-                    <label class="inline-flex cursor-pointer border border-white/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:border-white">
-                      {{ uploading ? 'Processing…' : 'Choose image' }}
-                      <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onCoverSelected" />
-                    </label>
-                    <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-white/35">
-                      Or paste a screenshot with Ctrl+V. The image is compressed and stored inside the comic itself.
-                    </p>
+                <!-- Logo menubar + ISSUE editable -->
+                <div class="flex items-center gap-4">
+                  <img src="/images/logo-menubar.png" alt="Logo" class="h-16 w-auto object-contain md:h-20" />
+                  <div class="flex items-baseline gap-2">
+                    <span class="font-display text-xl font-black uppercase text-white md:text-2xl">Issue</span>
+                    <input
+                      v-model.number="form.issue"
+                      type="number"
+                      min="1"
+                      class="w-16 border-b border-white/20 bg-transparent text-center font-display text-xl font-black uppercase text-white focus:border-white focus:outline-none md:text-2xl"
+                    />
                   </div>
                 </div>
+
+                <!-- Info editable: autor / año / páginas -->
+                <div class="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-3 text-[11px] uppercase tracking-[0.15em] text-white/50">
+                  <label class="flex items-center gap-1">
+                    Author:
+                    <input
+                      v-model="form.author"
+                      class="w-36 border-b border-white/20 bg-transparent text-center text-white placeholder:text-white/25 focus:border-white focus:outline-none"
+                      placeholder="Angello Aponte"
+                    />
+                  </label>
+                  <label class="flex items-center gap-1">
+                    Year:
+                    <input
+                      v-model.number="form.year"
+                      type="number"
+                      class="w-16 border-b border-white/20 bg-transparent text-center text-white placeholder:text-white/25 focus:border-white focus:outline-none"
+                      placeholder="2026"
+                    />
+                  </label>
+                  <label class="flex items-center gap-1">
+                    Pages:
+                    <input
+                      v-model.number="form.pages"
+                      type="number"
+                      class="w-14 border-b border-white/20 bg-transparent text-center text-white placeholder:text-white/25 focus:border-white focus:outline-none"
+                      placeholder="32"
+                    />
+                  </label>
+                </div>
+
+                <!-- Precio editable + precio final -->
+                <div class="mt-6 w-full text-center">
+                  <div class="flex items-center justify-center gap-4 text-[11px] uppercase tracking-[0.15em] text-white/50">
+                    <label class="flex items-center gap-1">
+                      Price: $
+                      <input
+                        v-model.number="form.price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        class="w-20 border-b border-white/20 bg-transparent text-center text-white placeholder:text-white/25 focus:border-white focus:outline-none"
+                        placeholder="0.00"
+                      />
+                    </label>
+                    <label class="flex items-center gap-1">
+                      Discount:
+                      <input
+                        v-model.number="form.discount"
+                        type="number"
+                        min="0"
+                        max="100"
+                        class="w-14 border-b border-white/20 bg-transparent text-center text-white placeholder:text-white/25 focus:border-white focus:outline-none"
+                        placeholder="0"
+                      />%
+                    </label>
+                  </div>
+                  <p class="font-display mt-3 text-5xl font-black text-white md:text-6xl">${{ previewPrice }}</p>
+                </div>
+
+                <!-- Estado (define el botón de compra de la ficha) -->
+                <select
+                  v-model="form.status"
+                  class="mt-8 w-full cursor-pointer px-8 py-5 text-center text-sm font-bold uppercase tracking-[0.25em] focus:outline-none"
+                  :class="isFormAvailable ? 'bg-white text-ink-950' : 'border border-white/20 bg-transparent text-white/50'"
+                >
+                  <option v-for="s in STATUSES" :key="s" :value="s">{{ s }}</option>
+                </select>
+
+                <label class="mt-4 flex cursor-pointer items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <input v-model="form.featured" type="checkbox" class="h-4 w-4 accent-white" />
+                  Featured
+                </label>
               </div>
 
-              <p v-if="error" class="mt-6 border border-red-500/40 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
-                {{ error }}
-              </p>
+              <!-- Derecha: portada (clic para cambiarla) -->
+              <div class="flex justify-center lg:justify-end">
+                <div class="w-full max-w-sm lg:max-w-none">
+                  <label class="block cursor-pointer overflow-hidden shadow-2xl shadow-black/50">
+                    <img
+                      :src="form.poster || '/images/no-image.webp'"
+                      :alt="`Cover of ${form.title || 'comic'}`"
+                      class="w-full object-cover lg:w-[28rem]"
+                    />
+                    <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onCoverSelected" />
+                  </label>
+                  <p class="mt-3 text-center text-[10px] uppercase tracking-[0.2em] text-white/40">
+                    {{ uploading ? 'Processing…' : 'Click the cover to change it · or paste Ctrl+V' }}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-              <div class="mt-8 flex flex-wrap gap-3">
-                <button
-                  @click="save"
-                  :disabled="saving"
-                  class="bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-ink-950 transition-colors duration-300 hover:bg-ink-100 disabled:opacity-50"
-                >
-                  {{ saving ? 'Saving…' : 'Save comic' }}
-                </button>
-                <button
-                  @click="cancelForm"
-                  class="border border-white/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white/60 transition-colors duration-300 hover:border-white hover:text-white"
-                >
-                  Cancel
-                </button>
+            <!-- Sección de detalles -->
+            <section class="mt-16 border-t border-white/10 pt-16 md:mt-24">
+              <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">Comic details</h2>
+
+              <div class="mt-6 flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
+                <div class="flex-1">
+                  <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
+                    Title *
+                    <input
+                      v-model="form.title"
+                      placeholder="The Origin"
+                      class="font-display mt-2 w-full border-b border-white/20 bg-transparent pb-2 text-3xl font-black uppercase tracking-tight text-white placeholder:text-white/20 focus:border-white focus:outline-none md:text-4xl"
+                    />
+                  </label>
+                  <label class="mt-6 block text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
+                    Character / Protagonist
+                    <input
+                      v-model="form.protagonist"
+                      placeholder="TUTEQUE-MAN"
+                      class="mt-2 w-full border-b border-white/20 bg-transparent pb-2 text-sm uppercase tracking-[0.15em] text-white placeholder:text-white/20 focus:border-white focus:outline-none"
+                    />
+                  </label>
+                  <label class="mt-6 block text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
+                    Description
+                    <textarea
+                      v-model="form.description"
+                      rows="4"
+                      placeholder="Comic synopsis, shown on the product page…"
+                      class="mt-2 w-full resize-y border-b border-white/10 bg-transparent text-lg leading-relaxed text-white/80 placeholder:text-white/20 focus:border-white focus:outline-none md:text-xl"
+                    ></textarea>
+                  </label>
+                  <p class="mt-6 text-[10px] uppercase tracking-[0.3em] text-white/30">
+                    Product ID (auto): <span class="font-bold text-white/60">{{ generatedId() || '…' }}</span>
+                  </p>
+                </div>
+
+                <!-- Rating editable -->
+                <div class="flex flex-col items-center gap-2">
+                  <div class="relative h-32 w-32 md:h-40 md:w-40">
+                    <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" class="text-white/20" />
+                      <circle
+                        cx="50" cy="50" r="44"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="4"
+                        stroke-linecap="round"
+                        :stroke-dasharray="276.46"
+                        :stroke-dashoffset="276.46 - (276.46 * (Number(form.rating) || 0)) / 100"
+                        class="text-white transition-all duration-700"
+                      />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <input
+                        v-model.number="form.rating"
+                        type="number"
+                        min="0"
+                        max="100"
+                        class="w-20 bg-transparent text-center font-display text-3xl font-black text-white placeholder:text-white/20 focus:outline-none md:text-4xl"
+                        placeholder="0"
+                      />
+                      <span class="text-[10px] uppercase tracking-wider text-white/50">%</span>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Rating</span>
+                </div>
               </div>
             </section>
+
+            <p v-if="error" class="mt-8 border border-red-500/40 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
+              {{ error }}
+            </p>
+
+            <div class="mt-10 flex flex-wrap gap-3">
+              <button
+                @click="save"
+                :disabled="saving"
+                class="bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-ink-950 transition-colors duration-300 hover:bg-ink-100 disabled:opacity-50"
+              >
+                {{ saving ? 'Saving…' : 'Save comic' }}
+              </button>
+              <button
+                @click="cancelForm"
+                class="border border-white/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white/60 transition-colors duration-300 hover:border-white hover:text-white"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -999,17 +997,11 @@ watch(search, (v) => {
                 <div v-for="comic in group.items" :key="comic.id" class="flex flex-col border border-ink-950/10 bg-white">
                   <div class="relative overflow-hidden bg-ink-100">
                     <img :src="comic.poster || '/images/no-image.webp'" :alt="`Cover of ${comic.title}`" class="aspect-[1920/2951] w-full object-cover" />
-                    <span v-if="comic.featured" class="absolute left-3 top-3 bg-ink-950 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white">
-                      Featured
-                    </span>
                   </div>
                   <div class="flex flex-1 flex-col p-4">
                     <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-950/40">{{ comic.year }} · Issue {{ comic.issue }}</p>
                     <h4 class="font-display mt-1 text-lg font-black uppercase tracking-tight text-ink-950">{{ comic.title }}</h4>
                     <p class="mt-1 text-xs text-ink-950/40">{{ comic.id }}</p>
-                    <span class="mt-3 inline-block w-fit border border-ink-950/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-ink-950/70">
-                      {{ comic.status }}
-                    </span>
                     <div class="mt-auto flex gap-2 pt-4">
                       <button
                         @click="openEdit(comic)"
