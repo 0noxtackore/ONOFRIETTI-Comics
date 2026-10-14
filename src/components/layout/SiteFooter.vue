@@ -39,51 +39,7 @@ const legal = [
 <template>
   <footer class="border-t border-white/10 bg-ink-950">
     <!-- Newsletter -->
-    <div class="border-b border-white/10">
-      <div class="mx-auto max-w-7xl px-5 py-16 text-center md:px-8 md:py-20">
-        <p class="text-xs font-bold uppercase tracking-[0.35em] text-white/50">Newsletter</p>
-        <h2 class="font-display mt-4 text-3xl font-black uppercase leading-none tracking-tight text-white md:text-5xl">
-          Subscribe to the ink
-        </h2>
-        <p class="mx-auto mt-4 max-w-md text-sm text-white/60 md:text-base">
-          Be the first to know about every release, reprint, and limited edition.
-          No spam. Just ink.
-        </p>
 
-        <form
-          v-if="!subscribed"
-          @submit.prevent="onSubscribe"
-          class="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row"
-        >
-          <input
-            v-model="newsletterEmail"
-            type="email"
-            required
-            placeholder="your@email.com"
-            class="w-full border border-white/20 bg-black/40 px-5 py-3.5 text-sm text-white transition-colors placeholder:text-white/30 focus:border-white focus:outline-none"
-          />
-          <button
-            type="submit"
-            class="shrink-0 bg-white px-8 py-3.5 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors hover:bg-white/80"
-          >
-            Subscribe
-          </button>
-        </form>
-
-        <p v-else class="mx-auto mt-8 max-w-md border border-white/20 px-6 py-4 text-sm text-white/70">
-          Done. Welcome to the ink side.
-        </p>
-      </div>
-    </div>
-
-    <!-- Wordmark gigante -->
-    <div class="overflow-hidden border-b border-white/10 py-2">
-      <p
-        class="font-display whitespace-nowrap text-center text-[clamp(2.5rem,10vw,12rem)] font-black uppercase leading-none tracking-tight text-white/10 select-none"
-      >
-        Onofrietti
-      </p>
-    </div>
 
     <!-- Columnas de enlaces -->
     <div class="mx-auto max-w-7xl px-5 py-14 md:px-8">
