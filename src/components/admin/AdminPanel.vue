@@ -169,6 +169,27 @@ const editorRelated = computed(() => {
     .slice(0, 4)
 })
 
+// Validación de campos obligatorios del cómic.
+const attempted = ref(false)
+const FIELD_LABELS = { title: 'Title', issue: 'Issue', price: 'Price', poster: 'Cover' }
+const missingFields = computed(() => {
+  const missing = []
+  if (!form.title.trim()) missing.push('title')
+  if (form.issue === '' || form.issue == null) missing.push('issue')
+  if (form.price === '' || form.price == null) missing.push('price')
+  if (!String(form.poster || '').trim()) missing.push('poster')
+  return missing
+})
+
+function fieldLabel(key) {
+  return FIELD_LABELS[key] || key
+}
+
+// Borde rojo para campos obligatorios vacíos (solo tras intentar guardar).
+function boxBorder(key) {
+  return attempted.value && missingFields.value.includes(key) ? 'border-red-500' : 'border-ink-950/15'
+}
+
 // Agrupa por protagonista, ordenado alfabéticamente.
 const groups = computed(() => {
   const map = new Map()
@@ -201,6 +222,7 @@ function openNew() {
   editingId.value = null
   showForm.value = true
   error.value = ''
+  attempted.value = false
 }
 
 function openEdit(comic) {
@@ -208,23 +230,26 @@ function openEdit(comic) {
   editingId.value = comic.id
   showForm.value = true
   error.value = ''
+  attempted.value = false
 }
 
 function cancelForm() {
   showForm.value = false
   editingId.value = null
   error.value = ''
+  attempted.value = false
 }
 
 async function save() {
   error.value = ''
+  attempted.value = true
+  if (missingFields.value.length) {
+    error.value = 'Complete required fields: ' + missingFields.value.map(fieldLabel).join(', ') + '.'
+    return
+  }
   const newId = generatedId()
   if (!newId) {
     error.value = 'Title is required (the ID is generated from the title).'
-    return
-  }
-  if (!form.title.trim()) {
-    error.value = 'Title is required.'
     return
   }
   const isEditing = Boolean(editingId.value)
@@ -646,7 +671,7 @@ watch(search, (v) => {
         </div>
       </header>
 
-      <!-- Editor: misma ficha que /comics/<slug>, con campos editables -->
+      <!-- Editor: ficha de cómic con campos editables (cajas blancas) -->
       <div v-if="showForm && activeTab === 'comics'" @paste="onPaste">
         <!-- Barra de acciones -->
         <div class="sticky top-0 z-20 flex flex-col gap-3 border-b border-ink-950/10 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
@@ -680,128 +705,146 @@ watch(search, (v) => {
         </div>
 
         <div class="bg-ink-50 text-ink-950">
-          <!-- Dark gray section: Issue/Buy/Info + Comic Details -->
+          <!-- Ficha (sección gris oscura) -->
           <div class="bg-ink-900 text-white">
             <div class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
-              <!-- Top Section: Series/Issue/Buy + Cover -->
-              <div class="flex flex-col gap-12 lg:flex-row lg:items-center lg:justify-between">
-                <!-- Left: Series Logo, Issue, Buy Button -->
-                <div class="flex flex-col items-center text-center">
-                  <!-- Series Logo -->
-                  <div v-if="selectedSeries && selectedSeries.logo" class="mb-6">
+              <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
+                <!-- Izquierda: serie, issue, info, precio, estado -->
+                <div class="flex w-full flex-col items-center gap-5 text-center">
+                  <!-- Serie: logo + nombre + selector -->
+                  <div class="flex flex-col items-center gap-3">
                     <img
+                      v-if="selectedSeries && selectedSeries.logo"
                       :src="selectedSeries.logo"
                       :alt="`Logo of ${selectedSeries.name}`"
-                      class="h-40 w-auto object-contain drop-shadow-lg md:h-48"
+                      class="h-32 w-auto object-contain drop-shadow-lg md:h-40"
                     />
+                    <p v-if="selectedSeries" class="font-display text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
+                      {{ selectedSeries.name }}
+                    </p>
+                    <label class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Series
+                      <select
+                        v-model="form.seriesId"
+                        class="mt-1 block w-64 rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-center text-xs text-ink-950 focus:border-ink-950 focus:outline-none"
+                      >
+                        <option value="">No series</option>
+                        <option v-for="s in series" :key="s.id" :value="s.id">{{ s.name }}</option>
+                      </select>
+                    </label>
                   </div>
 
-                  <!-- Series selector -->
-                  <select
-                    v-model="form.seriesId"
-                    class="mb-6 border-b border-white/20 bg-transparent pb-1 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 focus:border-white focus:outline-none"
-                  >
-                    <option value="">No series</option>
-                    <option v-for="s in series" :key="s.id" :value="s.id">{{ s.name }}</option>
-                  </select>
-
-                  <!-- Issue + Rating Row -->
+                  <!-- Issue -->
                   <div class="flex items-center gap-4">
-                    <!-- Menubar Logo -->
-                    <img src="/images/logo-menubar.png" alt="Logo" class="h-16 w-auto object-contain md:h-20" />
-
-                    <!-- Issue Number -->
-                    <p class="font-display flex items-center text-xl font-black uppercase text-white md:text-2xl">
-                      ISSUE&nbsp;<input
+                    <img src="/images/logo-menubar.png" alt="Logo" class="h-14 w-auto object-contain md:h-16" />
+                    <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Issue *
+                      <input
                         v-model.number="form.issue"
                         type="number"
                         min="1"
-                        class="w-16 bg-transparent text-center font-display text-xl font-black uppercase text-white focus:outline-none md:text-2xl"
+                        class="mt-1 block w-24 rounded-sm border bg-white px-3 py-2 text-center text-sm text-ink-950 focus:border-ink-950 focus:outline-none"
+                        :class="boxBorder('issue')"
                       />
-                    </p>
+                    </label>
                   </div>
 
-                  <!-- Comic Info -->
-                  <div class="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-white/50 lg:justify-start">
-                    <span class="flex items-center">Author:&nbsp;<input
-                      v-model="form.author"
-                      placeholder="Angello Aponte"
-                      class="w-32 bg-transparent text-center text-white placeholder:text-white/25 focus:outline-none"
-                    /></span>
-                    <span class="flex items-center">Year:&nbsp;<input
-                      v-model.number="form.year"
-                      type="number"
-                      class="w-16 bg-transparent text-center text-white placeholder:text-white/25 focus:outline-none"
-                    /></span>
-                    <span class="flex items-center">Pages:&nbsp;<input
-                      v-model.number="form.pages"
-                      type="number"
-                      class="w-14 bg-transparent text-center text-white placeholder:text-white/25 focus:outline-none"
-                    /></span>
+                  <!-- Author / Year / Pages -->
+                  <div class="grid w-full max-w-md grid-cols-1 gap-3 sm:grid-cols-3">
+                    <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Author
+                      <input
+                        v-model="form.author"
+                        placeholder="Angello Aponte"
+                        class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                      />
+                    </label>
+                    <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Year
+                      <input
+                        v-model.number="form.year"
+                        type="number"
+                        placeholder="2026"
+                        class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                      />
+                    </label>
+                    <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Pages
+                      <input
+                        v-model.number="form.pages"
+                        type="number"
+                        placeholder="32"
+                        class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                      />
+                    </label>
                   </div>
 
-                  <!-- Price -->
-                  <div class="mt-4 w-full text-center">
-                    <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-white/50">
-                      <span class="flex items-center">Price:&nbsp;$<input
+                  <!-- Price / Discount -->
+                  <div class="grid w-full max-w-md grid-cols-2 gap-3">
+                    <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Price ($) *
+                      <input
                         v-model.number="form.price"
                         type="number"
                         min="0"
                         step="0.01"
                         placeholder="0.00"
-                        class="w-20 bg-transparent text-center text-white placeholder:text-white/25 focus:outline-none"
-                      /></span>
-                      <span class="flex items-center">Discount:&nbsp;<input
+                        class="mt-1 w-full rounded-sm border bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        :class="boxBorder('price')"
+                      />
+                    </label>
+                    <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Discount (%)
+                      <input
                         v-model.number="form.discount"
                         type="number"
                         min="0"
                         max="100"
                         placeholder="0"
-                        class="w-14 bg-transparent text-center text-white placeholder:text-white/25 focus:outline-none"
-                      />%</span>
-                    </div>
-                    <div v-if="form.discount" class="mt-3 flex items-center justify-center gap-3">
-                      <p class="font-display text-2xl font-black text-red-500 line-through md:text-3xl">${{ form.price }}</p>
-                      <span class="rounded-full bg-red-500/10 px-3 py-1 text-xs font-bold text-red-600">-{{ form.discount }}%</span>
-                    </div>
-                    <p class="font-display mt-3 text-5xl font-black text-white md:text-6xl">${{ previewPrice }}</p>
+                        class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                      />
+                    </label>
                   </div>
 
-                  <!-- Buy Button (state selector) -->
-                  <div class="relative mt-8 w-full">
-                    <div
-                      class="flex w-full items-center justify-center gap-3 px-8 py-5 text-sm font-bold uppercase tracking-[0.25em] transition-all duration-300"
-                      :class="isFormAvailable ? 'bg-white text-ink-950' : 'border border-white/20 text-white/40'"
+                  <p class="font-display text-4xl font-black text-white md:text-5xl">
+                    ${{ previewPrice }}
+                    <span v-if="form.discount" class="ml-2 align-middle text-base font-bold text-red-400 line-through">${{ form.price }}</span>
+                  </p>
+
+                  <!-- Status -->
+                  <label class="w-full max-w-md text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                    Status (buy button preview)
+                    <select
+                      v-model="form.status"
+                      class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-sm text-ink-950 focus:border-ink-950 focus:outline-none"
                     >
-                      <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true">
-                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-                      </svg>
-                      {{ isFormAvailable ? 'Buy' : form.status }}
-                    </div>
-                    <select v-model="form.status" aria-label="Status" class="absolute inset-0 h-full w-full cursor-pointer opacity-0">
                       <option v-for="s in STATUSES" :key="s" :value="s">{{ s }}</option>
                     </select>
-                  </div>
+                  </label>
 
                   <!-- Featured -->
-                  <label class="mt-4 flex cursor-pointer items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                  <label class="flex cursor-pointer items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
                     <input v-model="form.featured" type="checkbox" class="h-4 w-4 accent-white" />
                     Featured
                   </label>
                 </div>
 
-                <!-- Right: Comic Cover (click to change) -->
-                <div class="flex justify-center lg:justify-end">
-                  <div class="overflow-hidden shadow-2xl shadow-black/50">
-                    <label class="block cursor-pointer">
-                      <img
-                        :src="form.poster || '/images/no-image.webp'"
-                        :alt="`Cover of ${form.title || 'comic'}`"
-                        class="w-96 object-cover md:w-[28rem]"
-                      />
-                      <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onCoverSelected" />
-                    </label>
-                  </div>
+                <!-- Derecha: portada (clic para cambiarla) -->
+                <div class="flex flex-col items-center justify-center gap-3">
+                  <label class="block cursor-pointer overflow-hidden shadow-2xl shadow-black/50">
+                    <img
+                      :src="form.poster || '/images/no-image.webp'"
+                      :alt="`Cover of ${form.title || 'comic'}`"
+                      class="w-80 object-cover md:w-96"
+                    />
+                    <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onCoverSelected" />
+                  </label>
+                  <p
+                    class="text-[10px] font-bold uppercase tracking-[0.2em]"
+                    :class="attempted && missingFields.includes('poster') ? 'text-red-400' : 'text-white/40'"
+                  >
+                    {{ uploading ? 'Processing…' : (attempted && missingFields.includes('poster') ? 'Cover is required' : 'Click the cover to change it · or paste Ctrl+V') }}
+                  </p>
                 </div>
               </div>
 
@@ -813,39 +856,37 @@ watch(search, (v) => {
                 </p>
 
                 <div class="mt-6 flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
-                  <!-- Editable title / character / description -->
-                  <div class="flex-1">
-                    <label class="block">
-                      <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Title</span>
+                  <div class="flex-1 space-y-4">
+                    <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Title *
                       <input
                         v-model="form.title"
                         placeholder="The Formidable Tuteque-Man"
-                        class="font-display mt-2 w-full bg-transparent text-3xl font-black uppercase tracking-tight text-white placeholder:text-white/20 focus:outline-none"
+                        class="mt-1 w-full rounded-sm border bg-white px-4 py-3 text-lg font-bold text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        :class="boxBorder('title')"
                       />
                     </label>
-                    <label class="mt-4 block">
-                      <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Character / Protagonist</span>
+                    <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Character / Protagonist
                       <input
                         v-model="form.protagonist"
                         placeholder="TUTEQUE-MAN"
-                        class="mt-2 w-full bg-transparent text-sm uppercase tracking-[0.15em] text-white/80 placeholder:text-white/20 focus:outline-none"
+                        class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-4 py-3 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
                       />
                     </label>
-                    <label class="mt-6 block">
-                      <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Description</span>
+                    <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Description
                       <textarea
                         v-model="form.description"
                         rows="4"
                         placeholder="Comic synopsis, shown on the product page…"
-                        class="mt-2 w-full max-w-3xl resize-y bg-transparent text-lg leading-relaxed text-white/70 placeholder:text-white/20 focus:outline-none md:text-xl"
+                        class="mt-1 w-full resize-y rounded-sm border border-ink-950/15 bg-white px-4 py-3 text-sm leading-relaxed text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
                       ></textarea>
                     </label>
-                    <p v-if="uploading" class="mt-4 text-[11px] uppercase tracking-[0.2em] text-white/40">Processing image…</p>
-                    <p v-else class="mt-4 text-[11px] uppercase tracking-[0.2em] text-white/25">Click the cover to change it · or paste Ctrl+V</p>
                   </div>
 
-                  <!-- Rating Circle -->
-                  <div class="flex flex-col items-center gap-2">
+                  <!-- Rating -->
+                  <div class="flex flex-col items-center gap-3">
                     <div class="relative h-32 w-32 md:h-40 md:w-40">
                       <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
                         <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="4" class="text-white/20" />
@@ -860,18 +901,22 @@ watch(search, (v) => {
                           class="text-white transition-all duration-700"
                         />
                       </svg>
-                      <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <input
-                          v-model.number="form.rating"
-                          type="number"
-                          min="0"
-                          max="100"
-                          placeholder="0"
-                          class="w-20 bg-transparent text-center font-display text-3xl font-black text-white placeholder:text-white/20 focus:outline-none md:text-4xl"
-                        />
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="font-display text-3xl font-black text-white md:text-4xl">{{ Number(form.rating) || 0 }}</span>
                         <span class="text-[10px] uppercase tracking-wider text-white/50">%</span>
                       </div>
                     </div>
+                    <label class="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                      Rating (%)
+                      <input
+                        v-model.number="form.rating"
+                        type="number"
+                        min="0"
+                        max="100"
+                        placeholder="0"
+                        class="mt-1 block w-24 rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-center text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                      />
+                    </label>
                     <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Rating</span>
                   </div>
                 </div>
@@ -1351,5 +1396,16 @@ watch(search, (v) => {
 .admin-modal-enter-from,
 .admin-modal-leave-to {
   opacity: 0;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 </style>
