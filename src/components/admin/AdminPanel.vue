@@ -187,7 +187,7 @@ function fieldLabel(key) {
 
 // Borde rojo para campos obligatorios vacíos (solo tras intentar guardar).
 function boxBorder(key) {
-  return attempted.value && missingFields.value.includes(key) ? 'border-red-500' : 'border-ink-950/15'
+  return attempted.value && missingFields.value.includes(key) ? 'border-red-500' : 'border-white/40'
 }
 
 // Agrupa por protagonista, ordenado alfabéticamente.
@@ -726,7 +726,7 @@ watch(search, (v) => {
                       Series
                       <select
                         v-model="form.seriesId"
-                        class="mt-1 block w-64 rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-center text-xs text-ink-950 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 block w-64 rounded-sm border border-white/40 bg-transparent px-3 py-2 text-center text-xs text-white focus:border-white focus:outline-none"
                       >
                         <option value="">No series</option>
                         <option v-for="s in series" :key="s.id" :value="s.id">{{ s.name }}</option>
@@ -743,7 +743,7 @@ watch(search, (v) => {
                         v-model.number="form.issue"
                         type="number"
                         min="1"
-                        class="mt-1 block w-24 rounded-sm border bg-white px-3 py-2 text-center text-sm text-ink-950 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 block w-24 rounded-sm border bg-transparent px-3 py-2 text-center text-sm text-white focus:border-white focus:outline-none"
                         :class="boxBorder('issue')"
                       />
                     </label>
@@ -756,7 +756,7 @@ watch(search, (v) => {
                       <input
                         v-model="form.author"
                         placeholder="Angello Aponte"
-                        class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 w-full rounded-sm border border-white/40 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                       />
                     </label>
                     <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
@@ -765,7 +765,7 @@ watch(search, (v) => {
                         v-model.number="form.year"
                         type="number"
                         placeholder="2026"
-                        class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 w-full rounded-sm border border-white/40 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                       />
                     </label>
                     <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
@@ -774,7 +774,7 @@ watch(search, (v) => {
                         v-model.number="form.pages"
                         type="number"
                         placeholder="32"
-                        class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 w-full rounded-sm border border-white/40 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                       />
                     </label>
                   </div>
@@ -789,7 +789,7 @@ watch(search, (v) => {
                         min="0"
                         step="0.01"
                         placeholder="0.00"
-                        class="mt-1 w-full rounded-sm border bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 w-full rounded-sm border bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                         :class="boxBorder('price')"
                       />
                     </label>
@@ -801,7 +801,7 @@ watch(search, (v) => {
                         min="0"
                         max="100"
                         placeholder="0"
-                        class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 w-full rounded-sm border border-white/40 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                       />
                     </label>
                   </div>
@@ -810,23 +810,6 @@ watch(search, (v) => {
                     ${{ previewPrice }}
                     <span v-if="form.discount" class="ml-2 align-middle text-base font-bold text-red-400 line-through">${{ form.price }}</span>
                   </p>
-
-                  <!-- Status -->
-                  <label class="w-full max-w-md text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                    Status (buy button preview)
-                    <select
-                      v-model="form.status"
-                      class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-sm text-ink-950 focus:border-ink-950 focus:outline-none"
-                    >
-                      <option v-for="s in STATUSES" :key="s" :value="s">{{ s }}</option>
-                    </select>
-                  </label>
-
-                  <!-- Featured -->
-                  <label class="flex cursor-pointer items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                    <input v-model="form.featured" type="checkbox" class="h-4 w-4 accent-white" />
-                    Featured
-                  </label>
                 </div>
 
                 <!-- Derecha: portada (clic para cambiarla) -->
@@ -862,7 +845,7 @@ watch(search, (v) => {
                       <input
                         v-model="form.title"
                         placeholder="The Formidable Tuteque-Man"
-                        class="mt-1 w-full rounded-sm border bg-white px-4 py-3 text-lg font-bold text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 w-full rounded-sm border bg-transparent px-4 py-3 text-lg font-bold text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                         :class="boxBorder('title')"
                       />
                     </label>
@@ -871,7 +854,7 @@ watch(search, (v) => {
                       <input
                         v-model="form.protagonist"
                         placeholder="TUTEQUE-MAN"
-                        class="mt-1 w-full rounded-sm border border-ink-950/15 bg-white px-4 py-3 text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 w-full rounded-sm border border-white/40 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                       />
                     </label>
                     <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
@@ -880,7 +863,7 @@ watch(search, (v) => {
                         v-model="form.description"
                         rows="4"
                         placeholder="Comic synopsis, shown on the product page…"
-                        class="mt-1 w-full resize-y rounded-sm border border-ink-950/15 bg-white px-4 py-3 text-sm leading-relaxed text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 w-full resize-y rounded-sm border border-white/40 bg-transparent px-4 py-3 text-sm leading-relaxed text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                       ></textarea>
                     </label>
                   </div>
@@ -914,7 +897,7 @@ watch(search, (v) => {
                         min="0"
                         max="100"
                         placeholder="0"
-                        class="mt-1 block w-24 rounded-sm border border-ink-950/15 bg-white px-3 py-2 text-center text-sm text-ink-950 placeholder:text-ink-950/30 focus:border-ink-950 focus:outline-none"
+                        class="mt-1 block w-24 rounded-sm border border-white/40 bg-transparent px-3 py-2 text-center text-sm text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                       />
                     </label>
                     <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Rating</span>
@@ -1220,7 +1203,7 @@ watch(search, (v) => {
             aria-modal="true"
             :aria-label="editingSeriesId ? 'Edit series' : 'New series'"
           >
-            <div class="w-full max-w-2xl border border-ink-950/15 bg-white text-ink-950">
+            <div class="w-full max-w-2xl border border-white/40 bg-transparent text-ink-950">
               <div class="flex items-center justify-between border-b border-ink-950/10 px-6 py-5 md:px-8">
                 <h2 class="font-display text-xl font-black uppercase tracking-tight">{{ editingSeriesId ? 'Edit series' : 'New series' }}</h2>
                 <button
@@ -1305,7 +1288,7 @@ watch(search, (v) => {
             aria-modal="true"
             :aria-label="editingCharacterId ? 'Edit character' : 'New character'"
           >
-            <div class="w-full max-w-2xl border border-ink-950/15 bg-white text-ink-950">
+            <div class="w-full max-w-2xl border border-white/40 bg-transparent text-ink-950">
               <div class="flex items-center justify-between border-b border-ink-950/10 px-6 py-5 md:px-8">
                 <h2 class="font-display text-xl font-black uppercase tracking-tight">{{ editingCharacterId ? 'Edit character' : 'New character' }}</h2>
                 <button
