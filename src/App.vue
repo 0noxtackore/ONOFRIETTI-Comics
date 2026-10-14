@@ -13,15 +13,22 @@ import ComicDetail from './components/comic/ComicDetail.vue'
 import { navigate } from './utils/router'
 
 const isAdmin = ref(false)
-const comicSlug = ref(null)
 const isComicsPage = ref(false)
+const isComicDetailPage = ref(false)
+const comicSlug = ref(null)
 
 function parseRoute() {
   const path = window.location.pathname
   isAdmin.value = path.startsWith('/admin')
   isComicsPage.value = path === '/comics'
   const m = path.match(/^\/comics\/(.+)$/)
-  comicSlug.value = m ? decodeURIComponent(m[1]) : null
+  if (m) {
+    isComicDetailPage.value = true
+    comicSlug.value = decodeURIComponent(m[1])
+  } else {
+    isComicDetailPage.value = false
+    comicSlug.value = null
+  }
 }
 
 function closeDetail() {
@@ -80,14 +87,15 @@ onUnmounted(() => {
 
     <main>
       <!-- Página principal -->
-      <HeroSection v-if="!isComicsPage" />
+      <HeroSection v-if="!isComicsPage && !isComicDetailPage" />
       <!-- Sección de cómics -->
-      <LatestComicsSection />
+      <LatestComicsSection v-if="isComicsPage || (!isComicDetailPage && !isAdmin)" />
+      <!-- Detalle de cómic -->
+      <ComicDetail v-if="isComicDetailPage && !isAdmin" :slug="comicSlug" />
     </main>
 
     <SiteFooter />
   </div>
 
   <!-- Ficha de detalle del cómic (solo en /comics/<slug>) -->
-  <ComicDetail v-if="!isAdmin && comicSlug" :slug="comicSlug" @close="closeDetail" />
 </template>
