@@ -76,75 +76,13 @@ onUnmounted(() => {
     <div class="mx-auto max-w-7xl px-5 md:px-8">
       <div class="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
         <SectionHeading
-          kicker="Latest issues"
-          title="New releases and available comics"
+          kicker="New This Week"
+          title="Fresh off the press"
           description="Each issue is a collectible. Ink on paper, no rush, just as it should be."
         />
       </div>
 
-      <div class="mt-12 lg:grid lg:grid-cols-[260px_1fr] lg:gap-10">
-        <!-- Sidebar de filtros -->
-        <aside class="self-start border border-ink-950/10 bg-white p-5 lg:sticky lg:top-24">
-          <h3 class="border-b border-ink-950/10 pb-4 text-xs font-bold uppercase tracking-[0.3em] text-ink-950">Filters</h3>
-
-          <!-- Búsqueda (compartida con el header) -->
-          <div class="relative mt-5">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-950/40"
-              aria-hidden="true"
-            >
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-            </svg>
-            <input
-              v-model="query"
-              type="search"
-              placeholder="Search comics…"
-              aria-label="Search comics"
-              class="w-full border border-ink-950/15 bg-ink-50 py-2.5 pl-10 pr-9 text-sm text-ink-950 transition-colors duration-300 placeholder:text-ink-950/40 focus:border-ink-950 focus:outline-none"
-            />
-            <button
-              v-if="query"
-              type="button"
-              @click="query = ''"
-              aria-label="Clear search"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-950/40 transition-colors hover:text-ink-950"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
-                <path d="M8 6.586 2.707 1.293 1.293 2.707 6.586 8l-5.293 5.293 1.414 1.414L8 9.414l5.293 5.293 1.414-1.414L9.414 8l5.293-5.293-1.414-1.414z"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Por protagonista -->
-          <div class="mt-5">
-            <p class="text-[11px] font-bold uppercase tracking-[0.25em] text-ink-950/70">Character</p>
-            <div class="mt-3 flex flex-col gap-2">
-              <button
-                type="button"
-                @click="selectedProtagonist = ''"
-                class="flex min-h-[2.5rem] w-full items-center justify-between gap-3 border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.15em] transition-colors duration-200"
-                :class="pill(selectedProtagonist === '')"
-              >
-                <span>All</span>
-                <span class="shrink-0 bg-ink-950/10 px-2 py-0.5 text-[10px] opacity-60">{{ baseList.length }}</span>
-              </button>
-              <button
-                v-for="p in protagonists"
-                :key="p"
-                type="button"
-                @click="selectedProtagonist = p"
-                class="flex min-h-[2.5rem] w-full items-center justify-between gap-3 border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.15em] transition-colors duration-200"
-                :class="pill(selectedProtagonist === p)"
-              >
-                <span class="truncate">{{ p }}</span>
-                <span class="shrink-0 bg-ink-950/10 px-2 py-0.5 text-[10px] opacity-60">{{ protagonistCount(p) }}</span>
-              </button>
-            </div>
-          </div>
-        </aside>
+      <div class="mt-12">
 
         <!-- Catálogo -->
         <div class="mt-10 lg:mt-0">
