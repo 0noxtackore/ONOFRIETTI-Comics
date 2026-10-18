@@ -1,17 +1,20 @@
 <script setup>
+import { computed } from 'vue'
 import { useScrollState } from '../../composables/useScrollState'
 import { useMenu } from '../../composables/useMenu'
+import { useI18n } from '../../i18n'
 import AppLogo from '../ui/AppLogo.vue'
 
 // El header pasa de transparente a negro sólido al hacer scroll.
 const { isScrolled } = useScrollState(32)
 const { isOpen, toggle } = useMenu()
+const { t } = useI18n()
 
-const navLinks = [
-  { href: '#hero', label: 'Home' },
-  { href: '#comics', label: 'Comics' },
-  { href: '#about', label: 'About' },
-]
+const navLinks = computed(() => [
+  { href: '#hero', label: t('nav.home') },
+  { href: '#comics', label: t('nav.comics') },
+  { href: '#about', label: t('nav.about') },
+])
 </script>
 
 <template>
@@ -23,7 +26,7 @@ const navLinks = [
       <AppLogo size="sm" class="mx-auto" />
 
       <!-- Navegación de escritorio, a la derecha -->
-      <nav class="hidden shrink-0 items-center gap-10 md:flex" aria-label="Main">
+      <nav class="hidden shrink-0 items-center gap-10 md:flex" :aria-label="t('nav.main')">
         <a
           v-for="link in navLinks"
           :key="link.href"
@@ -39,7 +42,7 @@ const navLinks = [
         :aria-expanded="isOpen ? 'true' : 'false'"
         :aria-controls="isOpen ? 'site-menu' : undefined"
         aria-haspopup="dialog"
-        :aria-label="isOpen ? 'Close menu' : 'Open menu'"
+        :aria-label="isOpen ? t('menu.close') : t('menu.open')"
         @click="toggle"
         class="absolute right-5 inline-flex h-11 w-11 flex-col items-center justify-center gap-1.5 border border-white/20 transition-colors hover:border-white md:hidden"
       >

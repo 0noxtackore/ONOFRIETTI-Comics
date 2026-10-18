@@ -9,6 +9,9 @@ import SectionHeading from '../ui/SectionHeading.vue'
 import ComicCard from '../comic/ComicCard.vue'
 import { fetchComics } from '../../services/comicsService'
 import { onAdminAuth } from '../../firebase/auth'
+import { useI18n } from '../../i18n'
+
+const { t } = useI18n()
 
 const comics = ref([])
 const loading = ref(true)
@@ -58,7 +61,7 @@ onUnmounted(() => {
               <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
             </svg>
             <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-ink-950/70">
-              You are viewing Coming Soon comics because you are the admin. Other visitors won't see them.
+              {{ t('catalog.adminNotice') }}
             </p>
           </div>
 

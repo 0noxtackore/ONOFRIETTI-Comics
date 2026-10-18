@@ -25,6 +25,7 @@ export function mapDoc(doc) {
     status: d.status || 'Available',
     author: d.author || 'Angello Aponte',
     description: d.description || '',
+    descriptionEs: d.descriptionEs || '',
     poster: d.poster || '',
     storagePath: d.storagePath || '',
     featured: Boolean(d.featured),

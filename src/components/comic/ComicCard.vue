@@ -3,11 +3,14 @@
 // El botón cambia según el estado: los disponibles llevan texto de venta.
 import { computed } from 'vue'
 import ComicCover from './ComicCover.vue'
+import { useI18n } from '../../i18n'
 
 const props = defineProps({
   comic: { type: Object, required: true },
   index: { type: Number, default: 0 },
 })
+
+const { t } = useI18n()
 
 // Buyable statuses
 const isAvailable = computed(() => ['Available', 'Limited Edition'].includes(props.comic.status))
@@ -25,13 +28,13 @@ const isNew = computed(() => {
 const buyLabel = computed(() => {
   switch (props.comic.status) {
     case 'Limited Edition':
-      return 'Buy now'
+      return t('card.buyNow')
     case 'Sold Out':
-      return 'Sold out'
+      return t('card.soldOut')
     case 'Coming Soon':
-      return 'Coming soon'
+      return t('card.comingSoon')
     default:
-      return 'Buy now'
+      return t('card.buyNow')
   }
 })
 
@@ -49,7 +52,7 @@ const titleFontSize = computed(() => {
   <article v-reveal="{ delay: (index % 3) * 90 }" class="group flex flex-col">
     <a
       :href="`/comics/${comic.slug}`"
-      :aria-label="`View ${comic.title} details`"
+      :aria-label="t('card.viewDetails', { title: comic.title })"
       class="group/cover relative block overflow-hidden transition-colors duration-500"
     >
       <div class="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
@@ -69,7 +72,7 @@ const titleFontSize = computed(() => {
       <img
         v-if="isNew"
         src="/images/new-icon.png"
-        alt="New"
+        :alt="t('card.isNew')"
         loading="lazy"
         class="pointer-events-none absolute right-2 top-2 z-10 h-20 w-20 drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
       />

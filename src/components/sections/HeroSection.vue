@@ -4,20 +4,16 @@ import MonoPoster from '../ui/MonoPoster.vue'
 import Marquee from '../ui/Marquee.vue'
 import { comics } from '../../data/comics'
 import { formatIssue } from '../../utils/format'
+import { useI18n } from '../../i18n'
+
+const { t } = useI18n()
 
 const featured = comics.find((c) => c.featured)
 const meta = featured
-  ? [formatIssue(featured.issue), featured.year, `${featured.pages} pages`, 'Ink and coffee']
+  ? [formatIssue(featured.issue), featured.year, t('hero.pages', { pages: featured.pages }), 'Ink and coffee']
   : []
 
-const tickerItems = [
-  'New issues every month',
-  '100% hand-drawn',
-  'The Origin available now',
-  'No superheroes. Just stories',
-  'Founded in 1998',
-  'Made in ink',
-]
+const tickerItems = t('hero.ticker')
 </script>
 
 <template>
@@ -39,17 +35,16 @@ const tickerItems = [
       <div class="max-w-3xl">
         <p class="rise-in mb-6 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.4em] text-white/70" style="animation-delay: 100ms">
           <span class="inline-block h-px w-12 bg-white"></span>
-          Onofrietti Comics presents
+          {{ t('hero.presents') }}
         </p>
 
         <h1 class="font-display text-[15vw] font-black uppercase leading-[0.85] tracking-tight text-white sm:text-8xl lg:text-[7rem]">
-          <span class="rise-in block" style="animation-delay: 200ms">El</span>
-          <span class="rise-in text-outline block" style="animation-delay: 300ms">Origen</span>
+          <span class="rise-in block" style="animation-delay: 200ms">{{ t('hero.titleTop') }}</span>
+          <span class="rise-in text-outline block" style="animation-delay: 300ms">{{ t('hero.titleBottom') }}</span>
         </h1>
 
         <p class="rise-in mt-8 max-w-xl text-base leading-relaxed text-white/70 md:text-lg" style="animation-delay: 420ms">
-          Where it all began. A story of ink, doodles, and the bottom of a
-          third-grade notebook.
+          {{ t('hero.description') }}
         </p>
 
         <ul class="rise-in mt-8 flex flex-wrap gap-x-2 gap-y-3 text-xs font-semibold uppercase tracking-[0.25em] text-white/60" style="animation-delay: 520ms">
@@ -64,14 +59,14 @@ const tickerItems = [
             href="#comics"
             class="group inline-flex items-center gap-3 bg-white px-8 py-4 text-xs font-bold uppercase tracking-[0.25em] text-black transition-colors hover:bg-white/80"
           >
-            See comics
+            {{ t('hero.seeComics') }}
             <span class="transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden="true">→</span>
           </a>
           <a
             href="#comics"
             class="inline-flex items-center gap-3 border border-white/30 px-8 py-4 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors hover:border-white hover:bg-white hover:text-black"
           >
-            The catalog
+            {{ t('hero.theCatalog') }}
           </a>
         </div>
       </div>

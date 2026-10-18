@@ -6,6 +6,7 @@
 // Firestore rechazan escrituras sin usuario autenticado).
 import { getFirebase } from '../firebase/init'
 import { mapDoc } from './comicsService'
+import { t } from '../i18n'
 
 // Lista todos los cómics directo de Firestore (sin caché).
 export async function listComics() {
@@ -19,7 +20,7 @@ export async function listComics() {
 // Crea o reemplaza un cómic por completo. id = ID del documento.
 export async function saveComic(id, data) {
   const fb = await getFirebase()
-  if (!fb) throw new Error('Firebase no está configurado')
+  if (!fb) throw new Error(t('errors.firebaseNotConfigured'))
   const { doc, setDoc } = await import('firebase/firestore')
   await setDoc(doc(fb.db, 'comics', id), data)
   return id
@@ -28,7 +29,7 @@ export async function saveComic(id, data) {
 // Elimina un cómic.
 export async function deleteComic(id) {
   const fb = await getFirebase()
-  if (!fb) throw new Error('Firebase no está configurado')
+  if (!fb) throw new Error(t('errors.firebaseNotConfigured'))
   const { doc, deleteDoc } = await import('firebase/firestore')
   await deleteDoc(doc(fb.db, 'comics', id))
 }
@@ -42,7 +43,7 @@ const COVER_RATIO = 1920 / 2951
 export async function fileToPoster(file, maxSize = 900) {
   const dataUrl = await compressImage(file, maxSize)
   if (dataUrl.length > 900000) {
-    throw new Error('La imagen es demasiado pesada para Firestore. Usa una más pequeña (máx. ~1 MB).')
+    throw new Error(t('errors.imageTooHeavy'))
   }
   return { storagePath: '', poster: dataUrl }
 }
@@ -82,10 +83,10 @@ function compressImage(file, maxSize) {
         if (canvas.toBlob) {
           canvas.toBlob(
             (blob) => {
-              if (!blob) return reject(new Error('No se pudo procesar la imagen'))
+              if (!blob) return reject(new Error(t('errors.processImageFailed')))
               const reader = new FileReader()
               reader.onload = () => resolve(reader.result)
-              reader.onerror = () => reject(new Error('No se pudo leer la imagen'))
+              reader.onerror = () => reject(new Error(t('errors.readImageFailed')))
               reader.readAsDataURL(blob)
             },
             'image/webp',
@@ -101,7 +102,7 @@ function compressImage(file, maxSize) {
     }
     img.onerror = () => {
       URL.revokeObjectURL(url)
-      reject(new Error('El archivo no es una imagen válida'))
+      reject(new Error(t('errors.invalidImage')))
     }
     img.src = url
   })

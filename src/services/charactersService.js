@@ -1,6 +1,7 @@
 // Servicios para gestionar personajes (characters).
 // Cada personaje tiene: id, name, slug, image (data URL), description.
 import { getFirebase } from '../firebase/init'
+import { t } from '../i18n'
 
 // Mapea un documento de Firestore a un objeto plano.
 function mapCharacterDoc(doc) {
@@ -38,7 +39,7 @@ export async function getCharacterBySlug(slug) {
 // Crea o actualiza un personaje.
 export async function saveCharacter(id, data) {
   const fb = await getFirebase()
-  if (!fb) throw new Error('Firebase no está configurado')
+  if (!fb) throw new Error(t('errors.firebaseNotConfigured'))
   const { doc, setDoc } = await import('firebase/firestore')
   await setDoc(doc(fb.db, 'characters', id), data)
   return id
@@ -47,7 +48,7 @@ export async function saveCharacter(id, data) {
 // Elimina un personaje.
 export async function deleteCharacter(id) {
   const fb = await getFirebase()
-  if (!fb) throw new Error('Firebase no está configurado')
+  if (!fb) throw new Error(t('errors.firebaseNotConfigured'))
   const { doc, deleteDoc } = await import('firebase/firestore')
   await deleteDoc(doc(fb.db, 'characters', id))
 }
@@ -56,7 +57,7 @@ export async function deleteCharacter(id) {
 export async function fileToCharacterImage(file, maxSize = 900) {
   const dataUrl = await compressImage(file, maxSize)
   if (dataUrl.length > 1000000) {
-    throw new Error('La imagen es demasiado pesada. Usa una más pequeña.')
+    throw new Error(t('errors.imageTooHeavyShort'))
   }
   return dataUrl
 }
@@ -79,10 +80,10 @@ function compressImage(file, maxSize) {
         if (canvas.toBlob) {
           canvas.toBlob(
             (blob) => {
-              if (!blob) return reject(new Error('No se pudo procesar la imagen'))
+              if (!blob) return reject(new Error(t('errors.processImageFailed')))
               const reader = new FileReader()
               reader.onload = () => resolve(reader.result)
-              reader.onerror = () => reject(new Error('No se pudo leer la imagen'))
+              reader.onerror = () => reject(new Error(t('errors.readImageFailed')))
               reader.readAsDataURL(blob)
             },
             'image/webp',
@@ -98,7 +99,7 @@ function compressImage(file, maxSize) {
     }
     img.onerror = () => {
       URL.revokeObjectURL(url)
-      reject(new Error('El archivo no es una imagen válida'))
+      reject(new Error(t('errors.invalidImage')))
     }
     img.src = url
   })

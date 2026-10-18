@@ -11,11 +11,14 @@ import { listComics, saveComic, deleteComic, fileToPoster } from '../../services
 import { listSeries, saveSeries, deleteSeries, fileToLogo } from '../../services/seriesService'
 import { listCharacters, saveCharacter, deleteCharacter, fileToCharacterImage } from '../../services/charactersService'
 import { navigate } from '../../utils/router'
+import { useI18n } from '../../i18n'
 
 const props = defineProps({
   action: { type: String, default: null }, // 'new', 'edit', or null
   slug: { type: String, default: null }
 })
+
+const { t } = useI18n()
 
 const STATUSES = ['Available', 'Limited Edition', 'Sold Out', 'Coming Soon']
 
@@ -69,7 +72,7 @@ function descriptionBlockImageUpload(index, file) {
     form.description[index].image = poster
     uploading.value = false
   }).catch((err) => {
-    error.value = 'Error uploading image: ' + err.message
+    error.value = t('admin.errors.uploadImage', { message: err.message })
     uploading.value = false
   })
 }
@@ -169,7 +172,10 @@ async function load() {
   ].filter(Boolean)
   if (failed.length) {
     const reason = [comicsRes, seriesRes, charactersRes].find((r) => r.status === 'rejected')?.reason
-    error.value = `Could not load: ${failed.join(', ')}. Check the Firestore rules. (${reason?.message || reason})`
+    error.value = t('admin.errors.load', {
+      items: failed.join(', '),
+      reason: reason?.message || reason,
+    })
   }
   loading.value = false
 }
@@ -222,7 +228,6 @@ const editorRelated = computed(() => {
 
 // Validación de campos obligatorios del cómic.
 const attempted = ref(false)
-const FIELD_LABELS = { title: 'Title', issue: 'Issue', price: 'Price', poster: 'Cover' }
 const missingFields = computed(() => {
   const missing = []
   if (!form.title.trim()) missing.push('title')
@@ -233,7 +238,7 @@ const missingFields = computed(() => {
 })
 
 function fieldLabel(key) {
-  return FIELD_LABELS[key] || key
+  return t('admin.fields.' + key)
 }
 
 function boxBorder(key) {
@@ -244,7 +249,7 @@ function boxBorder(key) {
 const groups = computed(() => {
   const map = new Map()
   for (const c of filteredComics.value) {
-    const key = c.protagonist || 'Uncategorized'
+    const key = c.protagonist || t('admin.catalog.uncategorized')
     if (!map.has(key)) map.set(key, [])
     map.get(key).push(c)
   }
@@ -289,6 +294,8 @@ function openEdit(comic) {
   showForm.value = true
   error.value = ''
   attempted.value = false
+  const slug = comic.slug || comic.id
+  navigate(`/admin/edit/${slug}`)
 }
 
 function cancelForm() {
@@ -302,12 +309,12 @@ async function save() {
   error.value = ''
   attempted.value = true
   if (missingFields.value.length) {
-    error.value = 'Complete required fields: ' + missingFields.value.map(fieldLabel).join(', ') + '.'
+    error.value = t('admin.errors.requiredFields', { fields: missingFields.value.map(fieldLabel).join(', ') })
     return
   }
   const newId = generatedId()
   if (!newId) {
-    error.value = 'Title is required (the ID is generated from the title).'
+    error.value = t('admin.errors.titleRequired')
     return
   }
   const isEditing = Boolean(editingId.value)
@@ -340,23 +347,27 @@ async function save() {
         await deleteComic(editingId.value)
       } catch (e) {
         throw new Error(
-          `New comic saved as "${newId}", but the old one "${editingId.value}" could not be deleted: ${e.message}`
+          t('admin.errors.idChangeFailed', {
+            newId,
+            oldId: editingId.value,
+            message: e.message,
+          })
         )
       }
     }
     await load()
     showForm.value = false
     editingId.value = null
-    notice.value = isEditing ? 'Comic updated.' : 'Comic created.'
+    notice.value = isEditing ? t('admin.notices.comicUpdated') : t('admin.notices.comicCreated')
   } catch (e) {
-    error.value = 'Error saving: ' + e.message
+    error.value = t('admin.errors.saving', { message: e.message })
   } finally {
     saving.value = false
   }
 }
 
 async function remove(comic) {
-  if (!window.confirm(`Delete "${comic.title}"? This action cannot be undone.`)) return
+  if (!window.confirm(t('admin.errors.confirmDeleteComic', { title: comic.title }))) return
   error.value = ''
   try {
     await deleteComic(comic.id)
@@ -365,9 +376,9 @@ async function remove(comic) {
       showForm.value = false
       editingId.value = null
     }
-    notice.value = 'Comic deleted.'
+    notice.value = t('admin.notices.comicDeleted')
   } catch (e) {
-    error.value = 'Error deleting: ' + e.message
+    error.value = t('admin.errors.deleting', { message: e.message })
   }
 }
 
@@ -403,7 +414,7 @@ function cancelSeriesForm() {
 async function saveSeriesData() {
   error.value = ''
   if (!seriesForm.name.trim()) {
-    error.value = 'Series name is required.'
+    error.value = t('admin.errors.seriesNameRequired')
     return
   }
   const slug = slugifyName(seriesForm.name)
@@ -419,16 +430,16 @@ async function saveSeriesData() {
     await load()
     showSeriesForm.value = false
     editingSeriesId.value = null
-    notice.value = editingSeriesId.value ? 'Series updated.' : 'Series created.'
+    notice.value = editingSeriesId.value ? t('admin.notices.seriesUpdated') : t('admin.notices.seriesCreated')
   } catch (e) {
-    error.value = 'Error saving series: ' + e.message
+    error.value = t('admin.errors.savingSeries', { message: e.message })
   } finally {
     saving.value = false
   }
 }
 
 async function removeSeries(s) {
-  if (!window.confirm(`Delete series "${s.name}"? This action cannot be undone.`)) return
+  if (!window.confirm(t('admin.errors.confirmDeleteSeries', { name: s.name }))) return
   error.value = ''
   try {
     await deleteSeries(s.id)
@@ -437,9 +448,9 @@ async function removeSeries(s) {
       showSeriesForm.value = false
       editingSeriesId.value = null
     }
-    notice.value = 'Series deleted.'
+    notice.value = t('admin.notices.seriesDeleted')
   } catch (e) {
-    error.value = 'Error deleting series: ' + e.message
+    error.value = t('admin.errors.deletingSeries', { message: e.message })
   }
 }
 
@@ -475,7 +486,7 @@ function cancelCharacterForm() {
 async function saveCharacterData() {
   error.value = ''
   if (!characterForm.name.trim()) {
-    error.value = 'Character name is required.'
+    error.value = t('admin.errors.characterNameRequired')
     return
   }
   const slug = slugifyCharacterName(characterForm.name)
@@ -493,16 +504,16 @@ async function saveCharacterData() {
     await load()
     showCharacterForm.value = false
     editingCharacterId.value = null
-    notice.value = isEditing ? 'Character updated.' : 'Character created.'
+    notice.value = isEditing ? t('admin.notices.characterUpdated') : t('admin.notices.characterCreated')
   } catch (e) {
-    error.value = 'Error saving character: ' + e.message
+    error.value = t('admin.errors.savingCharacter', { message: e.message })
   } finally {
     saving.value = false
   }
 }
 
 async function removeCharacter(c) {
-  if (!window.confirm(`Delete character "${c.name}"? This action cannot be undone.`)) return
+  if (!window.confirm(t('admin.errors.confirmDeleteCharacter', { name: c.name }))) return
   error.value = ''
   try {
     await deleteCharacter(c.id)
@@ -511,9 +522,9 @@ async function removeCharacter(c) {
       showCharacterForm.value = false
       editingCharacterId.value = null
     }
-    notice.value = 'Character deleted.'
+    notice.value = t('admin.notices.characterDeleted')
   } catch (e) {
-    error.value = 'Error deleting character: ' + e.message
+    error.value = t('admin.errors.deletingCharacter', { message: e.message })
   }
 }
 
@@ -523,9 +534,9 @@ async function processCharacterImage(file) {
   try {
     const image = await fileToCharacterImage(file)
     characterForm.image = image
-    notice.value = 'Image ready to save.'
+    notice.value = t('admin.notices.imageReady')
   } catch (err) {
-    error.value = 'Error processing the image: ' + err.message
+    error.value = t('admin.errors.processImage', { message: err.message })
   } finally {
     uploading.value = false
   }
@@ -540,16 +551,16 @@ function onCharacterImageSelected(e) {
 async function processLogo(file) {
   error.value = ''
   if (!seriesForm.name.trim()) {
-    error.value = 'Write the series name first.'
+    error.value = t('admin.errors.writeSeriesName')
     return
   }
   uploading.value = true
   try {
     const logo = await fileToLogo(file)
     seriesForm.logo = logo
-    notice.value = 'Logo ready to save.'
+    notice.value = t('admin.notices.logoReady')
   } catch (err) {
-    error.value = 'Error processing the image: ' + err.message
+    error.value = t('admin.errors.processImage', { message: err.message })
   } finally {
     uploading.value = false
   }
@@ -564,7 +575,7 @@ function onLogoSelected(e) {
 async function processCover(file) {
   error.value = ''
   if (!form.title.trim()) {
-    error.value = 'Write the comic title first.'
+    error.value = t('admin.errors.writeComicTitle')
     return
   }
   uploading.value = true
@@ -572,9 +583,9 @@ async function processCover(file) {
     const { poster } = await fileToPoster(file)
     form.storagePath = ''
     form.poster = poster
-    notice.value = 'Image converted to link and ready to save.'
+    notice.value = t('admin.notices.coverReady')
   } catch (err) {
-    error.value = 'Error processing the image: ' + err.message
+    error.value = t('admin.errors.processImage', { message: err.message })
   } finally {
     uploading.value = false
   }
@@ -602,7 +613,7 @@ async function login() {
     await signInAdmin(email.value.trim(), password.value)
     password.value = ''
   } catch {
-    error.value = 'Invalid credentials.'
+    error.value = t('admin.login.invalid')
   } finally {
     busy.value = false
   }
@@ -657,36 +668,36 @@ watch(search, (v) => {
     <!-- Aviso: Firebase no configurado -->
     <div v-if="!isConfigured" class="flex min-h-screen items-center justify-center p-8">
       <p class="max-w-md border border-ink-950/15 p-8 text-center text-sm uppercase tracking-[0.25em] text-ink-950/60">
-        Firebase is not configured. Complete the <span class="font-bold text-ink-950">.env</span> file to use the panel.
+        {{ t('admin.firebaseNotConfigured', { env: '.env' }) }}
       </p>
     </div>
 
     <!-- Pantalla de login -->
     <div v-else-if="!user" class="flex min-h-screen items-center justify-center p-8">
       <form class="w-full max-w-sm border border-ink-950/15 p-10" @submit.prevent="login">
-        <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/40">Restricted system</p>
-        <h1 class="font-display mt-2 text-2xl font-black uppercase tracking-tight text-ink-950">Admin access</h1>
+        <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/40">{{ t('admin.login.restricted') }}</p>
+        <h1 class="font-display mt-2 text-2xl font-black uppercase tracking-tight text-ink-950">{{ t('admin.login.title') }}</h1>
 
         <label class="mt-8 block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
-          Email
+          {{ t('admin.login.email') }}
           <input
             v-model="email"
             type="email"
             required
             autocomplete="username"
-            placeholder="you@example.com"
+            :placeholder="t('admin.login.emailPlaceholder')"
             class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm text-ink-950 placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
           />
         </label>
 
         <label class="mt-5 block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
-          Password
+          {{ t('admin.login.password') }}
           <input
             v-model="password"
             type="password"
             required
             autocomplete="current-password"
-            placeholder="Enter your password"
+            :placeholder="t('admin.login.passwordPlaceholder')"
             class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm text-ink-950 placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
           />
         </label>
@@ -698,7 +709,7 @@ watch(search, (v) => {
           :disabled="busy"
           class="mt-8 w-full bg-ink-950 px-6 py-3.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800 disabled:opacity-50"
         >
-          {{ busy ? 'Signing in…' : 'Sign in' }}
+          {{ busy ? t('admin.login.signingIn') : t('admin.login.signIn') }}
         </button>
       </form>
     </div>
@@ -709,21 +720,21 @@ watch(search, (v) => {
       <header class="bg-black text-white">
         <div class="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-6 md:flex-row md:items-center md:justify-between md:px-8">
           <div>
-            <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/40">Signed in as · {{ user.email }}</p>
-            <h1 class="font-display mt-1 text-3xl font-black uppercase tracking-tight">Admin panel</h1>
+            <p class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/40">{{ t('admin.header.signedInAs', { email: user.email }) }}</p>
+            <h1 class="font-display mt-1 text-3xl font-black uppercase tracking-tight">{{ t('admin.header.title') }}</h1>
           </div>
           <div class="flex gap-3">
             <button
               @click="goToSite"
               class="border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:border-white"
             >
-              Back to site
+              {{ t('admin.header.backToSite') }}
             </button>
             <button
               @click="logout"
               class="border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white/50 transition-colors duration-300 hover:border-white hover:text-white"
             >
-              Sign out
+              {{ t('admin.header.signOut') }}
             </button>
           </div>
         </div>
@@ -740,24 +751,24 @@ watch(search, (v) => {
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
             </svg>
-            Back to catalog
+            {{ t('admin.editor.backToCatalog') }}
           </button>
           <div class="flex items-center gap-3">
             <span class="hidden text-[10px] uppercase tracking-[0.3em] text-ink-950/40 sm:inline">
-              {{ editingId ? 'Editing comic' : 'New comic' }}
+              {{ editingId ? t('admin.editor.editing') : t('admin.editor.newComic') }}
             </span>
             <button
               @click="cancelForm"
               class="border border-ink-950/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
             >
-              Cancel
+              {{ t('admin.editor.cancel') }}
             </button>
             <button
               @click="save"
               :disabled="saving"
               class="bg-ink-950 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800 disabled:opacity-50"
             >
-              {{ saving ? 'Saving…' : 'Save comic' }}
+              {{ saving ? t('admin.editor.saving') : t('admin.editor.save') }}
             </button>
           </div>
         </div>
@@ -774,19 +785,19 @@ watch(search, (v) => {
                     <img
                       v-if="selectedSeries && selectedSeries.logo"
                       :src="selectedSeries.logo"
-                      :alt="`Logo of ${selectedSeries.name}`"
+                      :alt="t('detail.logoAlt', { name: selectedSeries.name })"
                       class="h-32 w-auto object-contain drop-shadow-lg md:h-40"
                     />
                     <p v-if="selectedSeries" class="font-display text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
                       {{ selectedSeries.name }}
                     </p>
                     <label class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Series
+                      {{ t('admin.editor.series') }}
                       <select
                         v-model="form.seriesId"
                         class="mt-1 block w-64 rounded-sm border border-white/40 bg-ink-800 px-3 py-2 text-center text-xs text-white focus:border-white focus:outline-none"
                       >
-                        <option value="">No series</option>
+                        <option value="">{{ t('admin.editor.noSeries') }}</option>
                         <option v-for="s in series" :key="s.id" :value="s.id">{{ s.name }}</option>
                       </select>
                     </label>
@@ -796,7 +807,7 @@ watch(search, (v) => {
                   <div class="flex items-center gap-4">
                     <img src="/images/logo-menubar.png" alt="Logo" class="h-14 w-auto object-contain md:h-16" />
                     <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Issue *
+                      {{ t('admin.editor.issue') }} *
                       <input
                         v-model.number="form.issue"
                         type="number"
@@ -810,7 +821,7 @@ watch(search, (v) => {
                   <!-- Author / Year / Pages -->
                   <div class="grid w-full max-w-md grid-cols-1 gap-3 sm:grid-cols-3">
                     <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Author
+                      {{ t('admin.editor.author') }}
                       <input
                         v-model="form.author"
                         placeholder="Angello Aponte"
@@ -818,7 +829,7 @@ watch(search, (v) => {
                       />
                     </label>
                     <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Year
+                      {{ t('admin.editor.year') }}
                       <input
                         v-model.number="form.year"
                         type="number"
@@ -827,7 +838,7 @@ watch(search, (v) => {
                       />
                     </label>
                     <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Pages
+                      {{ t('admin.editor.pages') }}
                       <input
                         v-model.number="form.pages"
                         type="number"
@@ -840,7 +851,7 @@ watch(search, (v) => {
                   <!-- Price / Discount -->
                   <div class="grid w-full max-w-md grid-cols-2 gap-3">
                     <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Price ($) *
+                      {{ t('admin.editor.price') }} *
                       <input
                         v-model.number="form.price"
                         type="number"
@@ -852,7 +863,7 @@ watch(search, (v) => {
                       />
                     </label>
                     <label class="text-left text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Discount (%)
+                      {{ t('admin.editor.discount') }}
                       <input
                         v-model.number="form.discount"
                         type="number"
@@ -875,7 +886,7 @@ watch(search, (v) => {
                   <label class="group relative block cursor-pointer overflow-hidden shadow-2xl shadow-black/50">
                     <img
                       :src="form.poster || '/images/no-image.webp'"
-                      :alt="`Cover of ${form.title || 'comic'}`"
+                      :alt="t('cover.alt', { title: form.title || 'comic' })"
                       class="w-80 object-cover md:w-96"
                     />
                     <span class="absolute inset-0 flex items-center justify-center bg-ink-950/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -889,45 +900,45 @@ watch(search, (v) => {
                     class="text-[10px] font-bold uppercase tracking-[0.2em]"
                     :class="attempted && missingFields.includes('poster') ? 'text-red-400' : 'text-white/40'"
                   >
-                    {{ uploading ? 'Processing…' : (attempted && missingFields.includes('poster') ? 'Cover is required' : 'Click the cover to change it · or paste Ctrl+V') }}
+                    {{ uploading ? t('admin.editor.processing') : (attempted && missingFields.includes('poster') ? t('admin.editor.coverRequired') : t('admin.editor.coverHint')) }}
                   </p>
                 </div>
               </div>
 
               <!-- Comic Details Section -->
               <section class="mt-16 border-t border-white/10 pt-16 md:mt-24">
-                <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">Comic Details</h2>
+                <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">{{ t('admin.editor.comicDetails') }}</h2>
                 <p class="mt-2 text-[10px] uppercase tracking-[0.3em] text-white/40">
-                  Product ID (auto): <span class="font-bold text-white">{{ generatedId() || '…' }}</span>
+                  {{ t('admin.editor.productId') }} <span class="font-bold text-white">{{ generatedId() || '…' }}</span>
                 </p>
 
                 <div class="mt-6 flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
                   <div class="flex-1 space-y-4">
                     <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Title *
+                      {{ t('admin.editor.title') }} *
                       <input
                         v-model="form.title"
-                        placeholder="The Formidable Tuteque-Man"
+                        :placeholder="t('admin.editor.titlePlaceholder')"
                         class="mt-1 w-full rounded-sm border bg-transparent px-4 py-3 text-lg font-bold text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                         :class="boxBorder('title')"
                       />
                     </label>
                     <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Character / Protagonist
+                      {{ t('admin.editor.protagonist') }}
                       <input
                         v-model="form.protagonist"
-                        placeholder="TUTEQUE-MAN"
+                        :placeholder="t('admin.editor.protagonistPlaceholder')"
                         class="mt-1 w-full rounded-sm border border-white/40 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                       />
                     </label>
                     <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Description
+                      {{ t('admin.editor.description') }}
                       <div class="mt-3 space-y-4" @paste="onDescriptionBlockPaste">
                         <div v-for="(block, index) in form.description" :key="index" class="flex flex-col gap-3 p-4 border border-white/20 bg-white/5">
                           <div class="flex items-start gap-3">
                             <!-- Image side (optional) -->
                             <div class="relative w-32 h-32 md:w-40 md:h-40 flex-shrink-0 overflow-hidden border border-white/20 bg-white/5" :class="block.imagePosition === 'left' ? 'order-1' : 'order-2'">
-                              <img v-if="block.image" :src="block.image" alt="Block image" class="w-full h-full object-cover" />
+                              <img v-if="block.image" :src="block.image" :alt="t('detail.blockImageAlt')" class="w-full h-full object-cover" />
                               <label v-else class="absolute inset-0 flex items-center justify-center cursor-pointer bg-white/5 hover:bg-white/10">
                                 <svg class="h-8 w-8 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -939,12 +950,12 @@ watch(search, (v) => {
                             <!-- Text side -->
                             <div class="flex-1 min-w-0" :class="block.imagePosition === 'left' ? 'order-2' : 'order-1'">
                               <div class="flex items-center gap-2 mb-2">
-                                <label class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Image position</label>
+                                <label class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">{{ t('admin.editor.imagePosition') }}</label>
                                 <select v-model="block.imagePosition" class="rounded-sm border border-white/30 bg-ink-800 px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
-                                  <option value="left">Left</option>
-                                  <option value="right">Right</option>
+                                  <option value="left">{{ t('admin.editor.left') }}</option>
+                                  <option value="right">{{ t('admin.editor.right') }}</option>
                                 </select>
-                                <label class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Aspect ratio</label>
+                                <label class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">{{ t('admin.editor.aspectRatio') }}</label>
                                 <select v-model="block.aspectRatio" class="rounded-sm border border-white/30 bg-ink-800 px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
                                   <option value="16:9">16:9</option>
                                   <option value="4:3">4:3</option>
@@ -952,14 +963,14 @@ watch(search, (v) => {
                                   <option value="3:4">3:4</option>
                                   <option value="9:16">9:16</option>
                                 </select>
-                                <button type="button" @click="moveDescriptionBlock(index, -1)" class="ml-auto px-2 py-1 text-xs text-white/70 hover:text-white">↑ Up</button>
-                                <button type="button" @click="moveDescriptionBlock(index, 1)" class="px-2 py-1 text-xs text-white/70 hover:text-white">↓ Down</button>
-                                <button type="button" @click="removeDescriptionBlock(index)" class="px-2 py-1 text-xs text-red-400 hover:text-red-300">✕ Remove</button>
+                                <button type="button" @click="moveDescriptionBlock(index, -1)" class="ml-auto px-2 py-1 text-xs text-white/70 hover:text-white">{{ t('admin.editor.up') }}</button>
+                                <button type="button" @click="moveDescriptionBlock(index, 1)" class="px-2 py-1 text-xs text-white/70 hover:text-white">{{ t('admin.editor.down') }}</button>
+                                <button type="button" @click="removeDescriptionBlock(index)" class="px-2 py-1 text-xs text-red-400 hover:text-red-300">{{ t('admin.editor.remove') }}</button>
                               </div>
                               <textarea
                                 v-model="block.text"
                                 rows="3"
-                                placeholder="Write your description block here..."
+                                :placeholder="t('admin.editor.blockPlaceholder')"
                                 class="w-full resize-y rounded-sm border border-white/30 bg-transparent px-4 py-3 text-sm leading-relaxed text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                               ></textarea>
                             </div>
@@ -967,7 +978,7 @@ watch(search, (v) => {
                         </div>
                         <button type="button" @click="addDescriptionBlock" class="flex items-center gap-2 text-white/70 hover:text-white text-xs font-bold uppercase tracking-[0.2em]">
                           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                          Add description block
+                          {{ t('admin.editor.addBlock') }}
                         </button>
                       </div>
                     </label>
@@ -995,7 +1006,7 @@ watch(search, (v) => {
                       </div>
                     </div>
                     <label class="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-                      Rating (%)
+                      {{ t('admin.editor.rating') }}
                       <input
                         v-model.number="form.rating"
                         type="number"
@@ -1005,7 +1016,7 @@ watch(search, (v) => {
                         class="mt-1 block w-24 rounded-sm border border-white/40 bg-transparent px-3 py-2 text-center text-sm text-white placeholder:text-white/30 focus:border-white focus:outline-none"
                       />
                     </label>
-                    <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Rating</span>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">{{ t('admin.editor.ratingLabel') }}</span>
                   </div>
                 </div>
               </section>
@@ -1018,7 +1029,7 @@ watch(search, (v) => {
 
           <!-- More from this series (preview) -->
           <section v-if="editorRelated.length" class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
-            <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/50">More from this series</h2>
+            <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/50">{{ t('detail.moreFrom') }}</h2>
             <h3 class="font-display mt-2 text-3xl font-black uppercase tracking-tight text-ink-950">{{ form.title }}</h3>
 
             <div class="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
@@ -1026,13 +1037,13 @@ watch(search, (v) => {
                 <div class="overflow-hidden border border-ink-950/10 bg-white transition-all duration-300 group-hover:border-ink-950 group-hover:shadow-lg group-hover:shadow-ink-950/5">
                   <img
                     :src="r.poster || '/images/no-image.webp'"
-                    :alt="`Cover of ${r.title}`"
+                    :alt="t('cover.alt', { title: r.title })"
                     class="aspect-[1920/2951] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                   />
                 </div>
                 <p class="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-950/50">{{ r.year }}</p>
                 <h4 class="font-display mt-1 text-sm font-black uppercase tracking-tight text-ink-950">{{ r.title }}</h4>
-                <p class="mt-0.5 text-xs text-ink-950/40">Issue {{ r.issue }}</p>
+                <p class="mt-0.5 text-xs text-ink-950/40">{{ t('detail.issueShort', { number: r.issue }) }}</p>
               </a>
             </div>
           </section>
@@ -1047,21 +1058,21 @@ watch(search, (v) => {
           class="px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] transition-colors duration-300"
           :class="activeTab === 'comics' ? 'border-b-2 border-ink-950 text-ink-950' : 'text-ink-950/50 hover:text-ink-950'"
         >
-          Comics ({{ comics.length }})
+          {{ t('admin.tabs.comics') }} ({{ comics.length }})
         </button>
         <button
           @click="activeTab = 'series'"
           class="px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] transition-colors duration-300"
           :class="activeTab === 'series' ? 'border-b-2 border-ink-950 text-ink-950' : 'text-ink-950/50 hover:text-ink-950'"
         >
-          Series ({{ series.length }})
+          {{ t('admin.tabs.series') }} ({{ series.length }})
         </button>
         <button
           @click="activeTab = 'characters'"
           class="px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] transition-colors duration-300"
           :class="activeTab === 'characters' ? 'border-b-2 border-ink-950 text-ink-950' : 'text-ink-950/50 hover:text-ink-950'"
         >
-          Characters ({{ characters.length }})
+          {{ t('admin.tabs.characters') }} ({{ characters.length }})
         </button>
       </div>
 
@@ -1077,13 +1088,13 @@ watch(search, (v) => {
         <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div class="flex-1">
             <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-ink-950/60">
-              Catalog ({{ filteredComics.length }} / {{ comics.length }})
+              {{ t('admin.catalog.title') }} ({{ filteredComics.length }} / {{ comics.length }})
             </h2>
             <div class="relative mt-3 max-w-md">
               <input
                 v-model="search"
                 type="search"
-                placeholder="Search by title, character, ID, issue, status…"
+                :placeholder="t('admin.catalog.searchPlaceholder')"
                 class="w-full border border-ink-950/20 bg-transparent py-3 pl-4 pr-10 text-sm text-ink-950 placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
               />
               <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-ink-950/40">
@@ -1097,7 +1108,7 @@ watch(search, (v) => {
             @click="openNew"
             class="bg-ink-950 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800"
           >
-            + New comic
+            {{ t('admin.catalog.newComic') }}
           </button>
         </div>
 
@@ -1108,12 +1119,12 @@ watch(search, (v) => {
 
         <!-- Lista vacía -->
         <div v-else-if="comics.length === 0" class="mt-6 border border-ink-950/10 p-10 text-center">
-          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">No comics yet. Create the first one.</p>
+          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">{{ t('admin.catalog.empty') }}</p>
         </div>
 
         <!-- Sin resultados de búsqueda -->
         <div v-else-if="filteredComics.length === 0" class="mt-6 border border-ink-950/10 p-10 text-center">
-          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">No comics match your search.</p>
+          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">{{ t('admin.catalog.noResults') }}</p>
         </div>
 
         <!-- Lista de cómics agrupada por protagonista -->
@@ -1130,7 +1141,7 @@ watch(search, (v) => {
                 </span>
                 <span class="flex flex-col">
                   <span class="text-sm font-bold uppercase tracking-[0.3em] text-ink-950">{{ group.name }}</span>
-                  <span class="text-[11px] uppercase tracking-[0.2em] text-ink-950/40">{{ group.items.length }} issues</span>
+                  <span class="text-[11px] uppercase tracking-[0.2em] text-ink-950/40">{{ t('admin.catalog.issues', { count: group.items.length }) }}</span>
                 </span>
               </span>
               <svg
@@ -1150,7 +1161,7 @@ watch(search, (v) => {
                     <img :src="comic.poster || '/images/no-image.webp'" :alt="`Cover of ${comic.title}`" class="aspect-[1920/2951] w-full object-cover" />
                   </div>
                   <div class="flex flex-1 flex-col p-4">
-                    <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-950/40">{{ comic.year }} · Issue {{ comic.issue }}</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-950/40">{{ comic.year }} · {{ t('detail.issueShort', { number: comic.issue }) }}</p>
                     <h4 class="font-display mt-1 text-lg font-black uppercase tracking-tight text-ink-950">{{ comic.title }}</h4>
                     <p class="mt-1 text-xs text-ink-950/40">{{ comic.id }}</p>
                     <div class="mt-auto flex gap-2 pt-4">
@@ -1158,13 +1169,13 @@ watch(search, (v) => {
                         @click="openEdit(comic)"
                         class="flex-1 border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-ink-950"
                       >
-                        Edit
+                        {{ t('admin.catalog.edit') }}
                       </button>
                       <button
                         @click="remove(comic)"
                         class="border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-950/50 transition-colors duration-300 hover:border-red-500 hover:text-red-600"
                       >
-                        Delete
+                        {{ t('admin.catalog.delete') }}
                       </button>
                     </div>
                   </div>
@@ -1180,14 +1191,14 @@ watch(search, (v) => {
         <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div class="flex-1">
             <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-ink-950/60">
-              Series ({{ series.length }})
+              {{ t('admin.series.title') }} ({{ series.length }})
             </h2>
           </div>
           <button
             @click="openNewSeries"
             class="bg-ink-950 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800"
           >
-            + New series
+            {{ t('admin.series.new') }}
           </button>
         </div>
 
@@ -1198,7 +1209,7 @@ watch(search, (v) => {
 
         <!-- Lista vacía -->
         <div v-else-if="series.length === 0" class="mt-6 border border-ink-950/10 p-10 text-center">
-          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">No series yet. Create the first one.</p>
+          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">{{ t('admin.series.empty') }}</p>
         </div>
 
         <!-- Lista de series -->
@@ -1206,7 +1217,7 @@ watch(search, (v) => {
           <div v-for="s in series" :key="s.id" class="flex flex-col gap-3 border border-ink-950/10 py-4 px-4 md:flex-row md:items-center md:justify-between">
             <div class="flex items-center gap-4">
               <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-ink-100">
-                <img v-if="s.logo" :src="s.logo" :alt="`Logo of ${s.name}`" class="h-full w-full object-cover" />
+                <img v-if="s.logo" :src="s.logo" :alt="t('detail.logoAlt', { name: s.name })" class="h-full w-full object-cover" />
                 <div v-else class="flex h-full w-full items-center justify-center text-ink-950/30">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -1222,13 +1233,13 @@ watch(search, (v) => {
                 @click="openEditSeries(s)"
                 class="border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-ink-950"
               >
-                Edit
+                {{ t('admin.series.edit') }}
               </button>
               <button
                 @click="removeSeries(s)"
                 class="border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-950/50 transition-colors duration-300 hover:border-red-500 hover:text-red-600"
               >
-                Delete
+                {{ t('admin.series.delete') }}
               </button>
             </div>
           </div>
@@ -1240,14 +1251,14 @@ watch(search, (v) => {
         <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div class="flex-1">
             <h2 class="text-sm font-bold uppercase tracking-[0.3em] text-ink-950/60">
-              Characters ({{ characters.length }})
+              {{ t('admin.characters.title') }} ({{ characters.length }})
             </h2>
           </div>
           <button
             @click="openNewCharacter"
             class="bg-ink-950 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800"
           >
-            + New character
+            {{ t('admin.characters.new') }}
           </button>
         </div>
 
@@ -1258,7 +1269,7 @@ watch(search, (v) => {
 
         <!-- Lista vacía -->
         <div v-else-if="characters.length === 0" class="mt-6 border border-ink-950/10 p-10 text-center">
-          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">No characters yet. Create the first one.</p>
+          <p class="text-sm uppercase tracking-[0.25em] text-ink-950/40">{{ t('admin.characters.empty') }}</p>
         </div>
 
         <!-- Lista de personajes -->
@@ -1266,7 +1277,7 @@ watch(search, (v) => {
           <div v-for="c in characters" :key="c.id" class="flex flex-col border border-ink-950/10">
             <div class="flex items-center gap-4 p-4">
               <div class="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-ink-100">
-                <img v-if="c.image" :src="c.image" :alt="`Photo of ${c.name}`" class="h-full w-full object-cover" />
+                <img v-if="c.image" :src="c.image" :alt="t('cover.alt', { title: c.name })" class="h-full w-full object-cover" />
                 <div v-else class="flex h-full w-full items-center justify-center text-ink-950/30">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -1275,7 +1286,7 @@ watch(search, (v) => {
               </div>
               <div class="min-w-0">
                 <h4 class="font-display text-lg font-black uppercase tracking-tight">{{ c.name }}</h4>
-                <p class="mt-1 text-xs text-ink-950/50">{{ c.description || 'No description.' }}</p>
+                <p class="mt-1 text-xs text-ink-950/50">{{ c.description || t('admin.characters.noDescription') }}</p>
               </div>
             </div>
             <div class="mt-auto flex items-center gap-3 border-t border-ink-950/10 p-4">
@@ -1283,13 +1294,13 @@ watch(search, (v) => {
                 @click="openEditCharacter(c)"
                 class="flex-1 border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 hover:border-ink-950"
               >
-                Edit
+                {{ t('admin.characters.edit') }}
               </button>
               <button
                 @click="removeCharacter(c)"
                 class="border border-ink-950/20 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-950/50 transition-colors duration-300 hover:border-red-500 hover:text-red-600"
               >
-                Delete
+                {{ t('admin.characters.delete') }}
               </button>
             </div>
           </div>
@@ -1306,15 +1317,15 @@ watch(search, (v) => {
             @click.self="cancelSeriesForm"
             role="dialog"
             aria-modal="true"
-            :aria-label="editingSeriesId ? 'Edit series' : 'New series'"
+            :aria-label="editingSeriesId ? t('admin.series.editTitle') : t('admin.series.newTitle')"
           >
             <div class="w-full max-w-2xl border border-white/40 bg-transparent text-ink-950">
               <div class="flex items-center justify-between border-b border-ink-950/10 px-6 py-5 md:px-8">
-                <h2 class="font-display text-xl font-black uppercase tracking-tight">{{ editingSeriesId ? 'Edit series' : 'New series' }}</h2>
+                <h2 class="font-display text-xl font-black uppercase tracking-tight">{{ editingSeriesId ? t('admin.series.editTitle') : t('admin.series.newTitle') }}</h2>
                 <button
                   @click="cancelSeriesForm"
                   class="flex h-9 w-9 items-center justify-center border border-ink-950/20 text-sm text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
-                  aria-label="Close form"
+                  :aria-label="t('admin.closeForm')"
                 >
                   ×
                 </button>
@@ -1323,7 +1334,7 @@ watch(search, (v) => {
               <div class="px-6 py-6 md:px-8">
                 <div class="grid gap-6 md:grid-cols-2">
                   <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50 md:col-span-2">
-                    Series Name *
+                    {{ t('admin.series.name') }} *
                     <input
                       v-model="seriesForm.name"
                       placeholder="THE ORIGIN SAGA"
@@ -1333,10 +1344,10 @@ watch(search, (v) => {
                 </div>
 
                 <div class="mt-6 border border-ink-950/10 p-4">
-                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">Series Logo</p>
+                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">{{ t('admin.series.logo') }}</p>
                   <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div class="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-ink-100">
-                      <img v-if="seriesForm.logo" :src="seriesForm.logo" alt="Logo preview" class="h-full w-full object-cover" />
+                      <img v-if="seriesForm.logo" :src="seriesForm.logo" :alt="t('admin.series.logoPreviewAlt')" class="h-full w-full object-cover" />
                       <div v-else class="flex h-full w-full items-center justify-center text-ink-950/30">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -1347,11 +1358,11 @@ watch(search, (v) => {
                       <label
                         class="inline-flex cursor-pointer border border-ink-950/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-ink-950 transition-colors duration-300 hover:border-ink-950"
                       >
-                        {{ uploading ? 'Processing…' : 'Choose logo' }}
+                        {{ uploading ? t('admin.editor.processing') : t('admin.series.chooseLogo') }}
                         <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onLogoSelected" />
                       </label>
                       <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-ink-950/35">
-                        Square image recommended. Will be displayed in the comic detail.
+                        {{ t('admin.series.logoHint') }}
                       </p>
                     </div>
                   </div>
@@ -1367,13 +1378,13 @@ watch(search, (v) => {
                     :disabled="saving"
                     class="bg-ink-950 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800 disabled:opacity-50"
                   >
-                    {{ saving ? 'Saving…' : 'Save series' }}
+                    {{ saving ? t('admin.editor.saving') : t('admin.series.save') }}
                   </button>
                   <button
                     @click="cancelSeriesForm"
                     class="border border-ink-950/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
                   >
-                    Cancel
+                    {{ t('admin.editor.cancel') }}
                   </button>
                 </div>
               </div>
@@ -1391,15 +1402,15 @@ watch(search, (v) => {
             @click.self="cancelCharacterForm"
             role="dialog"
             aria-modal="true"
-            :aria-label="editingCharacterId ? 'Edit character' : 'New character'"
+            :aria-label="editingCharacterId ? t('admin.characters.editTitle') : t('admin.characters.newTitle')"
           >
             <div class="w-full max-w-2xl border border-white/40 bg-transparent text-ink-950">
               <div class="flex items-center justify-between border-b border-ink-950/10 px-6 py-5 md:px-8">
-                <h2 class="font-display text-xl font-black uppercase tracking-tight">{{ editingCharacterId ? 'Edit character' : 'New character' }}</h2>
+                <h2 class="font-display text-xl font-black uppercase tracking-tight">{{ editingCharacterId ? t('admin.characters.editTitle') : t('admin.characters.newTitle') }}</h2>
                 <button
                   @click="cancelCharacterForm"
                   class="flex h-9 w-9 items-center justify-center border border-ink-950/20 text-sm text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
-                  aria-label="Close form"
+                  :aria-label="t('admin.closeForm')"
                 >
                   ×
                 </button>
@@ -1407,29 +1418,29 @@ watch(search, (v) => {
 
               <div class="px-6 py-6 md:px-8">
                 <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
-                  Character Name *
+                  {{ t('admin.characters.name') }} *
                   <input
                     v-model="characterForm.name"
-                    placeholder="TUTEQUE MAN"
+                    :placeholder="t('admin.characters.namePlaceholder')"
                     class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm uppercase placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                   />
                 </label>
 
                 <label class="mt-5 block text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">
-                  Description
+                  {{ t('admin.characters.description') }}
                   <textarea
                     v-model="characterForm.description"
                     rows="3"
-                    placeholder="Short biography or notes…"
+                    :placeholder="t('admin.characters.descriptionPlaceholder')"
                     class="mt-2 w-full border border-ink-950/20 bg-transparent px-4 py-3 text-sm placeholder:text-ink-950/25 focus:border-ink-950 focus:outline-none"
                   ></textarea>
                 </label>
 
                 <div class="mt-6 border border-ink-950/10 p-4">
-                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">Photo</p>
+                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950/50">{{ t('admin.characters.photo') }}</p>
                   <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div class="h-24 w-24 shrink-0 overflow-hidden rounded-full bg-ink-100">
-                      <img v-if="characterForm.image" :src="characterForm.image" alt="Photo preview" class="h-full w-full object-cover" />
+                      <img v-if="characterForm.image" :src="characterForm.image" :alt="t('admin.characters.photoPreviewAlt')" class="h-full w-full object-cover" />
                       <div v-else class="flex h-full w-full items-center justify-center text-ink-950/30">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -1438,11 +1449,11 @@ watch(search, (v) => {
                     </div>
                     <div class="flex-1">
                       <label class="inline-flex cursor-pointer border border-ink-950/30 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-ink-950 transition-colors duration-300 hover:border-ink-950">
-                        {{ uploading ? 'Processing…' : 'Choose photo' }}
+                        {{ uploading ? t('admin.editor.processing') : t('admin.characters.choosePhoto') }}
                         <input type="file" accept="image/*" class="hidden" :disabled="uploading" @change="onCharacterImageSelected" />
                       </label>
                       <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-ink-950/35">
-                        Square image recommended. Stored inside the character.
+                        {{ t('admin.characters.photoHint') }}
                       </p>
                     </div>
                   </div>
@@ -1458,13 +1469,13 @@ watch(search, (v) => {
                     :disabled="saving"
                     class="bg-ink-950 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800 disabled:opacity-50"
                   >
-                    {{ saving ? 'Saving…' : 'Save character' }}
+                    {{ saving ? t('admin.editor.saving') : t('admin.characters.save') }}
                   </button>
                   <button
                     @click="cancelCharacterForm"
                     class="border border-ink-950/20 px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] text-ink-950/60 transition-colors duration-300 hover:border-ink-950 hover:text-ink-950"
                   >
-                    Cancel
+                    {{ t('admin.editor.cancel') }}
                   </button>
                 </div>
               </div>

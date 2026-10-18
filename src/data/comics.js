@@ -15,6 +15,7 @@ export const comics = [
     status: 'Available',
     author: 'Angello Aponte',
     description: 'The first installment of the saga. An origin that changes the rules of the game, page after page.',
+    descriptionEs: 'La primera entrega de la saga. Un origen que cambia las reglas del juego, página a página.',
     variant: 'burst',
     featured: true,
   },
@@ -29,6 +30,7 @@ export const comics = [
     status: 'Available',
     author: 'Angello Aponte',
     description: 'Ink that bleeds color. A violent story about creation and its consequences.',
+    descriptionEs: 'Tinta que sangra color. Una historia violenta sobre la creación y sus consecuencias.',
     variant: 'diag',
   },
   {
@@ -42,6 +44,7 @@ export const comics = [
     status: 'Limited Edition',
     author: 'Angello Aponte',
     description: 'Zero errors. An obsessive thriller about perfection and the cracks no one wants to see.',
+    descriptionEs: 'Cero errores. Un thriller obsesivo sobre la perfección y las grietas que nadie quiere ver.',
     variant: 'rings',
   },
   {
@@ -55,6 +58,7 @@ export const comics = [
     status: 'Sold Out',
     author: 'Angello Aponte',
     description: 'Nothing to lose. The closing of an era, panel by panel, ink by ink.',
+    descriptionEs: 'Nada que perder. El cierre de una era, viñeta a viñeta, tinta a tinta.',
     variant: 'scan',
   },
   {
@@ -68,6 +72,7 @@ export const comics = [
     status: 'Coming Soon',
     author: 'Angello Aponte',
     description: 'Night shift. The ones in charge when the city lights go out.',
+    descriptionEs: 'Turno nocturno. Los que mandan cuando se apagan las luces de la ciudad.',
     variant: 'grid',
   },
   {
@@ -81,6 +86,7 @@ export const comics = [
     status: 'Coming Soon',
     author: 'Angello Aponte',
     description: 'Ink-powered engine. Machines, grease, and a city on the brink.',
+    descriptionEs: 'Motor a tinta. Máquinas, grasa y una ciudad al borde del colapso.',
     variant: 'noise',
   },
 ]

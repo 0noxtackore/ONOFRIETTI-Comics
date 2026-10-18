@@ -21,21 +21,28 @@ const comicSlug = ref(null)
 
 function parseRoute() {
   const path = window.location.pathname
-  const adminMatch = path.match(/^\/admin(?:\/(.+))?$/)
+  const adminMatch = path.match(/^\/admin\/edit\/(.+)$/)
   if (adminMatch) {
     isAdmin.value = true
-    const slug = adminMatch[1]
-    if (!slug || slug === 'new') {
-      adminAction.value = 'new'
-      adminSlug.value = null
-    } else {
-      adminAction.value = 'edit'
-      adminSlug.value = slug
-    }
+    adminAction.value = 'edit'
+    adminSlug.value = adminMatch[1]
   } else {
-    isAdmin.value = false
-    adminAction.value = null
-    adminSlug.value = null
+    const adminMatch2 = path.match(/^\/admin(?:\/(.+))?$/)
+    if (adminMatch2) {
+      isAdmin.value = true
+      const slug = adminMatch2[1]
+      if (!slug || slug === 'new') {
+        adminAction.value = 'new'
+        adminSlug.value = null
+      } else {
+        adminAction.value = 'edit'
+        adminSlug.value = slug
+      }
+    } else {
+      isAdmin.value = false
+      adminAction.value = null
+      adminSlug.value = null
+    }
   }
   isComicsPage.value = path === '/comics'
   const m = path.match(/^\/comics\/(.+)$/)

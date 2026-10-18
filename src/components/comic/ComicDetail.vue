@@ -4,11 +4,14 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { fetchComicBySlug, fetchComics } from '../../services/comicsService'
 import { getSeriesById } from '../../services/seriesService'
 import { onAdminAuth } from '../../firebase/auth'
+import { useI18n } from '../../i18n'
 
 const props = defineProps({
   slug: { type: String, required: true },
 })
 const emit = defineEmits(['close'])
+
+const { t, tStatus, locale } = useI18n()
 
 const comic = ref(null)
 const loading = ref(true)
@@ -17,6 +20,16 @@ const added = ref(false)
 const related = ref([])
 const series = ref(null)
 const isAdmin = ref(false)
+
+// Descripción a mostrar: usa la versión en español si existe y el idioma es 'es'.
+const displayDescription = computed(() => {
+  const c = comic.value
+  if (!c) return ''
+  if (locale.value === 'es' && typeof c.description === 'string' && c.descriptionEs) {
+    return c.descriptionEs
+  }
+  return c.description
+})
 
 const isAvailable = computed(() => ['Available', 'Limited Edition'].includes(comic.value?.status))
 const discountedPrice = computed(() => {
@@ -117,12 +130,12 @@ watch(() => props.slug, load)
     <!-- No encontrado -->
     <div v-else-if="!comic" class="flex min-h-screen items-center justify-center p-10">
       <div class="text-center">
-        <p class="text-sm uppercase tracking-[0.25em] text-ink-400">Comic not found</p>
+        <p class="text-sm uppercase tracking-[0.25em] text-ink-400">{{ t('detail.notFound') }}</p>
         <a
           href="/"
           class="mt-6 inline-block rounded-lg bg-ink-950 px-8 py-3 text-xs font-bold uppercase tracking-[0.25em] text-white transition-colors duration-300 hover:bg-ink-800"
         >
-          Back to Home
+          {{ t('detail.backHome') }}
         </a>
       </div>
     </div>
@@ -140,7 +153,7 @@ watch(() => props.slug, load)
             <div v-if="series && series.logo" class="mb-6">
               <img
                 :src="series.logo"
-                :alt="`Logo of ${series.name}`"
+                :alt="t('detail.logoAlt', { name: series.name })"
                 loading="lazy"
                 class="h-40 w-auto object-contain drop-shadow-lg md:h-48"
               />
@@ -153,15 +166,15 @@ watch(() => props.slug, load)
 
               <!-- Issue Number -->
               <p class="font-display text-xl font-black uppercase text-white md:text-2xl">
-                ISSUE {{ comic.issue }}
+                {{ t('detail.issue', { number: comic.issue }) }}
               </p>
             </div>
 
             <!-- Comic Info -->
               <div class="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[11px] uppercase tracking-[0.15em] text-white/50 lg:justify-start">
-              <span>Author: {{ comic.author }}</span>
-              <span>Year: {{ comic.year }}</span>
-              <span>Pages: {{ comic.pages || '—' }}</span>
+              <span>{{ t('detail.author', { author: comic.author }) }}</span>
+              <span>{{ t('detail.year', { year: comic.year }) }}</span>
+              <span>{{ t('detail.pages', { pages: comic.pages || '—' }) }}</span>
             </div>
 
             <!-- Price -->
@@ -194,7 +207,7 @@ watch(() => props.slug, load)
               <svg v-else viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true">
                 <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
               </svg>
-              {{ isAvailable ? (added ? 'Added!' : 'Buy') : comic.status }}
+              {{ isAvailable ? (added ? t('detail.added') : t('detail.buy')) : tStatus(comic.status) }}
             </button>
           </div>
 
@@ -203,7 +216,7 @@ watch(() => props.slug, load)
             <div class="overflow-hidden shadow-2xl shadow-black/50">
               <img
                 :src="comic.poster || '/images/no-image.webp'"
-                :alt="`Cover of ${comic.title}`"
+                :alt="t('cover.alt', { title: comic.title })"
                 loading="lazy"
                 class="w-96 object-cover md:w-[28rem]"
               />
@@ -213,15 +226,15 @@ watch(() => props.slug, load)
 
         <!-- Comic Details Section -->
         <section class="mt-16 border-t border-white/10 pt-16 md:mt-24">
-          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">Comic Details</h2>
+          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50">{{ t('detail.comicDetails') }}</h2>
 
           <div class="mt-6 flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
             <!-- Description -->
-            <div v-if="comic.description" class="flex-1">
-              <div v-if="Array.isArray(comic.description)" class="space-y-8">
-                <div v-for="(block, index) in comic.description" :key="index" class="flex flex-col gap-4 md:flex-row md:items-center">
+            <div v-if="displayDescription" class="flex-1">
+              <div v-if="Array.isArray(displayDescription)" class="space-y-8">
+                <div v-for="(block, index) in displayDescription" :key="index" class="flex flex-col gap-4 md:flex-row md:items-center">
                   <div class="relative w-full md:w-1/2 overflow-hidden border border-white/20 bg-white/5" :class="block.imagePosition === 'left' ? 'order-2' : 'order-1'">
-                    <img v-if="block.image" :src="block.image" :alt="`Description block ${index + 1}`" :style="{ aspectRatio: block.aspectRatio || '16/9' }" class="w-full object-cover" />
+                    <img v-if="block.image" :src="block.image" :alt="t('detail.blockAlt', { number: index + 1 })" :style="{ aspectRatio: block.aspectRatio || '16/9' }" class="w-full object-cover" />
                   </div>
                   <div class="w-full md:w-1/2" :class="block.imagePosition === 'left' ? 'order-1' : 'order-2'">
                     <div class="p-6 md:p-8">
@@ -233,7 +246,7 @@ watch(() => props.slug, load)
                 </div>
               </div>
               <p v-else class="max-w-3xl text-lg leading-relaxed text-white/70 md:text-xl">
-                {{ comic.description }}
+                {{ displayDescription }}
               </p>
             </div>
 
@@ -258,7 +271,7 @@ watch(() => props.slug, load)
                   <span class="text-[10px] uppercase tracking-wider text-white/50">%</span>
                 </div>
               </div>
-              <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Rating</span>
+              <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">{{ t('detail.rating') }}</span>
             </div>
           </div>
         </section>
@@ -267,7 +280,7 @@ watch(() => props.slug, load)
 
         <!-- More from this series -->
         <section v-if="related.length" class="mx-auto max-w-6xl px-8 py-16 md:px-16 md:py-24">
-          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/50">More from this series</h2>
+          <h2 class="text-[10px] font-bold uppercase tracking-[0.4em] text-ink-950/50">{{ t('detail.moreFrom') }}</h2>
           <h3 class="font-display mt-2 text-3xl font-black uppercase tracking-tight text-ink-950">{{ comic.title }}</h3>
 
           <div class="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
@@ -275,14 +288,14 @@ watch(() => props.slug, load)
               <div class="overflow-hidden border border-ink-950/10 bg-white transition-all duration-300 group-hover:border-ink-950 group-hover:shadow-lg group-hover:shadow-ink-950/5">
                 <img
                   :src="r.poster || '/images/no-image.webp'"
-                  :alt="`Cover of ${r.title}`"
+                  :alt="t('cover.alt', { title: r.title })"
                   loading="lazy"
                   class="aspect-[1920/2951] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
               </div>
               <p class="mt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-950/50">{{ r.year }}</p>
               <h4 class="font-display mt-1 text-sm font-black uppercase tracking-tight text-ink-950">{{ r.title }}</h4>
-              <p class="mt-0.5 text-xs text-ink-950/40">Issue {{ r.issue }}</p>
+              <p class="mt-0.5 text-xs text-ink-950/40">{{ t('detail.issueShort', { number: r.issue }) }}</p>
             </a>
           </div>
         </section>
